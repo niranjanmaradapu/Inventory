@@ -16,4 +16,6 @@ public interface BarcodeRepo extends JpaRepository<Barcode, Long> {
 
 	Barcode findByBarcodeId(Long barcodeId);
 
+	Optional<Barcode> findByAttr1AndAttr2AndAttr3(String attr1, String attr2, String attr3);
+
 }

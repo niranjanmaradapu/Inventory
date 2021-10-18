@@ -16,6 +16,10 @@ public interface ProductItemRepo extends JpaRepository<ProductItem, Long> {
 	ProductItem findByNameAndUomAndCostPriceAndListPrice(String name, String uom, float costPrice, float listPrice);
 
 	Optional<ProductItem> findByName(String name);
+
+	//Optional<ProductItem> findByBarcodeId(Long barcodeId);
+
+	Optional<ProductItem> findByBarcodeBarcodeId(Long barcodeId);
    
 	//ProductItem findByAttr1AndAttr2AndAttr3(String attr1, String attr2, String attr3);
 
