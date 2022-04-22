@@ -6,6 +6,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -99,15 +101,14 @@ public class ProductTextileController {
 	}
     
     
-    @ApiOperation(value = "getAllBarcodeTextiles",notes="fetch list of barcodes for the textile ", response = ProductTextileVo.class)
-    @ApiResponses(value = {
-	        @ApiResponse(code = 500, message = "Server error"),
-	        @ApiResponse(code = 200, message = "Successful retrieval",
-	            response = ProductTextileVo.class, responseContainer = "List") })
+    @ApiOperation(value = "getAllBarcodeTextiles", notes = "fetch list of barcodes for the textile ", response = ProductTextileVo.class)
+	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
+			@ApiResponse(code = 200, message = "Successful retrieval", response = ProductTextileVo.class, responseContainer = "List") })
 	@PostMapping("/getAllBarcodeTextiles")
-	public GateWayResponse<?> getAllBarcodes(@RequestBody SearchFilterVo vo) {
+	public GateWayResponse<?> getAllBarcodes(Pageable pageable, @RequestBody SearchFilterVo vo) {
 		log.info("Recieved request to getAllBarcodes");
-		List<ProductTextileVo> allBarcodes = productTextileService.getAllBarcodes(vo);
+
+		Page<ProductTextileVo> allBarcodes = productTextileService.getAllBarcodes(vo, pageable);
 		return new GateWayResponse<>("fetching all barcode textile details sucessfully", allBarcodes);
 	}
     

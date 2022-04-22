@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -62,5 +64,17 @@ public interface ProductTextileRepo extends JpaRepository<ProductTextile, Long> 
 	ProductTextile findByBarcodeAndStatus(String barcode, ProductStatus status);
 
 	ProductTextile findByBarcodeAndSellingTypeCode(String barcode, ProductEnum productbundle);
+
+	Page<ProductTextile> findByCreationDateBetweenAndStatusAndStoreIdOrderByLastModifiedDateAsc(LocalDate fromDate,
+			LocalDate toDate, ProductStatus status, Long storeId, Pageable pageable);
+
+	Page<ProductTextile> findByCreationDateBetweenAndBarcodeAndStoreIdOrderByLastModifiedDateAsc(LocalDate fromDate,
+			LocalDate toDate, String barcode, Long storeId, Pageable pageable);
+
+	Page<ProductTextile> findByBarcodeAndStoreId(String barcode, Long storeId, Pageable pageable);
+
+	Page<ProductTextile> findByStoreIdAndStatus(Long storeId, ProductStatus status, Pageable pageable);
+
+	Page<ProductTextile> findByStatus(ProductStatus status, Pageable pageable);
 
 }

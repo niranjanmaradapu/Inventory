@@ -14,6 +14,8 @@ import javax.persistence.PersistenceContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.inventory.commons.NatureOfTransaction;
@@ -315,33 +317,23 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 	}
 
 	@Override
-	public List<ProductTextileVo> getAllBarcodes(SearchFilterVo vo) {
+	public Page<ProductTextileVo> getAllBarcodes(SearchFilterVo vo, Pageable pageable) {
 		log.debug("debugging getAllBarcodes():"+vo);
-		List<ProductTextile> barcodeDetails = new ArrayList<>();
+		Page<ProductTextile> barcodeDetails = null;
 		ProductStatus status = ProductStatus.ENABLE;
-		List<ProductTextile> stores = productTextileRepo.findByStoreIdAndStatus(vo.getStoreId(), status);
 		
-		/*
-		 * if(vo.getToDate().isBefore(vo.getFromDate())){ throw new
-		 * InvalidDateException("To Date is greater than From date"); }
-		 */
-		
+		//Page<ProductTextile> stores = productTextileRepo.findByStoreIdAndStatus(vo.getStoreId(), status, pageable);
 		/*
 		 * using dates and storeId
 		 */
-		if (stores != null) {
+		
 
-			if (vo.getFromDate() != null && (vo.getToDate() == null)
-					&& (vo.getBarcode() == null || vo.getBarcode() == "") && vo.getStoreId() != null) {
-
-				barcodeDetails = productTextileRepo.findByCreationDateAndStatusAndStoreId(vo.getFromDate(), status,
-						vo.getStoreId());
-			} else if (vo.getFromDate() != null && vo.getToDate() != null
-					&& (vo.getBarcode() == null || vo.getBarcode() == "") && vo.getStoreId() != null) {
+			if (vo.getFromDate() != null && vo.getToDate() != null && (vo.getBarcode() == null || vo.getBarcode() == "")
+					&& vo.getStoreId() != null) {
 
 				barcodeDetails = productTextileRepo
 						.findByCreationDateBetweenAndStatusAndStoreIdOrderByLastModifiedDateAsc(vo.getFromDate(),
-								vo.getToDate(), status, vo.getStoreId());
+								vo.getToDate(), status, vo.getStoreId(), pageable);
 			}
 
 			/*
@@ -351,22 +343,22 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 			else if (vo.getFromDate() != null && vo.getToDate() != null && vo.getBarcode() != null
 					&& vo.getStoreId() != null) {
 
+				// BarcodeTextile barOpt = barcodeTextileRepo.findByBarcode(vo.getBarcode());
 				barcodeDetails = productTextileRepo
 						.findByCreationDateBetweenAndBarcodeAndStoreIdOrderByLastModifiedDateAsc(vo.getFromDate(),
-								vo.getToDate(), vo.getBarcode(), vo.getStoreId());
+								vo.getToDate(), vo.getBarcode(), vo.getStoreId(), pageable);
 			}
 			/*
 			 * using barcode and storeId
 			 */
 			else if (vo.getFromDate() == null && vo.getToDate() == null && (!vo.getBarcode().isEmpty())
 					&& vo.getStoreId() != null) {
-				barcodeDetails = productTextileRepo.findByBarcodeAndStoreId(vo.getBarcode(), vo.getStoreId());
-			}
-			/*
-			 * using storeId
-			 */
+				barcodeDetails = productTextileRepo.findByBarcodeAndStoreId(vo.getBarcode(), vo.getStoreId(), pageable);
+			} /*
+				 * using storeId
+				 */
 			else if (vo.getStoreId() != null) {
-				barcodeDetails = productTextileRepo.findByStoreIdAndStatus(vo.getStoreId(), status);
+				barcodeDetails = productTextileRepo.findByStoreIdAndStatus(vo.getStoreId(), status, pageable);
 			}
 
 			/*
@@ -374,41 +366,44 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 			 */
 			else if ((vo.getFromDate() == null) && (vo.getToDate() == null) && (vo.getBarcode() == "")
 					&& vo.getStoreId() == null) {
-				barcodeDetails = productTextileRepo.findByStatus(status);
+				barcodeDetails = productTextileRepo.findByStatus(status, pageable);
 			}
-			if (barcodeDetails.isEmpty()) {
+
+			if (barcodeDetails == null || !barcodeDetails.hasContent()) {
 				log.error("No record found with given information");
 				throw new RecordNotFoundException("No record found with given information");
 			}
-
-			List<ProductTextileVo> barcodeList = productTextileMapper.EntityToVo(barcodeDetails);
-			barcodeList.stream().forEach(v -> {
-				List<ProductTransaction> transact = new ArrayList<>();
-				transact = productTransactionRepo.findAllByBarcodeId(v.getBarcode());
-				transact.stream().forEach(t -> {
-					if (t.getEffectingTable().equals("product textile table")) {
-						t = productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(v.getBarcode(),
-								"product textile table", true);
-						v.setQty(t.getQuantity());
-
-						v.setValue(t.getQuantity() * v.getItemMrp());
-					} else if (t.getEffectingTable().equals("Adjustments")) {
-						t = productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(v.getBarcode(),
-								"Adjustments", true);
-						v.setQty(t.getQuantity());
-
-						v.setValue(t.getQuantity() * v.getItemMrp());
-					}
-				});
-			});
-
+			
 			log.warn("we are checking if barcode textile is fetching...");
 			log.info("fetching all barcode textile details");
-			return barcodeList;
-		} else {
-			throw new RecordNotFoundException("store record is not found:" + vo.getStoreId());
-		}
+			return barcodeDetails.map(barcode -> maptToVo(barcode));
+			
 	}
+	
+	private ProductTextileVo maptToVo(ProductTextile barcode)
+	{
+	ProductTextileVo productTextileVO = productTextileMapper.EntityToVo(barcode);
+				List<ProductTransaction> transact = new ArrayList<>();
+				transact = productTransactionRepo.findAllByBarcodeId(barcode.getBarcode());
+				transact.stream().forEach(t -> {
+					if (t.getEffectingTable().equals("product textile table")) {
+						t = productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(barcode.getBarcode(),
+								"product textile table", true);
+						productTextileVO.setQty(t.getQuantity());
+
+						productTextileVO.setValue(t.getQuantity() * barcode.getItemMrp());
+					} else if (t.getEffectingTable().equals("Adjustments")) {
+						t = productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(
+								productTextileVO.getBarcode(), "Adjustments", true);
+						productTextileVO.setQty(t.getQuantity());
+
+						productTextileVO.setValue(t.getQuantity() * productTextileVO.getItemMrp());
+					}
+
+				});
+				return productTextileVO;
+
+			}
 
 	@Override
 	public void inventoryUpdate(List<InventoryUpdateVo> request) {
@@ -655,13 +650,11 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 		
 		if (barStore != null) {
 			
-			if (vo.getFromDate() != null && (vo.getToDate() == null)
-					&& (vo.getBarcode() == null || vo.getBarcode() == "") && vo.getStoreId() != null) {
 
-				barcodeDetails = productTextileRepo.findByCreationDateAndStatusAndStoreId(vo.getFromDate(), status,
-						vo.getStoreId());
-			}
-			else if (vo.getFromDate() != null && vo.getToDate() == null && (vo.getBarcode() == null || vo.getBarcode() == "")
+			/*
+			 * using from date and storeId
+			 */
+			if (vo.getFromDate() != null && vo.getToDate() == null && (vo.getBarcode() == null || vo.getBarcode() == "")
 					&& vo.getStoreId() != null) {
 
 				barcodeDetails = productTextileRepo.findByCreationDateAndStatusAndStoreId(vo.getFromDate(), status,
@@ -673,7 +666,7 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 			 * using dates and storeId
 			 */
 
-			if (vo.getFromDate() != null && vo.getToDate() != null && (vo.getBarcode() == null || vo.getBarcode() == "")
+			else if (vo.getFromDate() != null && vo.getToDate() != null && (vo.getBarcode() == null || vo.getBarcode() == "")
 					&& vo.getStoreId() != null) {
 
 				barcodeDetails = productTextileRepo
