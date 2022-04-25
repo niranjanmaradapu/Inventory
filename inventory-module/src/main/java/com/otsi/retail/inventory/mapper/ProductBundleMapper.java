@@ -44,7 +44,7 @@ public class ProductBundleMapper {
 			productTextileVo.setBarcode(p.getBarcode());
 			productTextileVo.setEmpId(p.getEmpId());
 			productTextileVo.setParentBarcode(p.getBarcode());
-			productTextileVo.setFromDate(p.getCreationDate());
+			productTextileVo.setFromDate(p.getCreatedDate());
 			productTextileVo.setToDate(p.getLastModifiedDate());
 			productTextileVo.setStatus(p.getStatus());
 			productTextileVo.setName(p.getName());

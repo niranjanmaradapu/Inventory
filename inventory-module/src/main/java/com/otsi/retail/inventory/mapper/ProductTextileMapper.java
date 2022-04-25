@@ -23,7 +23,7 @@ public class ProductTextileMapper {
 
 		BeanUtils.copyProperties(dto, vo);
 		vo.setEmpId(dto.getEmpId());
-		vo.setFromDate(dto.getCreationDate());
+		vo.setFromDate(dto.getCreatedDate());
 		vo.setToDate(dto.getLastModifiedDate());
 		vo.setBarcode(dto.getBarcode());
 		vo.setDivision(dto.getDivision());
@@ -61,8 +61,6 @@ public class ProductTextileMapper {
 		BeanUtils.copyProperties(vo, dto);
 		dto.setCostPrice(vo.getCostPrice());
 		dto.setEmpId(vo.getEmpId());
-		dto.setCreationDate(LocalDate.now());
-		dto.setLastModifiedDate(LocalDate.now());
 		dto.setStatus(ProductStatus.ENABLE);
 		dto.setName(vo.getName());
 		dto.setBarcode(vo.getBarcode());

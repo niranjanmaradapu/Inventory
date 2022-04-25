@@ -27,8 +27,8 @@ public class ProductTransactionMapper {
 		vo.setQuantity(dto.getQuantity());
 		vo.setMasterFlag(dto.isMasterFlag());
 		vo.setNatureOfTransaction(dto.getNatureOfTransaction());
-		vo.setCreationDate(dto.getCreationDate());
-		vo.setLastModified(dto.getLastModified());
+		vo.setCreatedDate(dto.getCreatedDate());
+		vo.setLastModifiedDate(dto.getLastModifiedDate());
 		vo.setStoreId(dto.getStoreId());
 		return vo;
 
