@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
 import com.otsi.retail.inventory.commons.ProductEnum;
 import com.otsi.retail.inventory.commons.ProductStatus;
 import com.otsi.retail.inventory.model.ProductTextile;
@@ -85,6 +86,7 @@ public interface ProductTextileRepo extends JpaRepository<ProductTextile, Long> 
 
 	Page<ProductTextile> findByEmpIdAndStatusAndStoreId(String empId, ProductStatus status, Long storeId,
 			Pageable pageable);
+
 
 
 
