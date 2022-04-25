@@ -1,5 +1,6 @@
 package com.otsi.retail.inventory.service;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -52,6 +55,7 @@ import com.otsi.retail.inventory.repo.ProductItemRepo;
 import com.otsi.retail.inventory.repo.ProductTextileRepo;
 import com.otsi.retail.inventory.repo.ProductTransactionReRepo;
 import com.otsi.retail.inventory.repo.ProductTransactionRepo;
+import com.otsi.retail.inventory.util.ExcelService;
 import com.otsi.retail.inventory.utils.DateConverters;
 import com.otsi.retail.inventory.vo.AdjustmentsVo;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
@@ -96,6 +100,9 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private ExcelService excelService;
 
 	@Override
 	public String addBarcodeTextile(ProductTextileVo textileVo) {
@@ -118,7 +125,7 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 		ProductTransaction saveTrans = productTransactionRepo.save(prodTrans);
 		log.warn("we are checking if textile is saved...");
 		log.info("after saving textile details");
-		return "barcode textile saved successfully:" + textileSave.getBarcode();
+		return textileSave.getBarcode();
 	}
 
 	protected String getSaltString() {
@@ -839,6 +846,19 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 			return vo;
 		} else
 			throw new RecordNotFoundException("No record found with parentBarcode:" + parentBarcode);
+	}
+	
+	@Override
+	public void addBulkProducts(MultipartFile multipartFile, Long storeId)
+			throws InstantiationException, IllegalAccessException, IOException {
+		List<ProductTextileVo> products = excelService.readExcel(multipartFile.getInputStream(),
+				ProductTextileVo.class);
+		if (CollectionUtils.isNotEmpty(products)) {
+			products.forEach(product -> {
+				product.setStoreId(storeId);
+				addBarcodeTextile(product);
+			});
+		}
 	}
 
 }
