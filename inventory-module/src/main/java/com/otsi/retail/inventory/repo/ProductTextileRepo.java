@@ -87,6 +87,8 @@ public interface ProductTextileRepo extends JpaRepository<ProductTextile, Long> 
 	Page<ProductTextile> findByEmpIdAndStatusAndStoreId(String empId, ProductStatus status, Long storeId,
 			Pageable pageable);
 
+	Page<ProductTextile> findByStoreId(Long storeId, Pageable pageable);
+
 
 
 

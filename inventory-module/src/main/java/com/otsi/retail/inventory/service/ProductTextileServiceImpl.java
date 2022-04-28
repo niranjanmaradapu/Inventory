@@ -10,10 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
-
+import java.io.IOException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -53,11 +54,13 @@ import com.otsi.retail.inventory.repo.ProductTextileRepo;
 import com.otsi.retail.inventory.repo.ProductTransactionReRepo;
 import com.otsi.retail.inventory.repo.ProductTransactionRepo;
 import com.otsi.retail.inventory.utils.DateConverters;
+import com.otsi.retail.inventory.utils.ExcelService;
 import com.otsi.retail.inventory.vo.AdjustmentsVo;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
 import com.otsi.retail.inventory.vo.ProductTextileVo;
 import com.otsi.retail.inventory.vo.SearchFilterVo;
 import com.otsi.retail.inventory.vo.UserDetailsVo;
+import org.apache.commons.collections4.CollectionUtils;
 
 @Component
 public class ProductTextileServiceImpl implements ProductTextileService {
@@ -93,6 +96,9 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 
 	@Autowired
 	private Config config;
+
+	@Autowired
+	private ExcelService excelService;
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -329,9 +335,9 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 				}
 				// Map<String, Integer> uvs = userDetailsVo.map.forEach((key, value) ->
 				// productTextileVO.setEmpName(x.getUserName()));
-
-				userDetailsVo.stream().forEach(x -> vo.setEmpName(x.getUserName()));
-
+				if (userDetailsVo != null) {
+					userDetailsVo.stream().forEach(x -> vo.setEmpName(x.getUserName()));
+				}
 				List<ProductTransaction> transact = new ArrayList<>();
 				transact = productTransactionRepo.findAllByBarcodeId(vo.getBarcode());
 				transact.stream().forEach(t -> {
@@ -429,6 +435,7 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 
 	private ProductTextileVo mapToVo(ProductTextile barcode) {
 		ProductTextileVo productTextileVO = productTextileMapper.EntityToVo(barcode);
+
 		List<ProductTextile> empIds = productTextileRepo.findAllByEmpId(productTextileVO.getEmpId());
 		List<Long> userIds = empIds.stream().map(x -> x.getEmpId()).distinct().collect(Collectors.toList());
 		List<UserDetailsVo> userDetailsVo = new ArrayList<>();
@@ -436,17 +443,19 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 			userDetailsVo = getUsersForGivenId(userIds);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
-		}
-		// Map<String, Integer> uvs = userDetailsVo.map.forEach((key, value) ->
-		// productTextileVO.setEmpName(x.getUserName()));
-
+		} // Map<String, Integer> uvs = //
 		/*
+		 * userDetailsVo.map.forEach((key, value) -> // //
+		 * productTextileVO.setEmpName(x.getUserName()));
+		 * 
 		 * Map<String, Integer> u = new HashMap<>(); userDetailsVo.stream().forEach(x ->
 		 * { u.add(x.getUserName(), x.getUserId()); });
 		 */
-
-		userDetailsVo.stream().forEach(x -> productTextileVO.setEmpName(x.getUserName()));
-
+		if (userDetailsVo != null) {
+			userDetailsVo.stream().forEach(x -> {
+				productTextileVO.setEmpName(x.getUserName());
+			});
+		}
 		List<ProductTransaction> transact = new ArrayList<>();
 		transact = productTransactionRepo.findAllByBarcodeId(barcode.getBarcode());
 		transact.stream().forEach(t -> {
@@ -546,91 +555,102 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 	}
 
 	@Override
-	public Page<AdjustmentsVo> getAllAdjustments(SearchFilterVo vo, Pageable pageable) {
-		log.info("Received request to getAllAdjustments:" + vo);
+	public Page<AdjustmentsVo> getAllAdjustments(SearchFilterVo searchFilterVo, Pageable pageable) {
+		log.info("Received request to getAllAdjustments:" + searchFilterVo);
 		Page<Adjustments> adjustmentDetails = null;
-		Page<ProductTransaction> transactStore = productTransactionRepo.findAllByStoreId(vo.getStoreId(), pageable);
-		if (transactStore != null) {
+		// Page<ProductTransaction> transactStore =
+		// productTransactionRepo.findAllByStoreId(searchFilterVo.getStoreId(),
+		// pageable);
 
-			if (vo.getFromDate() != null && vo.getToDate() == null && (vo.getCurrentBarcodeId() == "")
-					&& vo.getStoreId() != null) {
-				LocalDateTime fromTime = DateConverters.convertLocalDateToLocalDateTime(vo.getFromDate());
-				LocalDateTime fromTime1 = DateConverters.convertToLocalDateTimeMax(vo.getFromDate());
-				adjustmentDetails = adjustmentRepo.findByCreatedDateBetweenAndComments(fromTime, fromTime1, "rebar",
-						pageable);
+		Page<ProductTextile> productTextile = productTextileRepo.findByStoreId(searchFilterVo.getStoreId(), pageable);
+
+		if (productTextile != null) {
+			List<String> barcodes = productTextile.stream().map(barcode -> barcode.getBarcode())
+					.collect(Collectors.toList());
+			if (searchFilterVo.getFromDate() != null && searchFilterVo.getToDate() == null
+					&& StringUtils.isEmpty(searchFilterVo.getCurrentBarcodeId())
+					&& searchFilterVo.getStoreId() != null) {
+				LocalDateTime fromTime = DateConverters.convertLocalDateToLocalDateTime(searchFilterVo.getFromDate());
+				LocalDateTime toTime = DateConverters.convertToLocalDateTimeMax(searchFilterVo.getFromDate());
+				adjustmentDetails = adjustmentRepo.findByCreatedDateBetweenAndCommentsAndCurrentBarcodeIdIn(fromTime,
+						toTime, "rebar", barcodes, pageable);
 			}
 			/*
 			 * using dates with storeId
 			 */
-			else if (vo.getFromDate() != null && vo.getToDate() != null && (vo.getCurrentBarcodeId() == "")
-					&& vo.getStoreId() != null) {
-				LocalDateTime fromTime = DateConverters.convertLocalDateToLocalDateTime(vo.getFromDate());
-				LocalDateTime toTime = DateConverters.convertToLocalDateTimeMax(vo.getToDate());
-				adjustmentDetails = adjustmentRepo.findByCreatedDateBetweenAndCommentsOrderByLastModifiedDateAsc(
-						fromTime, toTime, "rebar", pageable);
+			else if (searchFilterVo.getFromDate() != null && searchFilterVo.getToDate() != null
+					&& (searchFilterVo.getCurrentBarcodeId() == "") && searchFilterVo.getStoreId() != null) {
+				LocalDateTime fromTime = DateConverters.convertLocalDateToLocalDateTime(searchFilterVo.getFromDate());
+				LocalDateTime toTime = DateConverters.convertToLocalDateTimeMax(searchFilterVo.getToDate());
+				adjustmentDetails = adjustmentRepo
+						.findByCreatedDateBetweenAndCommentsAndCurrentBarcodeIdInOrderByLastModifiedDateAsc(fromTime,
+								toTime, "rebar", barcodes, pageable);
 
 			}
 
 			/*
 			 * using dates and currentBarcodeId and storeId
 			 */
-			else if (vo.getFromDate() != null && vo.getToDate() != null && vo.getCurrentBarcodeId() != null
-					&& vo.getStoreId() != null) {
-				Adjustments adjustOpt = adjustmentRepo.findByCurrentBarcodeId(vo.getCurrentBarcodeId());
+			else if (searchFilterVo.getFromDate() != null && searchFilterVo.getToDate() != null
+					&& searchFilterVo.getCurrentBarcodeId() != null && searchFilterVo.getStoreId() != null) {
+				Adjustments adjustOpt = adjustmentRepo.findByCurrentBarcodeId(searchFilterVo.getCurrentBarcodeId());
 				if (adjustOpt != null) {
-					LocalDateTime fromTime = DateConverters.convertLocalDateToLocalDateTime(vo.getFromDate());
-					LocalDateTime toTime = DateConverters.convertToLocalDateTimeMax(vo.getToDate());
+					LocalDateTime fromTime = DateConverters
+							.convertLocalDateToLocalDateTime(searchFilterVo.getFromDate());
+					LocalDateTime toTime = DateConverters.convertToLocalDateTimeMax(searchFilterVo.getToDate());
 					adjustmentDetails = adjustmentRepo
 							.findByCreatedDateBetweenAndCurrentBarcodeIdAndCommentsOrderByLastModifiedDateAsc(fromTime,
-									toTime, vo.getCurrentBarcodeId(), "rebar", pageable);
+									toTime, searchFilterVo.getCurrentBarcodeId(), "rebar", pageable);
 				} else {
-					log.error("No record found with given currentbarcodeId:" + vo.getCurrentBarcodeId());
+					log.error("No record found with given currentbarcodeId:" + searchFilterVo.getCurrentBarcodeId());
 					throw new RecordNotFoundException(
-							"No record found with given currentbarcodeId:" + vo.getCurrentBarcodeId());
+							"No record found with given currentbarcodeId:" + searchFilterVo.getCurrentBarcodeId());
 				}
 			}
 
 			/*
 			 * values with empty string
 			 */
-			else if (vo.getFromDate() == null && vo.getToDate() == null && vo.getCurrentBarcodeId() == ""
-					&& vo.getStoreId() == null) {
+			else if (searchFilterVo.getFromDate() == null && searchFilterVo.getToDate() == null
+					&& searchFilterVo.getCurrentBarcodeId() == "" && searchFilterVo.getStoreId() == null) {
 				adjustmentDetails = adjustmentRepo.findByComments("rebar", pageable);
 			}
 			/*
 			 * using storeId
 			 */
-			else if (vo.getFromDate() == null && vo.getToDate() == null && vo.getCurrentBarcodeId() == ""
-					&& vo.getStoreId() != null) {
-				List<Long> effectingId = transactStore.stream().map(e -> e.getEffectingTableId())
-						.collect(Collectors.toList());
-				adjustmentDetails = adjustmentRepo.findByAdjustmentIdInAndComments(effectingId, "rebar", pageable);
+			else if (searchFilterVo.getFromDate() == null && searchFilterVo.getToDate() == null
+					&& StringUtils.isEmpty(searchFilterVo.getCurrentBarcodeId())
+					&& searchFilterVo.getStoreId() != null) {
+				adjustmentDetails = adjustmentRepo.findByCommentsAndCurrentBarcodeIdIn("rebar", barcodes, pageable);
 			}
 
 			/*
 			 * using currentBarcodeId and storeId
 			 */
-			else if (vo.getFromDate() == null && vo.getToDate() == null && vo.getCurrentBarcodeId() != null
-					&& vo.getStoreId() != null) {
-				List<Long> effectingId = transactStore.stream().map(e -> e.getEffectingTableId())
-						.collect(Collectors.toList());
-				adjustmentDetails = adjustmentRepo.findByCurrentBarcodeIdAndAdjustmentIdInAndComments(
-						vo.getCurrentBarcodeId(), effectingId, "rebar", pageable);
+			else if (searchFilterVo.getFromDate() == null && searchFilterVo.getToDate() == null
+					&& searchFilterVo.getCurrentBarcodeId() != null && searchFilterVo.getStoreId() != null) {
+
+				adjustmentDetails = adjustmentRepo
+						.findByCurrentBarcodeIdAndComments(searchFilterVo.getCurrentBarcodeId(), "rebar", pageable);
 			}
+
 			if (adjustmentDetails.isEmpty()) {
 				log.error("No record found with given information");
 				throw new RecordNotFoundException("No record found with given information");
 			}
 		}
 
-		return adjustmentDetails.map(adjustment -> adjustmentMapToVo(adjustment));
+		if (adjustmentDetails.hasContent()) {
+			return adjustmentDetails.map(adjustment -> adjustmentMapToVo(adjustment));
+		}
+		return Page.empty();
 	}
 
 	private AdjustmentsVo adjustmentMapToVo(Adjustments adjustment) {
+
 		AdjustmentsVo adjustmentsVo = adjustmentMapper.EntityToVo(adjustment);
-		List<ProductTransaction> transact = null;
-		transact = productTransactionRepo.findAllByStoreId(adjustmentsVo.getStoreId());
-		transact.stream().forEach(s -> adjustmentsVo.setStoreId(s.getStoreId()));
+		ProductTextile productTextile = productTextileRepo.findByBarcode(adjustmentsVo.getCurrentBarcodeId());
+		adjustmentsVo.setStoreId(productTextile.getStoreId());
 		log.info("fetching all adjustment details..:" + adjustmentsVo);
 		return adjustmentsVo;
 
@@ -839,6 +859,19 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 			return vo;
 		} else
 			throw new RecordNotFoundException("No record found with parentBarcode:" + parentBarcode);
+	}
+
+	@Override
+	public void addBulkProducts(MultipartFile multipartFile, Long storeId)
+			throws InstantiationException, IllegalAccessException, IOException {
+		List<ProductTextileVo> products = excelService.readExcel(multipartFile.getInputStream(),
+				ProductTextileVo.class);
+		if (CollectionUtils.isNotEmpty(products)) {
+			products.forEach(product -> {
+				product.setStoreId(storeId);
+				addBarcodeTextile(product);
+			});
+		}
 	}
 
 }

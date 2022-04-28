@@ -20,8 +20,8 @@ public class AdjustmentMapper {
 		vo.setCreatedBy(dto.getCreatedBy());
 		vo.setCurrentBarcodeId(dto.getCurrentBarcodeId());
 		vo.setToBeBarcodeId(dto.getToBeBarcodeId());
-		vo.setFromDate(dto.getCreatedDate().toLocalDate());
-		vo.setToDate(dto.getLastModifiedDate().toLocalDate());
+		vo.setCreatedDate(dto.getCreatedDate());
+		vo.setLastModifiedDate(dto.getLastModifiedDate());
 		vo.setComments(dto.getComments());
 		return vo;
 

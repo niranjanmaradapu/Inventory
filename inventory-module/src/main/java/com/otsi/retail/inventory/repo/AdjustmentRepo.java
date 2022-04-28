@@ -15,13 +15,17 @@ public interface AdjustmentRepo extends JpaRepository<Adjustments, Long> {
 
 	Adjustments findByCurrentBarcodeId(String currentBarcodeId);
 
-	//List<Adjustments> findAllByAdjustmentId(Long adjustmentId);
+	// List<Adjustments> findAllByAdjustmentId(Long adjustmentId);
 
-	Page<Adjustments> findByCreatedDateBetweenAndComments(LocalDateTime fromTime, LocalDateTime fromTime1,
-			String string, Pageable pageable);
-
-	Page<Adjustments> findByCreatedDateBetweenAndCommentsOrderByLastModifiedDateAsc(LocalDateTime fromTime,
-			LocalDateTime toTime, String string, Pageable pageable);
+	/*
+	 * Page<Adjustments> findByCreatedDateBetweenAndComments(LocalDateTime fromTime,
+	 * LocalDateTime fromTime1, String string, Pageable pageable);
+	 */
+	/*
+	 * Page<Adjustments>
+	 * findByCreatedDateBetweenAndCommentsOrderByLastModifiedDateAsc(LocalDateTime
+	 * fromTime, LocalDateTime toTime, String string, Pageable pageable);
+	 */
 
 	Page<Adjustments> findByCreatedDateBetweenAndCurrentBarcodeIdAndCommentsOrderByLastModifiedDateAsc(
 			LocalDateTime fromTime, LocalDateTime toTime, String currentBarcodeId, String string, Pageable pageable);
@@ -33,8 +37,14 @@ public interface AdjustmentRepo extends JpaRepository<Adjustments, Long> {
 	Page<Adjustments> findByCurrentBarcodeIdAndAdjustmentIdInAndComments(String currentBarcodeId,
 			List<Long> effectingId, String string, Pageable pageable);
 
-	
+	Page<Adjustments> findByCreatedDateBetweenAndCommentsAndCurrentBarcodeIdIn(LocalDateTime fromTime,
+			LocalDateTime fromTime1, String string, List<String> barcodes, Pageable pageable);
 
-	
+	Page<Adjustments> findByCreatedDateBetweenAndCommentsAndCurrentBarcodeIdInOrderByLastModifiedDateAsc(
+			LocalDateTime fromTime, LocalDateTime toTime, String string, List<String> barcodes, Pageable pageable);
+
+	Page<Adjustments> findByCommentsAndCurrentBarcodeIdIn(String string, List<String> barcodes, Pageable pageable);
+
+	Page<Adjustments> findByCurrentBarcodeIdAndComments(String currentBarcodeId, String comments, Pageable pageable);
 
 }
