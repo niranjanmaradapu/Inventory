@@ -1,9 +1,13 @@
 package com.otsi.retail.inventory.repo;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
 import com.otsi.retail.inventory.model.Adjustments;
 
 @Repository
@@ -11,21 +15,36 @@ public interface AdjustmentRepo extends JpaRepository<Adjustments, Long> {
 
 	Adjustments findByCurrentBarcodeId(String currentBarcodeId);
 
-	List<Adjustments> findAllByAdjustmentId(Long adjustmentId);
+	// List<Adjustments> findAllByAdjustmentId(Long adjustmentId);
 
-	
-	List<Adjustments> findByCreationDateBetweenAndCurrentBarcodeIdAndCommentsOrderByLastModifiedDateAsc(
-			LocalDate fromDate, LocalDate toDate, String currentBarcodeId, String string);
+	/*
+	 * Page<Adjustments> findByCreatedDateBetweenAndComments(LocalDateTime fromTime,
+	 * LocalDateTime fromTime1, String string, Pageable pageable);
+	 */
+	/*
+	 * Page<Adjustments>
+	 * findByCreatedDateBetweenAndCommentsOrderByLastModifiedDateAsc(LocalDateTime
+	 * fromTime, LocalDateTime toTime, String string, Pageable pageable);
+	 */
 
-	List<Adjustments> findByAdjustmentIdInAndComments(List<Long> effectingId, String string);
+	Page<Adjustments> findByCreatedDateBetweenAndCurrentBarcodeIdAndCommentsOrderByLastModifiedDateAsc(
+			LocalDateTime fromTime, LocalDateTime toTime, String currentBarcodeId, String string, Pageable pageable);
 
-	List<Adjustments> findByCurrentBarcodeIdAndAdjustmentIdInAndComments(String currentBarcodeId,
-			List<Long> effectingId, String string);
+	Page<Adjustments> findByComments(String string, Pageable pageable);
 
-	List<Adjustments> findByCreationDateBetweenAndCommentsOrderByLastModifiedDateAsc(LocalDate fromDate,
-			LocalDate toDate, String string);
+	Page<Adjustments> findByAdjustmentIdInAndComments(List<Long> effectingId, String string, Pageable pageable);
 
-	List<Adjustments> findByCreationDateAndComments(LocalDate fromDate, String string);
+	Page<Adjustments> findByCurrentBarcodeIdAndAdjustmentIdInAndComments(String currentBarcodeId,
+			List<Long> effectingId, String string, Pageable pageable);
 
-	
+	Page<Adjustments> findByCreatedDateBetweenAndCommentsAndCurrentBarcodeIdIn(LocalDateTime fromTime,
+			LocalDateTime fromTime1, String string, List<String> barcodes, Pageable pageable);
+
+	Page<Adjustments> findByCreatedDateBetweenAndCommentsAndCurrentBarcodeIdInOrderByLastModifiedDateAsc(
+			LocalDateTime fromTime, LocalDateTime toTime, String string, List<String> barcodes, Pageable pageable);
+
+	Page<Adjustments> findByCommentsAndCurrentBarcodeIdIn(String string, List<String> barcodes, Pageable pageable);
+
+	Page<Adjustments> findByCurrentBarcodeIdAndComments(String currentBarcodeId, String comments, Pageable pageable);
+
 }

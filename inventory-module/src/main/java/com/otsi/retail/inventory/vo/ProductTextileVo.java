@@ -5,9 +5,13 @@ package com.otsi.retail.inventory.vo;
  *
  */
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.otsi.retail.inventory.commons.ProductEnum;
 import com.otsi.retail.inventory.commons.ProductStatus;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -40,15 +44,16 @@ public class ProductTextileVo {
 	@ApiModelProperty(value = "item price of the textile product", name = "itemMrp",required = true)
 	private float itemMrp;
 	@ApiModelProperty(value = "employee id of the textile product", name = "empId",required = true)
-	private String empId;
+	private Long empId;
 	@ApiModelProperty(value = "store id of the textile product", name = "storeId",required = true)
 	private Long storeId;
 	@ApiModelProperty(value = "domain id of the textile product", name = "domainId",required = true)
 	private Long domainId;
 	@ApiModelProperty(value = "created date of the textile product", name = "fromDate")
-	private LocalDate fromDate;
+	private LocalDateTime fromDate;
 	@ApiModelProperty(value = "last modified date of the textile product", name = "toDate")
-	private LocalDate toDate;
+	@DateTimeFormat(pattern = "dd-MM-yyyy ")
+	private LocalDateTime toDate;
 	@ApiModelProperty(value = "unit of measures of the textile product", name = "uom",required = true)
 	private String uom;
 	@ApiModelProperty(value = "quantity of the textile product", name = "qty",required = true)
@@ -63,5 +68,7 @@ public class ProductTextileVo {
 	private ProductStatus status;
 	@ApiModelProperty(value = "qty multiply itemMrp of the textile product", name = "value")
 	private float value;
+	@ApiModelProperty(value = "emp name  of the textile product", name = "empName")
+	private String empName;
 
 }

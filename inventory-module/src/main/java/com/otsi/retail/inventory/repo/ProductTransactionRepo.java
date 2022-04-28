@@ -1,6 +1,9 @@
 package com.otsi.retail.inventory.repo;
 
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import com.otsi.retail.inventory.model.ProductTransaction;
@@ -9,8 +12,6 @@ import com.otsi.retail.inventory.model.ProductTransaction;
 public interface ProductTransactionRepo extends JpaRepository<ProductTransaction, Long> {
 
 	ProductTransaction findByQuantity(int qty);
-
-	List<ProductTransaction> findAllByStoreId(Long storeId);
 
 	ProductTransaction findByEffectingTableId(Long adjustmentId);
 
@@ -29,5 +30,11 @@ public interface ProductTransactionRepo extends JpaRepository<ProductTransaction
 	List<ProductTransaction> findAllByBarcodeId(String barcode);
 
 	ProductTransaction findByBarcodeIdAndCommentAndMasterFlag(String barcode, String string, boolean b);
+
+	List<ProductTransaction> findAllByStoreId(Long storeId);
+
+	Page<ProductTransaction> findAllByStoreId(Long storeId, Pageable pageable);
+
+	
 	
 }
