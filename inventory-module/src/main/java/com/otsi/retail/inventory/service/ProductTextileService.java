@@ -45,6 +45,6 @@ public interface ProductTextileService {
 	void addBulkProducts(MultipartFile multipartFile, Long storeId)
 			throws InstantiationException, IllegalAccessException, IOException;
 
-	
+	List<String> getProperties(String domainType);
 
 }

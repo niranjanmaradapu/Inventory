@@ -1,4 +1,4 @@
-package com.otsi.retail.inventory.utils;
+package com.otsi.retail.inventory.util;
 
 import java.math.BigInteger;
 import java.text.ParseException;

@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.otsi.retail.inventory.gatewayresponse.GateWayResponse;
 import com.otsi.retail.inventory.rabbitmq.MQConfig;
 import com.otsi.retail.inventory.service.ProductTextileService;
-import com.otsi.retail.inventory.utils.Constants;
+import com.otsi.retail.inventory.util.Constants;
 import com.otsi.retail.inventory.vo.AdjustmentsVo;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
 import com.otsi.retail.inventory.vo.ProductTextileVo;
@@ -197,6 +197,15 @@ public class ProductTextileController {
 			@RequestParam("storeId") Long storeId) throws InstantiationException, IllegalAccessException, IOException {
 		productTextileService.addBulkProducts(file, storeId);
 		return ResponseEntity.ok(CommonUtilities.buildSuccessResponse(Constants.SUCCESS, Constants.RESULT));
+	}
+	
+	/**
+	 * @param domainType
+	 */
+	@GetMapping(path = "/properties")
+	public ResponseEntity<?> getProperties(@RequestParam("domainType") String domainType) {
+		List<String> propertiesList = productTextileService.getProperties(domainType);
+		return ResponseEntity.ok(propertiesList);
 	}
 
 }

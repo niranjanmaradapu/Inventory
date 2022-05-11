@@ -1,5 +1,6 @@
 package com.otsi.retail.inventory.service;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
@@ -10,9 +11,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
-import java.io.IOException;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.otsi.retail.inventory.commons.DomainType;
 import com.otsi.retail.inventory.commons.NatureOfTransaction;
 import com.otsi.retail.inventory.commons.ProductStatus;
 import com.otsi.retail.inventory.config.Config;
@@ -53,14 +57,13 @@ import com.otsi.retail.inventory.repo.ProductItemRepo;
 import com.otsi.retail.inventory.repo.ProductTextileRepo;
 import com.otsi.retail.inventory.repo.ProductTransactionReRepo;
 import com.otsi.retail.inventory.repo.ProductTransactionRepo;
-import com.otsi.retail.inventory.utils.DateConverters;
-import com.otsi.retail.inventory.utils.ExcelService;
+import com.otsi.retail.inventory.util.DateConverters;
+import com.otsi.retail.inventory.util.ExcelService;
 import com.otsi.retail.inventory.vo.AdjustmentsVo;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
 import com.otsi.retail.inventory.vo.ProductTextileVo;
 import com.otsi.retail.inventory.vo.SearchFilterVo;
 import com.otsi.retail.inventory.vo.UserDetailsVo;
-import org.apache.commons.collections4.CollectionUtils;
 
 @Component
 public class ProductTextileServiceImpl implements ProductTextileService {
@@ -871,6 +874,21 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 				product.setStoreId(storeId);
 				addBarcodeTextile(product);
 			});
+		}
+	}
+
+	@Override
+	public List<String> getProperties(String domainType) {
+		List<String> textileList = new ArrayList<String>();
+		if (domainType.equals(DomainType.Textile.getName())) {
+			String[] propertiesList = { "category", "division", "section", "subSection", "colour" };
+
+			for (String properties : propertiesList) {
+				textileList.add(properties);
+			}
+			return textileList;
+		} else {
+			return textileList;
 		}
 	}
 
