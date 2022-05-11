@@ -35,7 +35,7 @@ public class ProductBundleMapper {
 		productBundleVo.setStatus(productBundle.getStatus());
 		productBundleVo.setFromDate(productBundle.getCreatedDate());
 		productBundleVo.setToDate(productBundle.getLastModifiedDate());
-		
+
 		List<ProductTextileVo> listVo = new ArrayList<>();
 
 		productBundle.getProductTextiles().stream().forEach(p -> {
@@ -51,6 +51,7 @@ public class ProductBundleMapper {
 			productTextileVo.setDivision(p.getDivision());
 			productTextileVo.setSection(p.getSection());
 			productTextileVo.setSubSection(p.getSubSection());
+			productTextileVo.setSellingTypeCode(p.getSellingTypeCode());
 			List<ProductTransaction> transact = new ArrayList<>();
 			transact = productTransactionRepo.findAllByBarcodeId(p.getBarcode());
 			transact.stream().forEach(t -> {
@@ -78,7 +79,6 @@ public class ProductBundleMapper {
 			productTextileVo.setColour(p.getColour());
 			productTextileVo.setStoreId(p.getStoreId());
 			productTextileVo.setDomainId(p.getDomainId());
-			productTextileVo.setSellingTypeCode(p.getSellingTypeCode());
 			listVo.add(productTextileVo);
 
 		});

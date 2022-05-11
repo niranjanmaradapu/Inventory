@@ -53,14 +53,14 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 			ProductTextile textileBarcode = productTextileRepo.findByBarcodeAndStatus(productTextile.getBarcode(),
 					status);
 			if (textileBarcode != null) {
-				productTextile.setSellingTypeCode(ProductEnum.PRODUCTBUNDLE);
+				textileBarcode.setSellingTypeCode(ProductEnum.PRODUCTBUNDLE);
+				productTextileRepo.save(textileBarcode);
 			}
 		});
 		bundle.setProductTextiles(productTextileMapper.VoToEntity(textiles));
 		productBundleVo = productBundleMapper.EntityToVo(productBundleRepo.save(bundle));
 		return productBundleVo;
 	}
-
 
 	@Override
 	public Optional<ProductBundle> getProductBundle(Long id) {
@@ -105,7 +105,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		 * using bundle id and storeId
 		 */
 		else if (fromDate == null && toDate == null && id != null && storeId != null) {
-			bundles = productBundleRepo.findByIdAndStatusAndStoreId(id,status, storeId);
+			bundles = productBundleRepo.findByIdAndStatusAndStoreId(id, status, storeId);
 
 		}
 		/*
@@ -114,18 +114,17 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		else if (storeId != null) {
 			bundles = productBundleRepo.findAllByStoreIdAndStatus(storeId, status);
 		}
-		
+
 		/*
 		 * using from date
 		 */
-		if (fromDate != null && toDate==null && id==null && storeId==null) {
+		if (fromDate != null && toDate == null && id == null && storeId == null) {
 			LocalDateTime fromTime = DateConverters.convertLocalDateToLocalDateTime(fromDate);
 			LocalDateTime toTime = DateConverters.convertToLocalDateTimeMax(fromDate);
 
 			bundles = productBundleRepo.findByCreatedDateBetweenAndStatus(fromTime, toTime, status);
 		}
 
-		
 		List<ProductBundleVo> productBundleVo = productBundleMapper.EntityToVo(bundles);
 
 		productBundleVo.stream().forEach(bundleVo -> {
