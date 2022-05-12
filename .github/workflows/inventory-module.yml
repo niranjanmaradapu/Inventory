@@ -7,16 +7,16 @@ on:
   pull_request:
     branches: 
       - DevOps
+  workflow_call: 
 jobs:
   build:
     runs-on: ubuntu-latest
     env: 
       MODULE_NAME: inventory-module
-    permissions:
-      contents: read
-      packages: write
     steps:
       - uses: actions/checkout@v2
+        with:
+          repository: 'niranjanmaradapu/inventory-module'
       - name: Set up Maven
         uses: stCarolas/setup-maven@v4
         with:
@@ -55,11 +55,10 @@ jobs:
     runs-on: ubuntu-latest
     env: 
       MODULE_NAME: inventory-module
-    permissions:
-      contents: read
-      packages: write
     steps:
       - uses: actions/checkout@v2         
+        with:
+          repository: 'niranjanmaradapu/inventory-module'
       - name: AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
