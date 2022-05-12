@@ -1,6 +1,5 @@
 package com.otsi.retail.inventory.mapper;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
@@ -21,10 +20,9 @@ public class AdjustmentMapper {
 		vo.setCreatedBy(dto.getCreatedBy());
 		vo.setCurrentBarcodeId(dto.getCurrentBarcodeId());
 		vo.setToBeBarcodeId(dto.getToBeBarcodeId());
-		vo.setFromDate(dto.getCreationDate());
-		vo.setToDate(dto.getLastModifiedDate());
+		vo.setCreatedDate(dto.getCreatedDate());
+		vo.setLastModifiedDate(dto.getLastModifiedDate());
 		vo.setComments(dto.getComments());
-
 		return vo;
 
 	}
@@ -45,12 +43,10 @@ public class AdjustmentMapper {
 
 	public Adjustments VoToEntity(AdjustmentsVo vo) {
 		Adjustments dto = new Adjustments();
-		dto.setAdjustmentId(vo.getAdjustmentId());
-		dto.setCreatedBy(vo.getCreatedBy());
+	    dto.setAdjustmentId(vo.getAdjustmentId());
+		//dto.setCreatedBy(vo.getCreatedBy());
 		dto.setCurrentBarcodeId(vo.getCurrentBarcodeId());
 		dto.setToBeBarcodeId(vo.getToBeBarcodeId());
-		dto.setCreationDate(LocalDate.now());
-		dto.setLastModifiedDate(LocalDate.now());
 		dto.setComments(vo.getComments());
 		return dto;
 

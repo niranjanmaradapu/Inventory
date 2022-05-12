@@ -84,9 +84,9 @@ public class UomServiceImpl implements UomService {
 			throw new RecordNotFoundException("uom not found with id: " + id);
 		}
 		uomRepo.delete(uomOpt.get());
-		log.warn("we are checking if domain is deleted...");
-		log.info("after deleting domain details:" + id);
-		return "domain data deleted succesfully: " + id;
+		log.warn("we are checking if uom is deleted...");
+		log.info("after deleting uom details:" + id);
+		return "uom data deleted succesfully: " + id;
 	}
 
 }

@@ -27,10 +27,6 @@ public class CatalogMapper {
 		entity.setName(vo.getName());
 		entity.setDescription(vo.getDescription());
 		entity.setStatus(vo.getStatus());
-		// entity.setCUID(vo.getCUID());
-		// entity.setParent(vo.getCUID());
-		entity.setCreateDate(new Date());
-		entity.setLastModified(new Date());
 		entity.setCatergory(vo.getCategory());
 
 		return entity;
@@ -49,8 +45,6 @@ public class CatalogMapper {
 			vo.setDescription(x.getDescription());
 			vo.setStatus(x.getStatus());
 			vo.setCUID(x.getParent().getId());
-			vo.setCreateDate(new Date());
-			vo.setLastModified(new Date());
 			lvo.add(vo);
 		});
 
@@ -65,18 +59,15 @@ public class CatalogMapper {
 		vo.setName(dtos.getName());
 		vo.setDescription(dtos.getDescription());
 		vo.setStatus(dtos.getStatus());
-		// vo.setCUID(dtos.getParent().getId());
-		vo.setCreateDate(new Date());
-		vo.setLastModified(new Date());
-
-		// BeanUtils.copyProperties(dtos, vo);
+		vo.setCreatedDate(dtos.getCreatedDate());
+		vo.setLastModifiedDate(dtos.getLastModifiedDate());
 		return vo;
 
 	}
+
 	public List<CatalogVo> convertlEntityToVo(List<CatalogEntity> dtos) {
 		return dtos.stream().map(entity -> convertEntityToVo(entity)).collect(Collectors.toList());
 
 	}
-	
 
 }

@@ -67,4 +67,23 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<Object>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	@ExceptionHandler(value = InvalidPriceException.class)
+	public ResponseEntity<Object> handleInvalidPriceException(InvalidPriceException invalidPriceException) {
+		ErrorResponse<?> error = new ErrorResponse<>(400, "price is greater thean zero");
+		return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(value = InvalidBarcodeException.class)
+	public ResponseEntity<Object> handleInvalidBarcodeException(InvalidBarcodeException invalidBarcodeException) {
+		ErrorResponse<?> error = new ErrorResponse<>(400, "barcode was invalid");
+		log.error("error response is:" + error);
+		return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(value = InvalidDateException.class)
+	public ResponseEntity<Object> handleInvalidDateException(InvalidDateException invalidDateException) {
+		ErrorResponse<?> error = new ErrorResponse<>(400, "From date is greater than To date");
+		log.error("error response is:" + error);
+		return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
+	}
 }

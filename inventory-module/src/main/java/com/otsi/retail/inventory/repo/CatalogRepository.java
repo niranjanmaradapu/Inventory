@@ -31,6 +31,4 @@ public interface CatalogRepository extends JpaRepository<CatalogEntity, Long> {
 	List<CatalogEntity> findByParentId(Long id);
 
 	List<CatalogEntity> findByDescription(Categories mainCategory);
-
-	//CatalogEntity findByCategory(Categories catgeory);
 }
