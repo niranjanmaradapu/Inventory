@@ -414,7 +414,7 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 			 * using storeId
 			 */
 		else if (vo.getStoreId() != null) {
-			barcodeDetails = productTextileRepo.findByStoreIdAndStatus(vo.getStoreId(), status, pageable);
+			barcodeDetails = productTextileRepo.findByStoreIdAndStatusOrderByCreatedDateDesc(vo.getStoreId(), status, pageable);
 		}
 
 		/*
@@ -813,7 +813,7 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 			 * using storeId
 			 */
 			else if (vo.getStoreId() != null) {
-				barcodeDetails = productTextileRepo.findByStoreIdAndStatus(vo.getStoreId(), status, pageable);
+				barcodeDetails = productTextileRepo.findByStoreIdAndStatusOrderByCreatedDateDesc(vo.getStoreId(), status, pageable);
 
 			}
 

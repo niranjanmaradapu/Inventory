@@ -54,7 +54,7 @@ public interface ProductTextileRepo extends JpaRepository<ProductTextile, Long> 
 	ProductTextile findByBarcodeAndStatus(String barcode, ProductStatus status);
 
 	ProductTextile findByBarcodeAndSellingTypeCode(String barcode, ProductEnum productbundle);
-	
+
 	List<ProductTextile> findByCreatedDateBetweenAndStatusAndStoreId(LocalDateTime fromTime, LocalDateTime fromTime1,
 			ProductStatus status, Long storeId);
 
@@ -72,7 +72,7 @@ public interface ProductTextileRepo extends JpaRepository<ProductTextile, Long> 
 
 	Page<ProductTextile> findByBarcodeAndStoreId(String barcode, Long storeId, Pageable pageable);
 
-	Page<ProductTextile> findByStoreIdAndStatus(Long storeId, ProductStatus status, Pageable pageable);
+	//Page<ProductTextile> findByStoreIdAndStatus(Long storeId, ProductStatus status, Pageable pageable);
 
 	Page<ProductTextile> findByStatus(ProductStatus status, Pageable pageable);
 
@@ -89,7 +89,7 @@ public interface ProductTextileRepo extends JpaRepository<ProductTextile, Long> 
 
 	Page<ProductTextile> findByStoreId(Long storeId, Pageable pageable);
 
-
-
+	Page<ProductTextile> findByStoreIdAndStatusOrderByCreatedDateDesc(Long storeId, ProductStatus status,
+			Pageable pageable);
 
 }
