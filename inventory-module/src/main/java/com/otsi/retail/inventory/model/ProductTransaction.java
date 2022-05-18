@@ -1,6 +1,5 @@
 package com.otsi.retail.inventory.model;
 
-import java.time.LocalDate;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -14,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductTransaction {
+public class ProductTransaction extends BaseEntity {
 
 	@Id
 	@GeneratedValue
@@ -27,7 +26,5 @@ public class ProductTransaction {
 	private Long effectingTableId;
 	private boolean masterFlag;
 	private String comment;
-	private LocalDate creationDate;
-	private LocalDate lastModified;
 
 }

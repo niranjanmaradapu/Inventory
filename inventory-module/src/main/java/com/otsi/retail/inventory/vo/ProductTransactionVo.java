@@ -1,11 +1,10 @@
 package com.otsi.retail.inventory.vo;
 
-import java.time.LocalDate;
 import lombok.Data;
 
 @Data
-public class ProductTransactionVo {
-
+public class ProductTransactionVo extends BaseEntityVo {
+	
 	private Long productTransactionId;
 	private Long storeId;
 	private String barcodeId;
@@ -15,7 +14,6 @@ public class ProductTransactionVo {
 	private Long effectingTableId;
 	private boolean masterFlag;
 	private String comment;
-	private LocalDate creationDate;
-	private LocalDate lastModified;
+
 
 }

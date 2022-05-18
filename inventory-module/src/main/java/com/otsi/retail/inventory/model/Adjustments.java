@@ -1,9 +1,5 @@
 package com.otsi.retail.inventory.model;
-/**
- * @author vasavi
- *
- */
-import java.time.LocalDate;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -17,16 +13,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Adjustments {
+public class Adjustments extends BaseEntity {
 
 	@Id
 	@GeneratedValue
 	private Long adjustmentId;
 	private String currentBarcodeId;
 	private String toBeBarcodeId;
-	private String createdBy;
 	private String comments;
-	private LocalDate creationDate;
-	private LocalDate lastModifiedDate;
 
 }
