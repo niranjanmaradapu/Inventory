@@ -26,10 +26,10 @@ public class ProductBundleMapper {
 
 	public ProductBundleVo EntityToVo(ProductBundle productBundle) {
 		ProductBundleVo productBundleVo = new ProductBundleVo();
-		productBundleVo.setId(productBundle.getId());
-		productBundleVo.setName(productBundle.getName());
-		productBundleVo.setDescription(productBundle.getDescription());
-		productBundleVo.setDomainId(productBundle.getDomainId());
+    		productBundleVo.setId(productBundle.getId());
+  		productBundleVo.setName(productBundle.getName());
+     		productBundleVo.setDescription(productBundle.getDescription());
+       		productBundleVo.setDomainId(productBundle.getDomainId());
 		productBundleVo.setStoreId(productBundle.getStoreId());
 		productBundleVo.setBundleQuantity(productBundle.getBundleQuantity());
 		productBundleVo.setStatus(productBundle.getStatus());
@@ -55,6 +55,7 @@ public class ProductBundleMapper {
 			List<ProductTransaction> transact = new ArrayList<>();
 			transact = productTransactionRepo.findAllByBarcodeId(p.getBarcode());
 			transact.stream().forEach(t -> {
+				
 				if (t.getEffectingTable().equals("product textile table")) {
 					t = productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(t.getBarcodeId(),
 							"product textile table", true);
@@ -68,6 +69,7 @@ public class ProductBundleMapper {
 
 					productTextileVo.setValue(t.getQuantity() * p.getItemMrp());
 				}
+			
 			});
             productTextileVo.setOriginalBarcodeCreatedAt(p.getOriginalBarcodeCreatedAt());
 			productTextileVo.setCategory(p.getCategory());

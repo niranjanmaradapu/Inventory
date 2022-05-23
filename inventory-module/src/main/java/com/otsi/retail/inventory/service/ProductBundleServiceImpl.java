@@ -118,11 +118,11 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		/*
 		 * using from date
 		 */
-		if (fromDate != null && toDate == null && id == null && storeId == null) {
+		if (fromDate != null && toDate == null && storeId != null) {
 			LocalDateTime fromTime = DateConverters.convertLocalDateToLocalDateTime(fromDate);
 			LocalDateTime toTime = DateConverters.convertToLocalDateTimeMax(fromDate);
 
-			bundles = productBundleRepo.findByCreatedDateBetweenAndStatus(fromTime, toTime, status);
+			bundles = productBundleRepo.findByCreatedDateBetweenAndStoreIdAndStatus(fromTime, toTime, storeId,status);
 		}
 
 		List<ProductBundleVo> productBundleVo = productBundleMapper.EntityToVo(bundles);
