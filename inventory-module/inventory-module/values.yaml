@@ -9,8 +9,8 @@ env:
   postgres_data: /var/lib/postgresql/data/pgdata
   postgres_db: inventory-module
 
-replicaCount: 1
-replicaCountPos: 1
+replicaCount: 3
+replicaCountPos: 3
 namespace: 
   name: default
 image:
