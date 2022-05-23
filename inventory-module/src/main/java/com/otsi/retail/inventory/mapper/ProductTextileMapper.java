@@ -37,7 +37,7 @@ public class ProductTextileMapper {
 		vo.setOriginalBarcodeCreatedAt(dto.getOriginalBarcodeCreatedAt());
 		vo.setStoreId(dto.getStoreId());
 		vo.setDomainId(dto.getDomainId());
-
+        vo.setSellingTypeCode(dto.getSellingTypeCode());
 		return vo;
 
 	}
@@ -73,6 +73,7 @@ public class ProductTextileMapper {
 		dto.setColour(vo.getColour());
 		dto.setStoreId(vo.getStoreId());
 		dto.setDomainId(vo.getDomainId());
+		dto.setSellingTypeCode(vo.getSellingTypeCode());
 		return dto;
 
 	}

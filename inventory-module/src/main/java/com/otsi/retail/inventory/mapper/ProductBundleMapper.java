@@ -26,16 +26,16 @@ public class ProductBundleMapper {
 
 	public ProductBundleVo EntityToVo(ProductBundle productBundle) {
 		ProductBundleVo productBundleVo = new ProductBundleVo();
-		productBundleVo.setId(productBundle.getId());
-		productBundleVo.setName(productBundle.getName());
-		productBundleVo.setDescription(productBundle.getDescription());
-		productBundleVo.setDomainId(productBundle.getDomainId());
+    		productBundleVo.setId(productBundle.getId());
+  		productBundleVo.setName(productBundle.getName());
+     		productBundleVo.setDescription(productBundle.getDescription());
+       		productBundleVo.setDomainId(productBundle.getDomainId());
 		productBundleVo.setStoreId(productBundle.getStoreId());
 		productBundleVo.setBundleQuantity(productBundle.getBundleQuantity());
 		productBundleVo.setStatus(productBundle.getStatus());
 		productBundleVo.setFromDate(productBundle.getCreatedDate());
 		productBundleVo.setToDate(productBundle.getLastModifiedDate());
-		
+
 		List<ProductTextileVo> listVo = new ArrayList<>();
 
 		productBundle.getProductTextiles().stream().forEach(p -> {
@@ -51,9 +51,11 @@ public class ProductBundleMapper {
 			productTextileVo.setDivision(p.getDivision());
 			productTextileVo.setSection(p.getSection());
 			productTextileVo.setSubSection(p.getSubSection());
+			productTextileVo.setSellingTypeCode(p.getSellingTypeCode());
 			List<ProductTransaction> transact = new ArrayList<>();
 			transact = productTransactionRepo.findAllByBarcodeId(p.getBarcode());
 			transact.stream().forEach(t -> {
+				
 				if (t.getEffectingTable().equals("product textile table")) {
 					t = productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(t.getBarcodeId(),
 							"product textile table", true);
@@ -67,6 +69,7 @@ public class ProductBundleMapper {
 
 					productTextileVo.setValue(t.getQuantity() * p.getItemMrp());
 				}
+			
 			});
             productTextileVo.setOriginalBarcodeCreatedAt(p.getOriginalBarcodeCreatedAt());
 			productTextileVo.setCategory(p.getCategory());
@@ -78,7 +81,6 @@ public class ProductBundleMapper {
 			productTextileVo.setColour(p.getColour());
 			productTextileVo.setStoreId(p.getStoreId());
 			productTextileVo.setDomainId(p.getDomainId());
-			productTextileVo.setSellingTypeCode(p.getSellingTypeCode());
 			listVo.add(productTextileVo);
 
 		});

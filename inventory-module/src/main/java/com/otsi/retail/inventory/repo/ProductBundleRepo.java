@@ -31,4 +31,7 @@ public interface ProductBundleRepo extends JpaRepository<ProductBundle, Long> {
 
 	List<ProductBundle> findByIdAndStatusAndStoreId(Long id, Boolean status, Long storeId);
 
+	List<ProductBundle> findByCreatedDateBetweenAndStoreIdAndStatus(LocalDateTime fromTime, LocalDateTime toTime,
+			Long storeId, Boolean status);
+
 }
