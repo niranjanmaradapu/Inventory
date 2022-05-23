@@ -27,4 +27,7 @@ public interface ProductBundleRepo extends JpaRepository<ProductBundle, Long> {
 			LocalDateTime fromTime, LocalDateTime toTime, Long id, Boolean status, Long storeId, Pageable pageable);
 
 
+	List<ProductBundle> findByCreatedDateBetweenAndStoreIdAndStatus(LocalDateTime fromTime, LocalDateTime toTime,
+			Long storeId, Boolean status);
+
 }
