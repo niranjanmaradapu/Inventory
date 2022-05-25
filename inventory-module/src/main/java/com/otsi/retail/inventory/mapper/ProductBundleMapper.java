@@ -15,7 +15,7 @@ import com.otsi.retail.inventory.vo.ProductTextileVo;
 
 @Component
 public class ProductBundleMapper {
-	
+
 	@Autowired
 	private ProductTransactionRepo productTransactionRepo;
 
@@ -35,54 +35,54 @@ public class ProductBundleMapper {
 		productBundleVo.setStatus(productBundle.getStatus());
 		productBundleVo.setFromDate(productBundle.getCreatedDate());
 		productBundleVo.setToDate(productBundle.getLastModifiedDate());
+		productBundleVo.setItemMrp(productBundle.getItemMrp());
 
-		List<ProductTextileVo> listVo = new ArrayList<>();
-
-		productBundle.getProductTextiles().stream().forEach(p -> {
-			ProductTextileVo productTextileVo = new ProductTextileVo();
-			productTextileVo.setProductTextileId(p.getProductTextileId());
-			productTextileVo.setBarcode(p.getBarcode());
-			productTextileVo.setEmpId(p.getEmpId());
-			productTextileVo.setParentBarcode(p.getBarcode());
-			productTextileVo.setFromDate(p.getCreatedDate());
-			productTextileVo.setToDate(p.getLastModifiedDate());
-			productTextileVo.setStatus(p.getStatus());
-			productTextileVo.setName(p.getName());
-			productTextileVo.setDivision(p.getDivision());
-			productTextileVo.setSection(p.getSection());
-			productTextileVo.setSubSection(p.getSubSection());
-			productTextileVo.setSellingTypeCode(p.getSellingTypeCode());
-			List<ProductTransaction> transact = new ArrayList<>();
-			transact = productTransactionRepo.findAllByBarcodeId(p.getBarcode());
-			transact.stream().forEach(t -> {
-				if (t.getEffectingTable().equals("product textile table")) {
-					t = productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(t.getBarcodeId(),
-							"product textile table", true);
-					productTextileVo.setQty(t.getQuantity());
-
-					productTextileVo.setValue(t.getQuantity() * p.getItemMrp());
-				} else if (t.getEffectingTable().equals("Adjustments")) {
-					t = productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(t.getBarcodeId(),
-							"Adjustments", true);
-					productTextileVo.setQty(t.getQuantity());
-
-					productTextileVo.setValue(t.getQuantity() * p.getItemMrp());
-				}
-			});
-            productTextileVo.setOriginalBarcodeCreatedAt(p.getOriginalBarcodeCreatedAt());
-			productTextileVo.setCategory(p.getCategory());
-			productTextileVo.setBatchNo(p.getBatchNo());
-			productTextileVo.setCostPrice(p.getCostPrice());
-			productTextileVo.setItemMrp(p.getItemMrp());
-			productTextileVo.setHsnCode(p.getHsnCode());
-			productTextileVo.setUom(p.getUom());
-			productTextileVo.setColour(p.getColour());
-			productTextileVo.setStoreId(p.getStoreId());
-			productTextileVo.setDomainId(p.getDomainId());
-			listVo.add(productTextileVo);
-
-		});
-		productBundleVo.setProductTextiles(listVo);
+		/*
+		 * List<ProductTextileVo> listVo = new ArrayList<>();
+		 * 
+		 * productBundle.getProductTextiles().stream().forEach(p -> { ProductTextileVo
+		 * productTextileVo = new ProductTextileVo();
+		 * productTextileVo.setProductTextileId(p.getProductTextileId());
+		 * productTextileVo.setBarcode(p.getBarcode());
+		 * productTextileVo.setEmpId(p.getEmpId());
+		 * productTextileVo.setParentBarcode(p.getBarcode());
+		 * productTextileVo.setQty(p.getQuantity());
+		 * productTextileVo.setFromDate(p.getCreatedDate());
+		 * productTextileVo.setToDate(p.getLastModifiedDate());
+		 * productTextileVo.setStatus(p.getStatus());
+		 * productTextileVo.setName(p.getName());
+		 * productTextileVo.setDivision(p.getDivision());
+		 * productTextileVo.setSection(p.getSection());
+		 * productTextileVo.setSubSection(p.getSubSection());
+		 * productTextileVo.setSellingTypeCode(p.getSellingTypeCode());
+		 * List<ProductTransaction> transact = new ArrayList<>(); transact =
+		 * productTransactionRepo.findAllByBarcodeId(p.getBarcode());
+		 * transact.stream().forEach(t -> { if
+		 * (t.getEffectingTable().equals("product textile table")) { t =
+		 * productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(t.
+		 * getBarcodeId(), "product textile table", true);
+		 * productTextileVo.setQty(t.getQuantity());
+		 * 
+		 * productTextileVo.setValue(t.getQuantity() * p.getItemMrp()); } else if
+		 * (t.getEffectingTable().equals("Adjustments")) { t =
+		 * productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(t.
+		 * getBarcodeId(), "Adjustments", true);
+		 * productTextileVo.setQty(t.getQuantity());
+		 * 
+		 * productTextileVo.setValue(t.getQuantity() * p.getItemMrp()); } });
+		 * productTextileVo.setOriginalBarcodeCreatedAt(p.getOriginalBarcodeCreatedAt())
+		 * ; productTextileVo.setCategory(p.getCategory());
+		 * productTextileVo.setBatchNo(p.getBatchNo());
+		 * productTextileVo.setCostPrice(p.getCostPrice());
+		 * productTextileVo.setItemMrp(p.getItemMrp());
+		 * productTextileVo.setHsnCode(p.getHsnCode());
+		 * productTextileVo.setUom(p.getUom());
+		 * productTextileVo.setColour(p.getColour());
+		 * productTextileVo.setStoreId(p.getStoreId());
+		 * productTextileVo.setDomainId(p.getDomainId()); listVo.add(productTextileVo);
+		 * 
+		 * }); productBundleVo.setProductTextiles(listVo);
+		 */
 		return productBundleVo;
 
 	}
@@ -109,7 +109,7 @@ public class ProductBundleMapper {
 		productBundle.setStoreId(productBundleVo.getStoreId());
 		productBundle.setStatus(Boolean.TRUE);
 		productBundle.setBundleQuantity(productBundleVo.getBundleQuantity());
-	    return productBundle;
+		return productBundle;
 
 	}
 

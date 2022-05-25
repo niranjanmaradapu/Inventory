@@ -1,12 +1,11 @@
 package com.otsi.retail.inventory.repo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import com.otsi.retail.inventory.model.ProductBundle;
 
 @Repository
@@ -14,21 +13,18 @@ public interface ProductBundleRepo extends JpaRepository<ProductBundle, Long> {
 
 	List<ProductBundle> findByStatus(Boolean status);
 
-	List<ProductBundle> findByCreatedDateBetweenAndStatusOrderByLastModifiedDateAsc(LocalDate fromDate,
-			LocalDate toDate, Boolean status);
-	
-	List<ProductBundle> findByCreatedDateAndStatus(LocalDate fromDate, Boolean status);
+	Page<ProductBundle> findByCreatedDateBetweenAndStatus(LocalDateTime fromTime, LocalDateTime toTime, Boolean status,
+			Pageable pageable);
 
-	List<ProductBundle> findByCreatedDateBetweenAndStatus(LocalDateTime atStartOfDay, LocalDateTime endOfDay,
-			Boolean status);
+	Page<ProductBundle> findAllByStoreIdAndStatus(Long storeId, Boolean status, Pageable pageable);
 
-	List<ProductBundle> findByCreatedDateAndStatus(String string, Boolean status);
+	Page<ProductBundle> findByCreatedDateBetweenAndStoreIdAndStatus(LocalDateTime fromTime, LocalDateTime toTime,
+			Long storeId, Boolean status, Pageable pageable);
 
-	List<ProductBundle> findAllByStoreIdAndStatus(Long storeId, Boolean status);
+	Page<ProductBundle> findByIdAndStatusAndStoreId(Long id, Boolean status, Long storeId, Pageable pageable);
 
-	List<ProductBundle> findByCreatedDateBetweenAndIdAndStatusAndStoreIdOrderByLastModifiedDateAsc(
-			LocalDateTime fromTime, LocalDateTime toTime, Long id, Boolean status, Long storeId);
+	Page<ProductBundle> findByCreatedDateBetweenAndIdAndStatusAndStoreIdOrderByLastModifiedDateAsc(
+			LocalDateTime fromTime, LocalDateTime toTime, Long id, Boolean status, Long storeId, Pageable pageable);
 
-	List<ProductBundle> findByIdAndStatusAndStoreId(Long id, Boolean status, Long storeId);
 
 }
