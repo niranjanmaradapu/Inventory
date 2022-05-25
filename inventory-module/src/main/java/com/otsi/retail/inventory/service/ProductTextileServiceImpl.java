@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -34,6 +33,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otsi.retail.inventory.commons.DomainType;
+import com.otsi.retail.inventory.commons.Generation;
 import com.otsi.retail.inventory.commons.NatureOfTransaction;
 import com.otsi.retail.inventory.commons.ProductStatus;
 import com.otsi.retail.inventory.config.Config;
@@ -101,6 +101,9 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 	private Config config;
 
 	@Autowired
+	private Generation generation;
+
+	@Autowired
 	private ExcelService excelService;
 
 	@Autowired
@@ -110,10 +113,11 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 	public String addBarcodeTextile(ProductTextileVo textileVo) {
 		log.debug("debugging saveProductTextile:" + textileVo);
 		if (textileVo.getCostPrice() == 0 || textileVo.getItemMrp() == 0) {
-			throw new InvalidPriceException("price is greater thean zero");
+			throw new InvalidPriceException("price is greater than zero");
 		}
 		ProductTextile prodTextile = productTextileMapper.VoToEntity(textileVo);
-		prodTextile.setBarcode("BAR-" + getSaltString().toString());
+		prodTextile.setBarcode("BAR-" + generation.getSaltString().toString());
+		prodTextile.setQuantity(textileVo.getQty());
 		ProductTextile textileSave = productTextileRepo.save(prodTextile);
 		ProductTransaction prodTrans = new ProductTransaction();
 		prodTrans.setBarcodeId(textileSave.getBarcode());
@@ -130,19 +134,6 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 		return "barcode textile saved successfully:" + textileSave.getBarcode();
 	}
 
-	protected String getSaltString() {
-		String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-		StringBuilder salt = new StringBuilder();
-		Random rnd = new Random();
-		while (salt.length() < 6) { // length of the random string.
-			int index = (int) (rnd.nextFloat() * SALTCHARS.length());
-			salt.append(SALTCHARS.charAt(index));
-		}
-		String saltStr = salt.toString();
-		return saltStr;
-
-	}
-
 	@Override
 	public String updateBarcodeTextile(ProductTextileVo textileVo) {
 		log.debug(" debugging updateBarcode:" + textileVo);
@@ -155,8 +146,8 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 		prodTextileUpdate.setStatus(ProductStatus.DISABLE);
 		productTextileRepo.save(prodTextileUpdate);
 		ProductTextile productTextile = new ProductTextile();
-		productTextile.setBarcode(
-				"REBAR/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + getSaltString());
+		productTextile.setBarcode("REBAR/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/"
+				+ generation.getSaltString());
 
 		productTextile.setEmpId(textileVo.getEmpId());
 		productTextile.setParentBarcode(dto.get().getBarcode());
@@ -175,6 +166,7 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 		productTextile.setColour(textileVo.getColour());
 		productTextile.setStoreId(textileVo.getStoreId());
 		productTextile.setDomainId(textileVo.getDomainId());
+		productTextile.setQuantity(textileVo.getQty());
 		ProductTextile textileSave = productTextileRepo.save(productTextile);
 		List<ProductTransaction> transact = new ArrayList<>();
 		transact = productTransactionRepo.findAllByBarcodeId(dto.get().getBarcode());
@@ -191,13 +183,12 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 				productTransactionRepo.save(t);
 			}
 		});
-		Adjustments ad = new Adjustments();
-
-		ad.setCreatedBy(textileVo.getEmpId());
-		ad.setCurrentBarcodeId(textileSave.getBarcode());
-		ad.setToBeBarcodeId(prodTextileUpdate.getBarcode());
-		ad.setComments("rebar");
-		Adjustments audSave = adjustmentRepo.save(ad);
+		Adjustments adjustments = new Adjustments();
+		adjustments.setCreatedBy(textileVo.getEmpId());
+		adjustments.setCurrentBarcodeId(textileSave.getBarcode());
+		adjustments.setToBeBarcodeId(prodTextileUpdate.getBarcode());
+		adjustments.setComments("rebar");
+		Adjustments audSave = adjustmentRepo.save(adjustments);
 		ProductTransaction prodTrans = new ProductTransaction();
 		prodTrans.setBarcodeId(textileSave.getBarcode());
 		prodTrans.setStoreId(textileSave.getStoreId());
@@ -220,8 +211,10 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 			log.error("product textile details not found with id");
 			throw new RecordNotFoundException("product textile details not found with id: " + barcode);
 		}
-
-		saveAndUpdateAdjustments(prodOpt.getBarcode());
+		Adjustments adjustment = adjustmentRepo.findByCurrentBarcodeId(prodOpt.getBarcode());
+		if (adjustment != null) {
+			saveAndUpdateAdjustments(prodOpt.getBarcode());
+		}
 		saveAndUpdateProductTransaction(prodOpt.getBarcode());
 		List<ProductTransaction> transact = new ArrayList<>();
 		transact = productTransactionRepo.findAllByBarcodeId(barcode);
@@ -283,7 +276,8 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 	private Adjustments saveAndUpdateAdjustments(String barcode) {
 		Adjustments adjustUpdate = adjustmentRepo.findByCurrentBarcodeId(barcode);
 		adjustUpdate.setComments("deleted");
-		return adjustmentRepo.save(adjustUpdate);
+		adjustmentRepo.save(adjustUpdate);
+		return adjustUpdate;
 	}
 
 	public List<UserDetailsVo> getUsersForGivenId(List<Long> userIds) throws URISyntaxException {
@@ -414,7 +408,8 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 			 * using storeId
 			 */
 		else if (vo.getStoreId() != null) {
-			barcodeDetails = productTextileRepo.findByStoreIdAndStatusOrderByCreatedDateDesc(vo.getStoreId(), status, pageable);
+			barcodeDetails = productTextileRepo.findByStoreIdAndStatusOrderByCreatedDateDesc(vo.getStoreId(), status,
+					pageable);
 		}
 
 		/*
@@ -446,14 +441,7 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 			userDetailsVo = getUsersForGivenId(userIds);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
-		} // Map<String, Integer> uvs = //
-		/*
-		 * userDetailsVo.map.forEach((key, value) -> // //
-		 * productTextileVO.setEmpName(x.getUserName()));
-		 * 
-		 * Map<String, Integer> u = new HashMap<>(); userDetailsVo.stream().forEach(x ->
-		 * { u.add(x.getUserName(), x.getUserId()); });
-		 */
+		}
 		if (userDetailsVo != null) {
 			userDetailsVo.stream().forEach(x -> {
 				productTextileVO.setEmpName(x.getUserName());
@@ -813,7 +801,8 @@ public class ProductTextileServiceImpl implements ProductTextileService {
 			 * using storeId
 			 */
 			else if (vo.getStoreId() != null) {
-				barcodeDetails = productTextileRepo.findByStoreIdAndStatusOrderByCreatedDateDesc(vo.getStoreId(), status, pageable);
+				barcodeDetails = productTextileRepo.findByStoreIdAndStatusOrderByCreatedDateDesc(vo.getStoreId(),
+						status, pageable);
 
 			}
 

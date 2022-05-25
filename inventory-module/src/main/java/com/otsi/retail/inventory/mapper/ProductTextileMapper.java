@@ -38,7 +38,16 @@ public class ProductTextileMapper {
 		vo.setStoreId(dto.getStoreId());
 		vo.setDomainId(dto.getDomainId());
         vo.setSellingTypeCode(dto.getSellingTypeCode());
+        vo.setQty(dto.getQuantity());
 		return vo;
+
+	}
+	
+	public ProductTextile customVoToEntityMapper(ProductTextileVo vo) {
+		ProductTextile entity = new ProductTextile();
+        entity.setQuantity(vo.getQty());
+        entity.setProductTextileId(vo.getProductTextileId());
+		return entity;
 
 	}
 

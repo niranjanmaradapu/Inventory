@@ -48,5 +48,6 @@ public class ProductTextile extends BaseEntity {
 	private ProductEnum sellingTypeCode;
 	private LocalDate originalBarcodeCreatedAt;
 	private ProductStatus status;
+	private int quantity;
 
 }

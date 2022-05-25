@@ -18,6 +18,10 @@ public class ProductBundleVo {
 	private Long domainId;
 	
 	private Long storeId;
+	
+	private float itemMrp;
+	
+	private String barcode;
 
 	private Integer bundleQuantity;
 
