@@ -283,7 +283,7 @@ public class ProductServiceImpl implements ProductService {
 		ProductVO productVO = getBarcode(barcode, storeId);
 		if (StringUtils.isNotBlank(productVO.getHsnCode())) {
 			try {
-				Map taxValues = getHsnDetails(productVO.getHsnCode(), productVO.getItemMrp(), clientId);
+				Map taxValues = getHsnDetails(productVO.getHsnCode(), productVO.getCostPrice(), clientId);
 				productVO.setTaxValues(taxValues);
 			} catch (Exception ex) {
 				log.info("exception occured while fetching tax values for barcode {}", barcode);
