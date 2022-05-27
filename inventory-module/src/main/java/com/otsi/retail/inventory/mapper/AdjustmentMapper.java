@@ -23,6 +23,7 @@ public class AdjustmentMapper {
 		vo.setCreatedDate(dto.getCreatedDate());
 		vo.setLastModifiedDate(dto.getLastModifiedDate());
 		vo.setComments(dto.getComments());
+		vo.setStoreId(dto.getStoreId());
 		return vo;
 
 	}

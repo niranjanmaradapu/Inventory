@@ -15,8 +15,8 @@ public interface UomService {
 
 	List<UomVo> getAllUom();
 
-	String updateUom(UomVo uomVo);
+	UomVo updateUom(UomVo uomVo);
 
-	String deleteUom(Long id);
+	void deleteUom(Long id);
 
 }

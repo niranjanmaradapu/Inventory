@@ -5,20 +5,36 @@ import java.util.List;
 
 import lombok.Data;
 
-
 @Data
 public class UserDetailsVo {
-	private Long userId;
+	private Long id;
+
 	private String userName;
+
 	private String phoneNumber;
+
 	private String gender;
+
 	private LocalDate createdDate;
-	private LocalDate lastModifyedDate;
+
+	private LocalDate lastModifiedDate;
+
 	private String createdBy;
+
 	private Role role;
+
 	private List<UserAv> userAv;
+
 	private List<StoreVo> stores;
+
 	private StoreVo ownerOf;
 
+	private Boolean isActive;
+
+	private Boolean isSuperAdmin;
+
+	private Boolean isCustomer;
+
+	private Long modifiedBy;
 
 }

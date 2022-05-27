@@ -7,8 +7,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.inventory.commons.ProductStatus;
-import com.otsi.retail.inventory.model.ProductTextile;
-import com.otsi.retail.inventory.vo.ProductTextileVo;
+import com.otsi.retail.inventory.model.Product;
+import com.otsi.retail.inventory.vo.ProductVO;
 
 @Component
 public class ProductTextileMapper {
@@ -18,8 +18,8 @@ public class ProductTextileMapper {
 	 * 
 	 */
 
-	public ProductTextileVo EntityToVo(ProductTextile dto) {
-		ProductTextileVo vo = new ProductTextileVo();
+	public ProductVO EntityToVo(Product dto) {
+		ProductVO vo = new ProductVO();
 
 		BeanUtils.copyProperties(dto, vo);
 		vo.setEmpId(dto.getEmpId());
@@ -46,7 +46,7 @@ public class ProductTextileMapper {
 	 * to convert list dto's to vo's
 	 */
 
-	public List<ProductTextileVo> EntityToVo(List<ProductTextile> dtos) {
+	public List<ProductVO> EntityToVo(List<Product> dtos) {
 		return dtos.stream().map(dto -> EntityToVo(dto)).collect(Collectors.toList());
 
 	}
@@ -56,8 +56,8 @@ public class ProductTextileMapper {
 	 * 
 	 */
 
-	public ProductTextile VoToEntity(ProductTextileVo vo) {
-		ProductTextile dto = new ProductTextile();
+	public Product VoToEntity(ProductVO vo) {
+		Product dto = new Product();
 		BeanUtils.copyProperties(vo, dto);
 		dto.setCostPrice(vo.getCostPrice());
 		dto.setEmpId(vo.getEmpId());
@@ -82,9 +82,9 @@ public class ProductTextileMapper {
 	 * to convert list vo's to dto's
 	 */
 
-	public List<ProductTextile> VoToEntity(List<ProductTextileVo> vos) {
+	public List<Product> VoToEntity(List<ProductVO> vos) {
 		return vos.stream().map(vo -> VoToEntity(vo)).collect(Collectors.toList());
 
 	}
-
+	
 }

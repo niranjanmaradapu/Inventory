@@ -19,12 +19,12 @@ import com.otsi.retail.inventory.exceptions.RecordNotFoundException;
 import com.otsi.retail.inventory.mapper.ProductBundleMapper;
 import com.otsi.retail.inventory.mapper.ProductTextileMapper;
 import com.otsi.retail.inventory.model.ProductBundle;
-import com.otsi.retail.inventory.model.ProductTextile;
+import com.otsi.retail.inventory.model.Product;
 import com.otsi.retail.inventory.repo.ProductBundleRepo;
-import com.otsi.retail.inventory.repo.ProductTextileRepo;
+import com.otsi.retail.inventory.repo.ProductRepository;
 import com.otsi.retail.inventory.util.DateConverters;
 import com.otsi.retail.inventory.vo.ProductBundleVo;
-import com.otsi.retail.inventory.vo.ProductTextileVo;
+import com.otsi.retail.inventory.vo.ProductVO;
 
 @Component
 public class ProductBundleServiceImpl implements ProductBundleService {
@@ -38,7 +38,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 	private ProductBundleRepo productBundleRepo;
 
 	@Autowired
-	private ProductTextileRepo productTextileRepo;
+	private ProductRepository productTextileRepo;
 
 	@Autowired
 	private ProductTextileMapper productTextileMapper;
@@ -46,11 +46,11 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 	@Transactional
 	@Override
 	public ProductBundleVo addProductBundle(ProductBundleVo productBundleVo) {
-		ProductBundle bundle = productBundleMapper.VoToEntity(productBundleVo);
-		List<ProductTextileVo> textiles = productBundleVo.getProductTextiles();
+		ProductBundle bundle = productBundleMapper.voToEntity(productBundleVo);
+		List<ProductVO> textiles = productBundleVo.getProductTextiles();
 		ProductStatus status = ProductStatus.ENABLE;
 		textiles.stream().forEach(productTextile -> {
-			ProductTextile textileBarcode = productTextileRepo.findByBarcodeAndStatus(productTextile.getBarcode(),
+			Product textileBarcode = productTextileRepo.findByBarcodeAndStatus(productTextile.getBarcode(),
 					status);
 			if (textileBarcode != null) {
 				textileBarcode.setSellingTypeCode(ProductEnum.PRODUCTBUNDLE);
@@ -58,7 +58,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 			}
 		});
 		bundle.setProductTextiles(productTextileMapper.VoToEntity(textiles));
-		productBundleVo = productBundleMapper.EntityToVo(productBundleRepo.save(bundle));
+		productBundleVo = productBundleMapper.entityToVO(productBundleRepo.save(bundle));
 		return productBundleVo;
 	}
 
@@ -125,12 +125,12 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 			bundles = productBundleRepo.findByCreatedDateBetweenAndStatus(fromTime, toTime, status);
 		}
 
-		List<ProductBundleVo> productBundleVo = productBundleMapper.EntityToVo(bundles);
+		List<ProductBundleVo> productBundleVo = productBundleMapper.entityToVO(bundles);
 
 		productBundleVo.stream().forEach(bundleVo -> {
 
 			bundleVo.getProductTextiles().stream().forEach(product -> {
-				ProductTextile productTextile = productTextileRepo.findByBarcodeAndSellingTypeCode(product.getBarcode(),
+				Product productTextile = productTextileRepo.findByBarcodeAndSellingTypeCode(product.getBarcode(),
 						ProductEnum.PRODUCTBUNDLE);
 				bundleVo.setValue(bundleVo.getBundleQuantity() * productTextile.getItemMrp());
 			});
@@ -147,7 +147,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		if (!productBundleOpt.isPresent()) {
 			throw new RecordNotFoundException("bundle data is  not found with id: " + productBundleVo.getId());
 		}
-		ProductBundle productBundle = productBundleMapper.VoToEntity(productBundleVo);
+		ProductBundle productBundle = productBundleMapper.voToEntity(productBundleVo);
 		productBundle.setId(productBundleVo.getId());
 		ProductBundle productBundleUpdate = productBundleRepo.save(productBundle);
 		log.info("after updating bundle details:" + productBundleUpdate);
@@ -166,7 +166,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		// productBundleRepo.delete(productBundleOpt.get());
 		log.info("after deleting bundle details:" + id);
 		ProductBundleVo productBundleVo = productBundleMapper
-				.EntityToVo(productBundleRepo.save(productBundleOpt.get()));
+				.entityToVO(productBundleRepo.save(productBundleOpt.get()));
 		return productBundleVo;
 	}
 

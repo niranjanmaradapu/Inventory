@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.otsi.retail.inventory.gatewayresponse.GateWayResponse;
 import com.otsi.retail.inventory.service.ProductItemService;
 import com.otsi.retail.inventory.vo.ProductItemVo;
-import com.otsi.retail.inventory.vo.ProductTextileVo;
+import com.otsi.retail.inventory.vo.ProductVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

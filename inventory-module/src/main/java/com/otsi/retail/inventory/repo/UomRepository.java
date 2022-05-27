@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 import com.otsi.retail.inventory.model.UomEntity;
 
 @Repository
-public interface UomRepo extends JpaRepository<UomEntity, Long> {
+public interface UomRepository extends JpaRepository<UomEntity, Long> {
 
 }

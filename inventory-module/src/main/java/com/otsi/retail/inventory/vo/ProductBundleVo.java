@@ -21,7 +21,7 @@ public class ProductBundleVo {
 
 	private Integer bundleQuantity;
 
-	private List<ProductTextileVo> productTextiles;
+	private List<ProductVO> productTextiles;
 
 	private LocalDateTime fromDate;
 

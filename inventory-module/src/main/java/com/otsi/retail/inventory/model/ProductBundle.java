@@ -44,6 +44,6 @@ public class ProductBundle extends BaseEntity {
 
 	@ManyToMany
 	@JoinTable(name = "product_bundle_assignment_textile", joinColumns = @JoinColumn(name = "product_bundle_id"), inverseJoinColumns = @JoinColumn(name = "assigned_product_id"))
-	private List<ProductTextile> productTextiles;
+	private List<Product> productTextiles;
 
 }

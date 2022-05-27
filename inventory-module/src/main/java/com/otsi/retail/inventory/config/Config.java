@@ -14,5 +14,10 @@ public class Config {
 
 	@Value("${getUserDetails_url}")
 	private String userDetails;
+	
+	@Value("${hsn_details_url}")
+	private String hsnDetailsUrl;
+	
+	
 
 }
