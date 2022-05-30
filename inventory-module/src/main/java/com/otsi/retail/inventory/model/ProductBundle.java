@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Table(name = "product_bundle")
 public class ProductBundle extends BaseEntity {
-	
+
 	@Id
 	@GeneratedValue
 	private Long id;
@@ -41,6 +41,10 @@ public class ProductBundle extends BaseEntity {
 	private Long storeId;
 
 	private Integer bundleQuantity;
+
+	private String barcode;
+
+	private float itemMrp;
 
 	@ManyToMany
 	@JoinTable(name = "product_bundle_assignment_textile", joinColumns = @JoinColumn(name = "product_bundle_id"), inverseJoinColumns = @JoinColumn(name = "assigned_product_id"))

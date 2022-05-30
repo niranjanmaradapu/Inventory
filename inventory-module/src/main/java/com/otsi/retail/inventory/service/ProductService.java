@@ -30,7 +30,7 @@ public interface ProductService {
 
 	List<String> getValuesFromProductTextileColumns(String enumName);
 
-	void inventoryUpdate(List<InventoryUpdateVo> request);
+	void inventoryUpdate(List<InventoryUpdateVo> request, String type, String referringTable);
 
 	List<ProductVO> getBarcodes(List<String> barcode);
 

@@ -158,7 +158,19 @@ public class ProductController {
 	 */
 	@RabbitListener(queues = MQConfig.inventory_queue)
 	public void inventoryUpdate(@RequestBody List<InventoryUpdateVo> request) {
-		productService.inventoryUpdate(request);
+		String type = Constants.NEW_SALE;
+		String referringTable = Constants.ORDER_TABLE;
+		productService.inventoryUpdate(request ,type , referringTable);
+	}
+	/**
+	 * 
+	 * @param request
+	 */
+	//@RabbitListener(queues = MQConfig.returnslip_queue)
+	public void returnslipInventoryUpdate(@RequestBody List<InventoryUpdateVo> request) {
+		String type = Constants.RETURN_SLIP;
+		String referringTable = Constants.CUSTOMER_TABLE;
+		productService.inventoryUpdate(request ,type , referringTable);
 	}
 
 	/**

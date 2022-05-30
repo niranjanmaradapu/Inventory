@@ -3,6 +3,7 @@ package com.otsi.retail.inventory.mapper;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +38,7 @@ public class ProductTextileMapper {
 		vo.setOriginalBarcodeCreatedAt(dto.getOriginalBarcodeCreatedAt());
 		vo.setStoreId(dto.getStoreId());
 		vo.setDomainId(dto.getDomainId());
-        vo.setSellingTypeCode(dto.getSellingTypeCode());
+		vo.setSellingTypeCode(dto.getSellingTypeCode());
 		return vo;
 
 	}
@@ -48,6 +49,14 @@ public class ProductTextileMapper {
 
 	public List<ProductVO> EntityToVo(List<Product> dtos) {
 		return dtos.stream().map(dto -> EntityToVo(dto)).collect(Collectors.toList());
+
+	}
+
+	public Product customVoToEntityMapper(ProductVO productVo) {
+		Product product = new Product();
+		product.setQty(productVo.getQty());
+		product.setId(productVo.getId());
+		return product;
 
 	}
 
@@ -86,5 +95,5 @@ public class ProductTextileMapper {
 		return vos.stream().map(vo -> VoToEntity(vo)).collect(Collectors.toList());
 
 	}
-	
+
 }

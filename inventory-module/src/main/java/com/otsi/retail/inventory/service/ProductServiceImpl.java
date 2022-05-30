@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -44,6 +43,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otsi.retail.inventory.commons.AdjustmentType;
 import com.otsi.retail.inventory.commons.DomainType;
+import com.otsi.retail.inventory.commons.Generation;
 import com.otsi.retail.inventory.commons.NatureOfTransaction;
 import com.otsi.retail.inventory.commons.ProductStatus;
 import com.otsi.retail.inventory.config.Config;
@@ -59,11 +59,14 @@ import com.otsi.retail.inventory.model.ProductItem;
 import com.otsi.retail.inventory.model.ProductTransaction;
 import com.otsi.retail.inventory.model.ProductTransactionRe;
 import com.otsi.retail.inventory.repo.AdjustmentRepo;
+import com.otsi.retail.inventory.repo.BundledProductAssignmentRepository;
+import com.otsi.retail.inventory.repo.ProductBundleRepo;
 import com.otsi.retail.inventory.repo.ProductInventoryRepo;
 import com.otsi.retail.inventory.repo.ProductItemRepo;
 import com.otsi.retail.inventory.repo.ProductRepository;
 import com.otsi.retail.inventory.repo.ProductTransactionReRepo;
 import com.otsi.retail.inventory.repo.ProductTransactionRepo;
+import com.otsi.retail.inventory.util.Constants;
 import com.otsi.retail.inventory.util.DateConverters;
 import com.otsi.retail.inventory.util.ExcelService;
 import com.otsi.retail.inventory.vo.AdjustmentsVo;
@@ -113,6 +116,12 @@ public class ProductServiceImpl implements ProductService {
 	private ExcelService excelService;
 
 	@Autowired
+	private BundledProductAssignmentRepository bundledProductAssignmentRepository;
+
+	@Autowired
+	private ProductBundleRepo productBundleRepo;
+
+	@Autowired
 	private RestTemplate restTemplate;
 
 	private static final String PRODUCT_TABLE = "PRODUCT";
@@ -126,7 +135,7 @@ public class ProductServiceImpl implements ProductService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cost price and list price are required");
 		}
 		Product product = productTextileMapper.VoToEntity(productVO);
-		product.setBarcode("BAR-" + getSaltString().toString());
+		product.setBarcode("BAR-" + Generation.getSaltString().toString());
 		product = productRepository.save(product);
 		saveProductTransaction(product, NatureOfTransaction.PURCHASE.getName(), PRODUCT_TABLE, product.getId(),
 				PRODUCT_PURCHASE_COMMENT);
@@ -146,8 +155,8 @@ public class ProductServiceImpl implements ProductService {
 		productRepository.save(oldProduct);
 
 		Product product = productTextileMapper.VoToEntity(productVO);
-		product.setBarcode(
-				"REBAR/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/" + getSaltString());
+		product.setBarcode("REBAR/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/"
+				+ Generation.getSaltString());
 		product.setParentBarcode(oldProduct.getBarcode());
 		product = productRepository.save(product);
 
@@ -394,7 +403,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public void inventoryUpdate(List<InventoryUpdateVo> request) {
+	public void inventoryUpdate(List<InventoryUpdateVo> request, String type, String referringTable) {
 		request.stream().forEach(x -> {
 			// for textile update
 			if (x.getDomainId() == 1) {
@@ -403,31 +412,44 @@ public class ProductServiceImpl implements ProductService {
 					log.error("record not found with barcode:" + x.getBarCode());
 					throw new RecordNotFoundException("record not found with barcode:" + x.getBarCode());
 				}
-				List<ProductTransaction> transact = new ArrayList<>();
-				transact = productTransactionRepository.findAllByBarcodeId(barcodeDetails.getBarcode());
-				transact.stream().forEach(t -> {
-					if (t.getEffectingTable().equals("product textile table")) {
-						t = productTransactionRepository.findByBarcodeIdAndEffectingTableAndMasterFlag(
-								barcodeDetails.getBarcode(), "product textile table", true);
-						t.setQuantity(Math.abs(x.getQuantity() - t.getQuantity()));
-						productTransactionRepository.save(t);
-					} else if (t.getEffectingTable().equals("Adjustments")) {
-						t = productTransactionRepository.findByBarcodeIdAndEffectingTableAndMasterFlag(
-								barcodeDetails.getBarcode(), "Adjustments", true);
-						t.setQuantity(Math.abs(x.getQuantity() - t.getQuantity()));
-						productTransactionRepository.save(t);
-					}
-				});
-				ProductTransaction prodTrans = new ProductTransaction();
-				prodTrans.setBarcodeId(barcodeDetails.getBarcode());
-				prodTrans.setEffectingTableId(x.getLineItemId());
-				prodTrans.setQuantity(x.getQuantity());
-				prodTrans.setStoreId(x.getStoreId());
-				prodTrans.setNatureOfTransaction(NatureOfTransaction.SALE.getName());
-				prodTrans.setMasterFlag(true);
-				prodTrans.setComment("sale");
-				prodTrans.setEffectingTable("order table");
-				ProductTransaction textileUpdate = productTransactionRepository.save(prodTrans);
+				if (type.equals(Constants.NEW_SALE)) {
+					barcodeDetails.setQty(Math.abs(x.getQuantity() - barcodeDetails.getQty()));
+				} else if (type.equals(Constants.RETURN_SLIP)) {
+					barcodeDetails.setQty(Math.abs(x.getQuantity() + barcodeDetails.getQty()));
+				}
+				barcodeDetails.setLastModifiedDate(LocalDateTime.now());
+				productRepository.save(barcodeDetails);
+
+				/*
+				 * List<ProductTransaction> transact = new ArrayList<>(); transact =
+				 * productTransactionRepo.findAllByBarcodeId(barcodeDetails.getBarcode());
+				 * transact.stream().forEach(t -> { if
+				 * (t.getEffectingTable().equals("product textile table")) { t =
+				 * productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(
+				 * barcodeDetails.getBarcode(), "product textile table", true);
+				 * t.setQuantity(Math.abs(x.getQuantity() - t.getQuantity()));
+				 * productTransactionRepo.save(t); } else if
+				 * (t.getEffectingTable().equals("Adjustments")) { t =
+				 * productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(
+				 * barcodeDetails.getBarcode(), "Adjustments", true); if
+				 * (type.equals(Constants.NEW_SALE)) { t.setQuantity(Math.abs(x.getQuantity() -
+				 * t.getQuantity())); } else if (type.equals(Constants.RETURN_SLIP)) {
+				 * t.setQuantity(Math.abs(x.getQuantity() + t.getQuantity())); }
+				 * 
+				 * productTransactionRepo.save(t); } });
+				 */
+
+				ProductTransaction productTransaction = new ProductTransaction();
+				productTransaction.setBarcodeId(barcodeDetails.getBarcode());
+				productTransaction.setEffectingTableId(x.getLineItemId());
+				productTransaction.setQuantity(x.getQuantity());
+				productTransaction.setStoreId(x.getStoreId());
+				productTransaction.setNatureOfTransaction(NatureOfTransaction.SALE.getName());
+				productTransaction.setMasterFlag(true);
+				productTransaction.setComment(Constants.SALE);
+				// setReffering(productTransaction , referringTable);
+				productTransaction.setEffectingTable(referringTable);
+				ProductTransaction textileUpdate = productTransactionRepository.save(productTransaction);
 				log.info("updated textile successfully from newsale...");
 
 			} else {
@@ -459,8 +481,8 @@ public class ProductServiceImpl implements ProductService {
 				prodTransRe.setCreationDate(LocalDate.now());
 				prodTransRe.setLastModified(LocalDate.now());
 				prodTransRe.setMasterFlag(true);
-				prodTransRe.setComment("sale");
-				prodTransRe.setEffectingTable("order table");
+				prodTransRe.setComment(Constants.SALE);
+				prodTransRe.setEffectingTable(referringTable);
 				ProductTransactionRe retailUpdate = productTransactionReRepo.save(prodTransRe);
 				log.info("updated retail successfully from newsale....");
 			}
@@ -804,18 +826,4 @@ public class ProductServiceImpl implements ProductService {
 		return bvo;
 
 	}
-
-	protected String getSaltString() {
-		String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-		StringBuilder salt = new StringBuilder();
-		Random rnd = new Random();
-		while (salt.length() < 6) {
-			int index = (int) (rnd.nextFloat() * SALTCHARS.length());
-			salt.append(SALTCHARS.charAt(index));
-		}
-		String saltStr = salt.toString();
-		return saltStr;
-
-	}
-
 }
