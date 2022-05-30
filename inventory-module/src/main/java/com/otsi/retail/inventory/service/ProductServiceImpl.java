@@ -45,6 +45,7 @@ import com.otsi.retail.inventory.commons.AdjustmentType;
 import com.otsi.retail.inventory.commons.DomainType;
 import com.otsi.retail.inventory.commons.Generation;
 import com.otsi.retail.inventory.commons.NatureOfTransaction;
+import com.otsi.retail.inventory.commons.ProductEnum;
 import com.otsi.retail.inventory.commons.ProductStatus;
 import com.otsi.retail.inventory.config.Config;
 import com.otsi.retail.inventory.exceptions.InvalidDataException;
@@ -54,6 +55,8 @@ import com.otsi.retail.inventory.mapper.AdjustmentMapper;
 import com.otsi.retail.inventory.mapper.ProductTextileMapper;
 import com.otsi.retail.inventory.model.Adjustments;
 import com.otsi.retail.inventory.model.Product;
+import com.otsi.retail.inventory.model.ProductBundle;
+import com.otsi.retail.inventory.model.ProductBundleAssignmentTextile;
 import com.otsi.retail.inventory.model.ProductInventory;
 import com.otsi.retail.inventory.model.ProductItem;
 import com.otsi.retail.inventory.model.ProductTransaction;
@@ -114,9 +117,6 @@ public class ProductServiceImpl implements ProductService {
 
 	@Autowired
 	private ExcelService excelService;
-
-	@Autowired
-	private BundledProductAssignmentRepository bundledProductAssignmentRepository;
 
 	@Autowired
 	private ProductBundleRepo productBundleRepo;
@@ -413,32 +413,25 @@ public class ProductServiceImpl implements ProductService {
 					throw new RecordNotFoundException("record not found with barcode:" + x.getBarCode());
 				}
 				if (type.equals(Constants.NEW_SALE)) {
-					barcodeDetails.setQty(Math.abs(x.getQuantity() - barcodeDetails.getQty()));
+
+					if (barcodeDetails.getSellingTypeCode().equals(ProductEnum.BUNDLEDPRODUCT)) {
+						barcodeDetails.setQty(Math.abs(x.getQuantity() - barcodeDetails.getQty()));
+						ProductBundle bundle = productBundleRepo.findByBarcode(x.getBarCode());
+						bundle.setBundleQuantity(Math.abs(x.getQuantity() - bundle.getBundleQuantity()));
+						bundle.getProductTextiles().stream().forEach(product -> {
+							barcodeDetails.setQty(Math.abs(x.getQuantity() - product.getQty()));
+							productRepository.save(barcodeDetails);
+						});
+						productBundleRepo.save(bundle);
+					} else {
+						barcodeDetails.setQty(Math.abs(x.getQuantity() - barcodeDetails.getQty()));
+					}
 				} else if (type.equals(Constants.RETURN_SLIP)) {
 					barcodeDetails.setQty(Math.abs(x.getQuantity() + barcodeDetails.getQty()));
 				}
 				barcodeDetails.setLastModifiedDate(LocalDateTime.now());
 				productRepository.save(barcodeDetails);
-
-				/*
-				 * List<ProductTransaction> transact = new ArrayList<>(); transact =
-				 * productTransactionRepo.findAllByBarcodeId(barcodeDetails.getBarcode());
-				 * transact.stream().forEach(t -> { if
-				 * (t.getEffectingTable().equals("product textile table")) { t =
-				 * productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(
-				 * barcodeDetails.getBarcode(), "product textile table", true);
-				 * t.setQuantity(Math.abs(x.getQuantity() - t.getQuantity()));
-				 * productTransactionRepo.save(t); } else if
-				 * (t.getEffectingTable().equals("Adjustments")) { t =
-				 * productTransactionRepo.findByBarcodeIdAndEffectingTableAndMasterFlag(
-				 * barcodeDetails.getBarcode(), "Adjustments", true); if
-				 * (type.equals(Constants.NEW_SALE)) { t.setQuantity(Math.abs(x.getQuantity() -
-				 * t.getQuantity())); } else if (type.equals(Constants.RETURN_SLIP)) {
-				 * t.setQuantity(Math.abs(x.getQuantity() + t.getQuantity())); }
-				 * 
-				 * productTransactionRepo.save(t); } });
-				 */
-
+				
 				ProductTransaction productTransaction = new ProductTransaction();
 				productTransaction.setBarcodeId(barcodeDetails.getBarcode());
 				productTransaction.setEffectingTableId(x.getLineItemId());

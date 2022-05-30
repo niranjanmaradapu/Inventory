@@ -28,5 +28,7 @@ public class ProductBundleVo {
 	private LocalDateTime toDate;
 	
 	private Float value;
+	
+	private String barcode;
 
 }

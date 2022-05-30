@@ -87,6 +87,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 				itemMrpCalculation = textiles.stream().mapToDouble(x -> x.getItemMrp() * x.getQty()).sum();
 				float mrp = (float) itemMrpCalculation;
 				product.setItemMrp(mrp);
+				bundle.setItemMrp(mrp);
 			}
 		});
 
@@ -94,6 +95,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		// saving product bundle again as individual product
 
 		product.setBarcode(bundle.getBarcode());
+		product.setStoreId(bundle.getStoreId());
 		product.setSellingTypeCode(ProductEnum.BUNDLEDPRODUCT);
 		product.setQty(bundle.getBundleQuantity());
 		productTextileRepo.save(product);

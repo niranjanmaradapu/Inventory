@@ -1,17 +1,10 @@
 package com.otsi.retail.inventory.mapper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import com.otsi.retail.inventory.model.ProductBundle;
-import com.otsi.retail.inventory.model.ProductTransaction;
-import com.otsi.retail.inventory.repo.ProductTransactionRepo;
 import com.otsi.retail.inventory.vo.ProductBundleVo;
-import com.otsi.retail.inventory.vo.ProductVO;
 
 @Component
 public class ProductBundleMapper {
@@ -27,6 +20,7 @@ public class ProductBundleMapper {
 		productBundleVo.setStatus(productBundle.getStatus());
 		productBundleVo.setFromDate(productBundle.getCreatedDate());
 		productBundleVo.setToDate(productBundle.getLastModifiedDate());
+		productBundleVo.setBarcode(productBundle.getBarcode());
 
 		/*
 		 * List<ProductVO> listVo = new ArrayList<>();
@@ -59,8 +53,8 @@ public class ProductBundleMapper {
 		 * productTextileVo.setDomainId(product.getDomainId());
 		 * listVo.add(productTextileVo);
 		 * 
-		 * });
-		 *productBundleVo.setProductTextiles(listVo);
+		 * }); 
+		 * productBundleVo.setProductTextiles(listVo);
 		 */
 		return productBundleVo;
 
@@ -101,5 +95,4 @@ public class ProductBundleMapper {
 				.collect(Collectors.toList());
 
 	}
-
 }

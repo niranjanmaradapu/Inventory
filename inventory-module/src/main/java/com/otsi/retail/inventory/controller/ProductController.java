@@ -166,7 +166,7 @@ public class ProductController {
 	 * 
 	 * @param request
 	 */
-	//@RabbitListener(queues = MQConfig.returnslip_queue)
+	@RabbitListener(queues ="returnslip_queue")
 	public void returnslipInventoryUpdate(@RequestBody List<InventoryUpdateVo> request) {
 		String type = Constants.RETURN_SLIP;
 		String referringTable = Constants.CUSTOMER_TABLE;
