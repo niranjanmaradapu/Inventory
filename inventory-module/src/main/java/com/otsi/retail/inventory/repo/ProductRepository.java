@@ -46,7 +46,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	List<Product> findByBarcodeIn(List<String> barcode);
 
-	@Query(value = "select column_name from information_schema.columns where table_name ='product_textile'", nativeQuery = true)
+	@Query(value = "select column_name from information_schema.columns where table_name ='product'", nativeQuery = true)
 	List<String> findAllColumnNames();
 
 	List<Product> findByEmpIdAndStatusAndStoreId(String empId, ProductStatus status, Long storeId);

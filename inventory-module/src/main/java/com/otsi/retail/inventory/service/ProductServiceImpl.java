@@ -406,79 +406,46 @@ public class ProductServiceImpl implements ProductService {
 	public void inventoryUpdate(List<InventoryUpdateVo> request, String type, String referringTable) {
 		request.stream().forEach(x -> {
 			// for textile update
-			if (x.getDomainId() == 1) {
-				Product barcodeDetails = productRepository.findByBarcode(x.getBarCode());
-				if (barcodeDetails == null) {
-					log.error("record not found with barcode:" + x.getBarCode());
-					throw new RecordNotFoundException("record not found with barcode:" + x.getBarCode());
-				}
-				if (type.equals(Constants.NEW_SALE)) {
-
+			Product barcodeDetails = productRepository.findByBarcode(x.getBarCode());
+			if (barcodeDetails == null) {
+				log.error("record not found with barcode:" + x.getBarCode());
+				throw new RecordNotFoundException("record not found with barcode:" + x.getBarCode());
+			}
+			if (type.equals(Constants.NEW_SALE)) {
+				if (barcodeDetails.getSellingTypeCode() != null) {
 					if (barcodeDetails.getSellingTypeCode().equals(ProductEnum.BUNDLEDPRODUCT)) {
-						barcodeDetails.setQty(Math.abs(x.getQuantity() - barcodeDetails.getQty()));
 						ProductBundle bundle = productBundleRepo.findByBarcode(x.getBarCode());
+						// individual quantity calculation
+						Integer productTotalQuantity = bundle.getProductTextiles().stream()
+								.mapToInt(barcode -> barcode.getQty()).sum();
 						bundle.setBundleQuantity(Math.abs(x.getQuantity() - bundle.getBundleQuantity()));
 						bundle.getProductTextiles().stream().forEach(product -> {
-							barcodeDetails.setQty(Math.abs(x.getQuantity() - product.getQty()));
+							// update quantity
+							barcodeDetails.setQty(Math.abs(x.getQuantity() - (productTotalQuantity)));
 							productRepository.save(barcodeDetails);
 						});
 						productBundleRepo.save(bundle);
 					} else {
 						barcodeDetails.setQty(Math.abs(x.getQuantity() - barcodeDetails.getQty()));
 					}
-				} else if (type.equals(Constants.RETURN_SLIP)) {
-					barcodeDetails.setQty(Math.abs(x.getQuantity() + barcodeDetails.getQty()));
 				}
-				barcodeDetails.setLastModifiedDate(LocalDateTime.now());
-				productRepository.save(barcodeDetails);
-				
-				ProductTransaction productTransaction = new ProductTransaction();
-				productTransaction.setBarcodeId(barcodeDetails.getBarcode());
-				productTransaction.setEffectingTableId(x.getLineItemId());
-				productTransaction.setQuantity(x.getQuantity());
-				productTransaction.setStoreId(x.getStoreId());
-				productTransaction.setNatureOfTransaction(NatureOfTransaction.SALE.getName());
-				productTransaction.setMasterFlag(true);
-				productTransaction.setComment(Constants.SALE);
-				// setReffering(productTransaction , referringTable);
-				productTransaction.setEffectingTable(referringTable);
-				ProductTransaction textileUpdate = productTransactionRepository.save(productTransaction);
-				log.info("updated textile successfully from newsale...");
-
-			} else {
-				// for retail update
-				ProductItem barOpt = productItemRepo.findByBarcodeId(x.getBarCode());
-				if (barOpt == null) {
-					log.error("record not found with barcode:" + x.getBarCode());
-					throw new RecordNotFoundException("record not found with barcode:" + x.getBarCode());
-				}
-				Optional<ProductItem> prodOpt = productItemRepo.findByProductItemId(barOpt.getProductItemId());
-				ProductInventory item = prodOpt.get().getProductInventory();
-				if (item == null) {
-					throw new RecordNotFoundException("product inventory is not found");
-				}
-				ProductItem item1 = prodOpt.get();
-				Optional<ProductInventory> prodOp = productInventoryRepo.findByProductItem(item1);
-				ProductInventory prodInvUpdate = prodOp.get();
-				prodInvUpdate.setLastModified(LocalDate.now());
-				prodInvUpdate.setProductItem(item1);
-				prodInvUpdate.setStockvalue(Math.abs(barOpt.getProductInventory().getStockvalue() - x.getQuantity()));
-				productInventoryRepo.save(prodInvUpdate);
-
-				ProductTransactionRe prodTransRe = new ProductTransactionRe();
-				prodTransRe.setBarcodeId(barOpt.getBarcodeId());
-				prodTransRe.setEffectingTableId(x.getLineItemId());
-				prodTransRe.setQuantity(x.getQuantity());
-				prodTransRe.setStoreId(x.getStoreId());
-				prodTransRe.setNatureOfTransaction(NatureOfTransaction.SALE.getName());
-				prodTransRe.setCreationDate(LocalDate.now());
-				prodTransRe.setLastModified(LocalDate.now());
-				prodTransRe.setMasterFlag(true);
-				prodTransRe.setComment(Constants.SALE);
-				prodTransRe.setEffectingTable(referringTable);
-				ProductTransactionRe retailUpdate = productTransactionReRepo.save(prodTransRe);
-				log.info("updated retail successfully from newsale....");
+			} else if (type.equals(Constants.RETURN_SLIP)) {
+				barcodeDetails.setQty(Math.abs(x.getQuantity() + barcodeDetails.getQty()));
 			}
+			barcodeDetails.setLastModifiedDate(LocalDateTime.now());
+			productRepository.save(barcodeDetails);
+
+			ProductTransaction productTransaction = new ProductTransaction();
+			productTransaction.setBarcodeId(barcodeDetails.getBarcode());
+			productTransaction.setEffectingTableId(x.getLineItemId());
+			productTransaction.setQuantity(x.getQuantity());
+			productTransaction.setStoreId(x.getStoreId());
+			productTransaction.setNatureOfTransaction(NatureOfTransaction.SALE.getName());
+			productTransaction.setMasterFlag(true);
+			productTransaction.setComment(Constants.SALE);
+			productTransaction.setEffectingTable(referringTable);
+			productTransactionRepository.save(productTransaction);
+			log.info("updated textile successfully from newsale...");
 		});
 
 		log.info("updated inventory from newsale successfully..");
@@ -592,7 +559,7 @@ public class ProductServiceImpl implements ProductService {
 					enumName = enumName.isEmpty() ? enumName
 							: enumName.substring(0, 4).toLowerCase() + underscore + enumName.substring(4).toLowerCase();
 				}
-				query = "select p." + enumName + " from  product_textile p group by  p." + enumName;
+				query = "select p." + enumName + " from  product p group by  p." + enumName;
 			} else if (enumName.equalsIgnoreCase("Dcode") || enumName.equalsIgnoreCase("StyleCode")
 					|| enumName.equalsIgnoreCase("SubSectionId") || enumName.equalsIgnoreCase("DiscountType")) {
 				return Collections.emptyList();
@@ -612,13 +579,9 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<String> getAllColumns(Long domainId) {
+	public List<String> getAllColumns() {
 		List<String> columns = new ArrayList<>();
-		if (domainId == 1) {
-			columns = productRepository.findAllColumnNames();
-		} else {
-			columns = productItemRepo.findAllColumnNames();
-		}
+		columns = productRepository.findAllColumnNames();
 		return columns;
 	}
 

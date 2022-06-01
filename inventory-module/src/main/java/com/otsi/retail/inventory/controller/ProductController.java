@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.otsi.retail.inventory.commons.DomainType;
 import com.otsi.retail.inventory.gatewayresponse.GateWayResponse;
 import com.otsi.retail.inventory.rabbitmq.MQConfig;
 import com.otsi.retail.inventory.service.ProductService;
@@ -157,6 +158,7 @@ public class ProductController {
 	 * @param request
 	 */
 	@RabbitListener(queues = MQConfig.inventory_queue)
+	@PostMapping("/inventory-update")
 	public void inventoryUpdate(@RequestBody List<InventoryUpdateVo> request) {
 		String type = Constants.NEW_SALE;
 		String referringTable = Constants.ORDER_TABLE;
@@ -229,9 +231,9 @@ public class ProductController {
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
 			@ApiResponse(code = 200, message = "Successful retrieval", response = ProductVO.class, responseContainer = "List") })
 	@GetMapping("/getAllColumns")
-	public GateWayResponse<?> getAllColumns(@RequestParam Long domainId) {
+	public GateWayResponse<?> getAllColumns() {
 		log.info("Received Request to getAllColumns...");
-		List<String> columns = productService.getAllColumns(domainId);
+		List<String> columns = productService.getAllColumns();
 		return new GateWayResponse<>("fetching all Column details", columns);
 
 	}

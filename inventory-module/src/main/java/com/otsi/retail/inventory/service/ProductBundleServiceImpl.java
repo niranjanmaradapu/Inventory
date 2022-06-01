@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.itextpdf.text.io.GetBufferedRandomAccessSource;
 import com.otsi.retail.inventory.commons.Generation;
 import com.otsi.retail.inventory.commons.ProductEnum;
 import com.otsi.retail.inventory.commons.ProductStatus;
@@ -68,14 +69,22 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		ProductStatus status = ProductStatus.ENABLE;
 
 		List<ProductBundleAssignmentTextile> bundleList = new ArrayList<ProductBundleAssignmentTextile>();
-
+		Integer productBundleQuantity = productBundleVo.getBundleQuantity();
+		Long productTotalQuantity = textiles.stream().mapToLong(x -> x.getQty()).sum();
+		
 		textiles.stream().forEach(productTextile -> {
+			// Long productTotalQuantity = 1000l;
+			if (productTextile.getQty() * productBundleQuantity > productTotalQuantity) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+						"insufficient product quantity for product: " + productTextile.getName());
+			}
+
 			Product productBarcode = productTextileRepo.findByBarcodeAndStatus(productTextile.getBarcode(), status);
 			if (productBarcode != null) {
 				productBarcode.setSellingTypeCode(ProductEnum.PRODUCTBUNDLE);
 				productTextileRepo.save(productBarcode);
 			}
-
+     
 			ProductBundleAssignmentTextile bundledProductAssignment = new ProductBundleAssignmentTextile();
 			bundledProductAssignment.setProductBundleId(bundle);
 			bundledProductAssignment.setAssignedproductId(productTextileMapper.customVoToEntityMapper(productTextile));

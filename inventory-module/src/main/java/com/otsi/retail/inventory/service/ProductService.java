@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.otsi.retail.inventory.commons.DomainType;
 import com.otsi.retail.inventory.vo.AdjustmentsVo;
 import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
@@ -26,7 +27,7 @@ public interface ProductService {
 
 	ProductVO getBarcode(String barcode, Long storeId);
 
-	List<String> getAllColumns(Long domainId);
+	List<String> getAllColumns();
 
 	List<String> getValuesFromProductTextileColumns(String enumName);
 
@@ -50,5 +51,7 @@ public interface ProductService {
 	DomainTypePropertiesVO getProperties(String domainType);
 
 	ProductVO barcodeDetails(String barcode, Long clientId, Long storeId);
+
+	
 
 }
