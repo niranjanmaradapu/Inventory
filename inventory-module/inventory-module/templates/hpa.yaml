@@ -1,12 +1,12 @@
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "inventory.fullname" . }}
+  name: {{ include "inventory-module.fullname" . }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "inventory.fullname" . }}
+    name: {{ include "inventory-module.fullname" . }}
   minReplicas: 1
   maxReplicas: 10
   metrics:
