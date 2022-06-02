@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.otsi.retail.inventory.commons.Categories;
 import com.otsi.retail.inventory.model.CatalogEntity;
-import com.otsi.retail.inventory.vo.CatalogVo;
+import com.otsi.retail.inventory.vo.CatalogVO;
 
 /**
  * @author Sudheer.Swamy
@@ -24,7 +24,7 @@ public interface CatalogRepository extends JpaRepository<CatalogEntity, Long> {
 
 	Optional<CatalogEntity> findByName(String name);
 
-	CatalogVo save(CatalogVo update);
+	CatalogVO save(CatalogVO update);
 
 	CatalogEntity getById(int cuid);
 

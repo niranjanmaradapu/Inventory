@@ -4,61 +4,42 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import com.otsi.retail.inventory.model.Adjustments;
-import com.otsi.retail.inventory.vo.AdjustmentsVo;
+import com.otsi.retail.inventory.vo.AdjustmentsVO;
 
 @Component
 public class AdjustmentMapper {
 
-	/*
-	 * EntityToVo converts dto to vo
-	 * 
-	 */
-
-	public AdjustmentsVo EntityToVo(Adjustments dto) {
-		AdjustmentsVo vo = new AdjustmentsVo();
-		vo.setAdjustmentId(dto.getAdjustmentId());
-		vo.setCreatedBy(dto.getCreatedBy());
-		vo.setCurrentBarcodeId(dto.getCurrentBarcodeId());
-		vo.setToBeBarcodeId(dto.getToBeBarcodeId());
-		vo.setCreatedDate(dto.getCreatedDate());
-		vo.setLastModifiedDate(dto.getLastModifiedDate());
-		vo.setComments(dto.getComments());
-		vo.setStoreId(dto.getStoreId());
+	public AdjustmentsVO entityToVO(Adjustments entity) {
+		AdjustmentsVO vo = new AdjustmentsVO();
+		vo.setAdjustmentId(entity.getAdjustmentId());
+		vo.setCreatedBy(entity.getCreatedBy());
+		vo.setCurrentBarcodeId(entity.getCurrentBarcodeId());
+		vo.setToBeBarcodeId(entity.getToBeBarcodeId());
+		vo.setCreatedDate(entity.getCreatedDate());
+		vo.setLastModifiedDate(entity.getLastModifiedDate());
+		vo.setComments(entity.getComments());
+		vo.setStoreId(entity.getStoreId());
 		return vo;
 
 	}
 
-	/*
-	 * to convert list dto's to vo's
-	 */
-
-	public List<AdjustmentsVo> EntityToVo(List<Adjustments> dtos) {
-		return dtos.stream().map(dto -> EntityToVo(dto)).collect(Collectors.toList());
+	public List<AdjustmentsVO> entityToVO(List<Adjustments> entities) {
+		return entities.stream().map(entity -> entityToVO(entity)).collect(Collectors.toList());
 
 	}
 
-	/*
-	 * VoToEntity converts vo to dto
-	 * 
-	 */
-
-	public Adjustments VoToEntity(AdjustmentsVo vo) {
-		Adjustments dto = new Adjustments();
-	    dto.setAdjustmentId(vo.getAdjustmentId());
-		//dto.setCreatedBy(vo.getCreatedBy());
-		dto.setCurrentBarcodeId(vo.getCurrentBarcodeId());
-		dto.setToBeBarcodeId(vo.getToBeBarcodeId());
-		dto.setComments(vo.getComments());
-		return dto;
+	public Adjustments voToEntity(AdjustmentsVO vo) {
+		Adjustments entity = new Adjustments();
+		entity.setAdjustmentId(vo.getAdjustmentId());
+		entity.setCurrentBarcodeId(vo.getCurrentBarcodeId());
+		entity.setToBeBarcodeId(vo.getToBeBarcodeId());
+		entity.setComments(vo.getComments());
+		return entity;
 
 	}
 
-	/*
-	 * to convert list vo's to dto's
-	 */
-
-	public List<Adjustments> VoToEntity(List<AdjustmentsVo> vos) {
-		return vos.stream().map(vo -> VoToEntity(vo)).collect(Collectors.toList());
+	public List<Adjustments> voToEntity(List<AdjustmentsVO> vos) {
+		return vos.stream().map(vo -> voToEntity(vo)).collect(Collectors.toList());
 
 	}
 

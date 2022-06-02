@@ -17,13 +17,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.itextpdf.text.io.GetBufferedRandomAccessSource;
 import com.otsi.retail.inventory.commons.Generation;
 import com.otsi.retail.inventory.commons.ProductEnum;
 import com.otsi.retail.inventory.commons.ProductStatus;
 import com.otsi.retail.inventory.exceptions.RecordNotFoundException;
 import com.otsi.retail.inventory.mapper.ProductBundleMapper;
-import com.otsi.retail.inventory.mapper.ProductTextileMapper;
+import com.otsi.retail.inventory.mapper.ProductMapper;
 import com.otsi.retail.inventory.model.Product;
 import com.otsi.retail.inventory.model.ProductBundle;
 import com.otsi.retail.inventory.model.ProductBundleAssignmentTextile;
@@ -46,10 +45,10 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 	private ProductBundleRepo productBundleRepo;
 
 	@Autowired
-	private ProductRepository productTextileRepo;
+	private ProductRepository productRepository;
 
 	@Autowired
-	private ProductTextileMapper productTextileMapper;
+	private ProductMapper productMapper;
 
 	@Autowired
 	private BundledProductAssignmentRepository bundledProductAssignmentRepository;
@@ -79,15 +78,15 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 						"insufficient product quantity for product: " + productTextile.getName());
 			}
 
-			Product productBarcode = productTextileRepo.findByBarcodeAndStatus(productTextile.getBarcode(), status);
+			Product productBarcode = productRepository.findByBarcodeAndStatus(productTextile.getBarcode(), status);
 			if (productBarcode != null) {
 				productBarcode.setSellingTypeCode(ProductEnum.PRODUCTBUNDLE);
-				productTextileRepo.save(productBarcode);
+				productRepository.save(productBarcode);
 			}
      
 			ProductBundleAssignmentTextile bundledProductAssignment = new ProductBundleAssignmentTextile();
 			bundledProductAssignment.setProductBundleId(bundle);
-			bundledProductAssignment.setAssignedproductId(productTextileMapper.customVoToEntityMapper(productTextile));
+			bundledProductAssignment.setAssignedproductId(productMapper.customVoToEntityMapper(productTextile));
 			bundledProductAssignment.setQuantity(productTextile.getQty());
 			bundleList.add(bundledProductAssignment);
 
@@ -107,7 +106,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		product.setStoreId(bundle.getStoreId());
 		product.setSellingTypeCode(ProductEnum.BUNDLEDPRODUCT);
 		product.setQty(bundle.getBundleQuantity());
-		productTextileRepo.save(product);
+		productRepository.save(product);
 		ProductBundle bundleSave = productBundleRepo.save(bundle);
 		productBundleVo = productBundleMapper.entityToVO(bundleSave);
 		return productBundleVo;
@@ -183,10 +182,10 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 
 	private ProductBundleVo bundleMapToVo(ProductBundle productBundle) {
 		ProductBundleVo productBundleVo = productBundleMapper.entityToVO(productBundle);
-		productBundleVo.setProductTextiles(productTextileMapper.EntityToVo(productBundle.getProductTextiles()));
+		productBundleVo.setProductTextiles(productMapper.entityToVO(productBundle.getProductTextiles()));
 		productBundleVo.getProductTextiles().stream().forEach(product -> {
 
-			Product productBarcode = productTextileRepo.findByBarcodeAndSellingTypeCode(product.getBarcode(),
+			Product productBarcode = productRepository.findByBarcodeAndSellingTypeCode(product.getBarcode(),
 					ProductEnum.PRODUCTBUNDLE);
 			productBundleVo.setValue(productBundleVo.getBundleQuantity() * productBarcode.getItemMrp());
 		});

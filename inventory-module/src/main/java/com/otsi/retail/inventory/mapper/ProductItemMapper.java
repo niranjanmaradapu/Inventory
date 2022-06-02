@@ -3,13 +3,11 @@ package com.otsi.retail.inventory.mapper;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.inventory.commons.ProductItemAvEnum;
-import com.otsi.retail.inventory.commons.ProductStatus;
 import com.otsi.retail.inventory.model.ProductImage;
 import com.otsi.retail.inventory.model.ProductInventory;
 import com.otsi.retail.inventory.model.ProductItem;

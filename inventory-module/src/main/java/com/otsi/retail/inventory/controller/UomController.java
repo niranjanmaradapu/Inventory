@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.otsi.retail.inventory.model.UomEntity;
 import com.otsi.retail.inventory.service.UomService;
 import com.otsi.retail.inventory.util.Constants;
-import com.otsi.retail.inventory.vo.UomVo;
+import com.otsi.retail.inventory.vo.UomVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,13 +47,13 @@ public class UomController {
 	 * @param vo
 	 * @return
 	 */
-	@ApiOperation(value = "", notes = "adding unit of measures", response = UomVo.class)
+	@ApiOperation(value = "", notes = "adding unit of measures", response = UomVO.class)
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
-			@ApiResponse(code = 200, message = "Successful retrieval", response = UomVo.class, responseContainer = "Object") })
+			@ApiResponse(code = 200, message = "Successful retrieval", response = UomVO.class, responseContainer = "Object") })
 	@PostMapping
-	public ResponseEntity<?> saveUom(@RequestBody UomVo vo) {
+	public ResponseEntity<?> saveUom(@RequestBody UomVO vo) {
 		log.info("Recieved request to saveUom:" + vo);
-		UomVo uomVO = uomService.saveUom(vo);
+		UomVO uomVO = uomService.saveUom(vo);
 		return ResponseEntity.ok(uomVO);
 	}
 
@@ -76,13 +76,13 @@ public class UomController {
 	 * 
 	 * @return
 	 */
-	@ApiOperation(value = "/list", notes = "fetching all uoms ", response = UomVo.class)
+	@ApiOperation(value = "/list", notes = "fetching all uoms ", response = UomVO.class)
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
-			@ApiResponse(code = 200, message = "Successful retrieval", response = UomVo.class, responseContainer = "String") })
+			@ApiResponse(code = 200, message = "Successful retrieval", response = UomVO.class, responseContainer = "String") })
 	@GetMapping("/list")
 	public ResponseEntity<?> getAllUom() {
 		log.info("Recieved request to getAllUom");
-		List<UomVo> uomList = uomService.getAllUom();
+		List<UomVO> uomList = uomService.getAllUom();
 		return ResponseEntity.ok(uomList);
 	}
 
@@ -92,13 +92,13 @@ public class UomController {
 	 * @return
 	 * @throws Exception
 	 */
-	@ApiOperation(value = "", notes = "updating uom ", response = UomVo.class)
+	@ApiOperation(value = "", notes = "updating uom ", response = UomVO.class)
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
-			@ApiResponse(code = 200, message = "Successful retrieval", response = UomVo.class, responseContainer = "String") })
+			@ApiResponse(code = 200, message = "Successful retrieval", response = UomVO.class, responseContainer = "String") })
 	@PutMapping
-	public ResponseEntity<?> updateUom(@RequestBody UomVo uomVo) throws Exception {
+	public ResponseEntity<?> updateUom(@RequestBody UomVO uomVo) throws Exception {
 		log.info("Recieved request to updateUom:" + uomVo);
-		UomVo uom = uomService.updateUom(uomVo);
+		UomVO uom = uomService.updateUom(uomVo);
 		return ResponseEntity.ok(uom);
 
 	}

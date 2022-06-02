@@ -3,8 +3,6 @@
  */
 package com.otsi.retail.inventory.commons;
 
-import lombok.Data;
-
 /**
  * @author Sudheer.Swamy
  *

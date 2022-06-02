@@ -4,7 +4,7 @@
 package com.otsi.retail.inventory.service;
 
 import java.util.List;
-import com.otsi.retail.inventory.vo.CatalogVo;
+import com.otsi.retail.inventory.vo.CatalogVO;
 
 /**
  * @author Sudheer.Swamy
@@ -12,9 +12,9 @@ import com.otsi.retail.inventory.vo.CatalogVo;
  */
 public interface CatalogService {
 
-	public CatalogVo saveCatalogDetails(CatalogVo catalog) throws Exception;
+	public CatalogVO saveCatalogDetails(CatalogVO catalog) throws Exception;
 
-	public CatalogVo getCatalogByName(String name) throws Exception;
+	public CatalogVO getCatalogByName(String name) throws Exception;
 
 	//public List<CatalogVo> getAllCatalogs();
 
@@ -22,11 +22,11 @@ public interface CatalogService {
 
 	public void deleteCategoryById(Long id) throws Exception;
 
-	public List<CatalogVo> getCategories(Long id);
+	public List<CatalogVO> getCategories(Long id);
 
-	public List<CatalogVo> getMainCategories();
+	public List<CatalogVO> getMainCategories();
 
-	public List<CatalogVo> getAllCategories();
+	public List<CatalogVO> getAllCategories();
 	
 	
 

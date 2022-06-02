@@ -15,7 +15,7 @@ import com.otsi.retail.inventory.exceptions.RecordNotFoundException;
 import com.otsi.retail.inventory.mapper.UomMapper;
 import com.otsi.retail.inventory.model.UomEntity;
 import com.otsi.retail.inventory.repo.UomRepository;
-import com.otsi.retail.inventory.vo.UomVo;
+import com.otsi.retail.inventory.vo.UomVO;
 
 @Component
 public class UomServiceImpl implements UomService {
@@ -29,10 +29,10 @@ public class UomServiceImpl implements UomService {
 	private UomMapper uomMapper;
 
 	@Override
-	public UomVo saveUom(UomVo vo) {
-		UomEntity uom = uomMapper.VoToEntity(vo);
+	public UomVO saveUom(UomVO vo) {
+		UomEntity uom = uomMapper.voToEntity(vo);
 		UomEntity uomSave = uomRepository.save(uom);
-		return uomMapper.EntityToVo(uomSave);
+		return uomMapper.entityToVO(uomSave);
 	}
 
 	@Override
@@ -45,26 +45,26 @@ public class UomServiceImpl implements UomService {
 	}
 
 	@Override
-	public List<UomVo> getAllUom() {
-		List<UomVo> uoms = new ArrayList<>();
+	public List<UomVO> getAllUom() {
+		List<UomVO> uoms = new ArrayList<>();
 		List<UomEntity> uom = uomRepository.findAll();
 		uom.stream().forEach(um -> {
-			UomVo uomVo = uomMapper.EntityToVo(um);
+			UomVO uomVo = uomMapper.entityToVO(um);
 			uoms.add(uomVo);
 		});
 		return uoms;
 	}
 
 	@Override
-	public UomVo updateUom(UomVo uomVo) {
+	public UomVO updateUom(UomVO uomVo) {
 		Optional<UomEntity> uomOpt = uomRepository.findById(uomVo.getId());
 		if (!uomOpt.isPresent()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid uom id:" + uomVo.getId());
 		}
-		UomEntity uom = uomMapper.VoToEntity(uomVo);
+		UomEntity uom = uomMapper.voToEntity(uomVo);
 		uom.setId(uomVo.getId());
 		uom = uomRepository.save(uom);
-		return uomMapper.EntityToVo(uom);
+		return uomMapper.entityToVO(uom);
 	}
 
 	@Override

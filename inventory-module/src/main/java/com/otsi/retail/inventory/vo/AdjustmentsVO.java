@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-public class AdjustmentsVo {
+public class AdjustmentsVO {
 
 	private Long adjustmentId;
 	private String currentBarcodeId;

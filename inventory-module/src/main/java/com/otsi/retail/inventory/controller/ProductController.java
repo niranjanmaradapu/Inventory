@@ -2,7 +2,6 @@ package com.otsi.retail.inventory.controller;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,12 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.otsi.retail.inventory.commons.DomainType;
 import com.otsi.retail.inventory.gatewayresponse.GateWayResponse;
 import com.otsi.retail.inventory.rabbitmq.MQConfig;
 import com.otsi.retail.inventory.service.ProductService;
 import com.otsi.retail.inventory.util.Constants;
-import com.otsi.retail.inventory.vo.AdjustmentsVo;
+import com.otsi.retail.inventory.vo.AdjustmentsVO;
 import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
 import com.otsi.retail.inventory.vo.ProductVO;
@@ -181,13 +179,13 @@ public class ProductController {
 	 * @param vo
 	 * @return
 	 */
-	@ApiOperation(value = "/adjustments/filter", notes = "fetch rebarcodes", response = AdjustmentsVo.class)
+	@ApiOperation(value = "/adjustments/filter", notes = "fetch rebarcodes", response = AdjustmentsVO.class)
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
-			@ApiResponse(code = 200, message = "Successful retrieval", response = AdjustmentsVo.class, responseContainer = "List") })
+			@ApiResponse(code = 200, message = "Successful retrieval", response = AdjustmentsVO.class, responseContainer = "List") })
 	@PostMapping("/adjustments/filter")
 	public ResponseEntity<Page<?>> getAllAdjustments(Pageable pageable, @RequestBody SearchFilterVo vo) {
 		log.info("Recieved request to adjustments:" + vo);
-		Page<AdjustmentsVo> rebarProducts = productService.getAdjustments(vo, pageable);
+		Page<AdjustmentsVO> rebarProducts = productService.getAdjustments(vo, pageable);
 		return ResponseEntity.ok(rebarProducts);
 	}
 

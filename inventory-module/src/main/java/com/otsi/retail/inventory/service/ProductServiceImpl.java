@@ -52,17 +52,12 @@ import com.otsi.retail.inventory.exceptions.InvalidDataException;
 import com.otsi.retail.inventory.exceptions.RecordNotFoundException;
 import com.otsi.retail.inventory.gatewayresponse.GateWayResponse;
 import com.otsi.retail.inventory.mapper.AdjustmentMapper;
-import com.otsi.retail.inventory.mapper.ProductTextileMapper;
+import com.otsi.retail.inventory.mapper.ProductMapper;
 import com.otsi.retail.inventory.model.Adjustments;
 import com.otsi.retail.inventory.model.Product;
 import com.otsi.retail.inventory.model.ProductBundle;
-import com.otsi.retail.inventory.model.ProductBundleAssignmentTextile;
-import com.otsi.retail.inventory.model.ProductInventory;
-import com.otsi.retail.inventory.model.ProductItem;
 import com.otsi.retail.inventory.model.ProductTransaction;
-import com.otsi.retail.inventory.model.ProductTransactionRe;
 import com.otsi.retail.inventory.repo.AdjustmentRepo;
-import com.otsi.retail.inventory.repo.BundledProductAssignmentRepository;
 import com.otsi.retail.inventory.repo.ProductBundleRepo;
 import com.otsi.retail.inventory.repo.ProductInventoryRepo;
 import com.otsi.retail.inventory.repo.ProductItemRepo;
@@ -72,7 +67,7 @@ import com.otsi.retail.inventory.repo.ProductTransactionRepo;
 import com.otsi.retail.inventory.util.Constants;
 import com.otsi.retail.inventory.util.DateConverters;
 import com.otsi.retail.inventory.util.ExcelService;
-import com.otsi.retail.inventory.vo.AdjustmentsVo;
+import com.otsi.retail.inventory.vo.AdjustmentsVO;
 import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.FieldNameVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
@@ -86,7 +81,7 @@ public class ProductServiceImpl implements ProductService {
 	private Logger log = LogManager.getLogger(ProductServiceImpl.class);
 
 	@Autowired
-	private ProductTextileMapper productTextileMapper;
+	private ProductMapper productMapper;
 
 	@Autowired
 	private ProductRepository productRepository;
@@ -134,12 +129,12 @@ public class ProductServiceImpl implements ProductService {
 		if (productVO.getCostPrice() == 0 || productVO.getItemMrp() == 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cost price and list price are required");
 		}
-		Product product = productTextileMapper.VoToEntity(productVO);
+		Product product = productMapper.voToEntity(productVO);
 		product.setBarcode("BAR-" + Generation.getSaltString().toString());
 		product = productRepository.save(product);
 		saveProductTransaction(product, NatureOfTransaction.PURCHASE.getName(), PRODUCT_TABLE, product.getId(),
 				PRODUCT_PURCHASE_COMMENT);
-		return productTextileMapper.EntityToVo(product);
+		return productMapper.entityToVO(product);
 	}
 
 	@Override
@@ -154,7 +149,7 @@ public class ProductServiceImpl implements ProductService {
 		oldProduct.setStatus(ProductStatus.DISABLE);
 		productRepository.save(oldProduct);
 
-		Product product = productTextileMapper.VoToEntity(productVO);
+		Product product = productMapper.voToEntity(productVO);
 		product.setBarcode("REBAR/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/"
 				+ Generation.getSaltString());
 		product.setParentBarcode(oldProduct.getBarcode());
@@ -177,7 +172,7 @@ public class ProductServiceImpl implements ProductService {
 				oldProduct.getBarcode(), "rebar");
 		saveProductTransaction(product, NatureOfTransaction.REBARPARENT.getName(), ADJUSTMENTS_TABLE,
 				adjustments.getAdjustmentId(), ADJUSTMENTS_TABLE);
-		return productTextileMapper.EntityToVo(product);
+		return productMapper.entityToVO(product);
 	}
 
 	@Override
@@ -269,7 +264,7 @@ public class ProductServiceImpl implements ProductService {
 			if (product == null) {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No records found for barcode:" + barcode);
 			}
-			ProductVO productVO = productTextileMapper.EntityToVo(product);
+			ProductVO productVO = productMapper.entityToVO(product);
 			List<UserDetailsVo> userDetailsVo = new ArrayList<>();
 			try {
 				userDetailsVo = getUsersForGivenId(Arrays.asList(productVO.getEmpId()));
@@ -384,7 +379,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	private ProductVO mapToVo(Product barcode) {
-		ProductVO productTextileVO = productTextileMapper.EntityToVo(barcode);
+		ProductVO productTextileVO = productMapper.entityToVO(barcode);
 
 		List<UserDetailsVo> userDetailsVo = new ArrayList<>();
 		try {
@@ -452,7 +447,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public Page<AdjustmentsVo> getAdjustments(SearchFilterVo searchFilterVo, Pageable pageable) {
+	public Page<AdjustmentsVO> getAdjustments(SearchFilterVo searchFilterVo, Pageable pageable) {
 		Page<Adjustments> adjustmentDetails = null;
 
 		if (searchFilterVo.getFromDate() != null && searchFilterVo.getToDate() == null
@@ -509,13 +504,13 @@ public class ProductServiceImpl implements ProductService {
 		}
 
 		if (adjustmentDetails.hasContent()) {
-			return adjustmentDetails.map(adjustment -> adjustmentMapToVo(adjustment));
+			return adjustmentDetails.map(adjustment -> adjustmentMapToVO(adjustment));
 		}
 		return Page.empty();
 	}
 
-	private AdjustmentsVo adjustmentMapToVo(Adjustments adjustment) {
-		return adjustmentMapper.EntityToVo(adjustment);
+	private AdjustmentsVO adjustmentMapToVO(Adjustments adjustment) {
+		return adjustmentMapper.entityToVO(adjustment);
 	}
 
 	@Override
@@ -694,7 +689,7 @@ public class ProductServiceImpl implements ProductService {
 		log.debug("deugging getBarcodeDetails" + barcodes);
 		List<ProductVO> productsList = new ArrayList<ProductVO>();
 		List<Product> barcodeDetails = productRepository.findByBarcodeIn(barcodes);
-		productsList = productTextileMapper.EntityToVo(barcodeDetails);
+		productsList = productMapper.entityToVO(barcodeDetails);
 		return productsList;
 	}
 
@@ -702,7 +697,7 @@ public class ProductServiceImpl implements ProductService {
 	public ProductVO getProductByParentBarcode(String parentBarcode) {
 		Product product = productRepository.findByBarcode(parentBarcode);
 		if (product != null) {
-			ProductVO productVO = productTextileMapper.EntityToVo(product);
+			ProductVO productVO = productMapper.entityToVO(product);
 			productVO.setValue(product.getQty() * product.getItemMrp());
 			return productVO;
 		} else

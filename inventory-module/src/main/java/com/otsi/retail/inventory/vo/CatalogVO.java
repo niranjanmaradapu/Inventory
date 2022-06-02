@@ -15,7 +15,7 @@ import lombok.Data;
  */
 @Data
 @Component
-public class CatalogVo extends BaseEntityVo{
+public class CatalogVO extends BaseEntityVo{
 
 	private Long id;
 	private String name;

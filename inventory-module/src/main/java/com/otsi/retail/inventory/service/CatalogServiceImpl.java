@@ -20,7 +20,7 @@ import com.otsi.retail.inventory.exceptions.RecordNotFoundException;
 import com.otsi.retail.inventory.mapper.CatalogMapper;
 import com.otsi.retail.inventory.model.CatalogEntity;
 import com.otsi.retail.inventory.repo.CatalogRepository;
-import com.otsi.retail.inventory.vo.CatalogVo;
+import com.otsi.retail.inventory.vo.CatalogVO;
 
 /**
  * @author Sudheer.Swamy
@@ -36,7 +36,7 @@ public class CatalogServiceImpl implements CatalogService {
 	private CatalogMapper catalogMapper;
 
 	@Override
-	public CatalogVo saveCatalogDetails(CatalogVo catalog) throws Exception {
+	public CatalogVO saveCatalogDetails(CatalogVO catalog) throws Exception {
 		CatalogEntity entity = new CatalogEntity();
 
 		entity = catalogMapper.convertVoToEntity(catalog);
@@ -53,7 +53,7 @@ public class CatalogServiceImpl implements CatalogService {
 
 		catalogRepository.save(entity);
 
-		CatalogVo vo = catalogMapper.convertEntityToVo(entity);
+		CatalogVO vo = catalogMapper.convertEntityToVO(entity);
 		if (entity.getParent() != null) {
 			vo.setCUID(entity.getParent().getId());
 		} else {
@@ -65,7 +65,7 @@ public class CatalogServiceImpl implements CatalogService {
 	}
 
 	@Override
-	public CatalogVo getCatalogByName(String name) throws Exception {
+	public CatalogVO getCatalogByName(String name) throws Exception {
 
 		Optional<CatalogEntity> names = catalogRepository.findByName(name);
 
@@ -73,7 +73,7 @@ public class CatalogServiceImpl implements CatalogService {
 			throw new RecordNotFoundException("Given catalog name is not exists");
 		} else {
 
-			CatalogVo vo = catalogMapper.convertEntityToVo(names.get());
+			CatalogVO vo = catalogMapper.convertEntityToVO(names.get());
 			return vo;
 		}
 
@@ -96,7 +96,7 @@ public class CatalogServiceImpl implements CatalogService {
 	}
 
 	@Override
-	public List<CatalogVo> getCategories(Long id) {
+	public List<CatalogVO> getCategories(Long id) {
 		Optional<CatalogEntity> entity = catalogRepository.findById(id);
 		if (!entity.isPresent()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "catalog not found for id:" + id);
@@ -105,29 +105,29 @@ public class CatalogServiceImpl implements CatalogService {
 		if (catalogs.isEmpty()) {
 			return Collections.EMPTY_LIST;
 		}
-		List<CatalogVo> catalogsVO = catalogMapper.convertlistEntityToVo(catalogs);
+		List<CatalogVO> catalogsVO = catalogMapper.convertEntityToVO(catalogs);
 		return catalogsVO;
 	}
 
 	@Override
-	public List<CatalogVo> getMainCategories() {
+	public List<CatalogVO> getMainCategories() {
 
 		List<CatalogEntity> ent = catalogRepository.findByDescription(Categories.DIVISION);
 		if (ent.isEmpty()) {
 			throw new RecordNotFoundException("record not exists");
 		}
 
-		List<CatalogVo> lvo = catalogMapper.convertlEntityToVo(ent);
+		List<CatalogVO> lvo = catalogMapper.convertlEntityToVo(ent);
 		return lvo;
 	}
 
 	@Override
-	public List<CatalogVo> getAllCategories() {
+	public List<CatalogVO> getAllCategories() {
 		List<CatalogEntity> listOfCategories = catalogRepository.findAll();
 		if (listOfCategories.isEmpty()) {
 			return Collections.EMPTY_LIST;
 		}
-		List<CatalogVo> catalogList = catalogMapper.convertlEntityToVo(listOfCategories);
+		List<CatalogVO> catalogList = catalogMapper.convertlEntityToVo(listOfCategories);
 		return catalogList;
 	}
 

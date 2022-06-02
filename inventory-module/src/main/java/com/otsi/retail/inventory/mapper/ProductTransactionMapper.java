@@ -6,62 +6,47 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.inventory.model.ProductTransaction;
-import com.otsi.retail.inventory.vo.ProductTransactionVo;
+import com.otsi.retail.inventory.vo.ProductTransactionVO;
 
 @Component
 public class ProductTransactionMapper {
 
 
-	/*
-	 * EntityToVo converts dto to vo
-	 * 
-	 */
-
-	public ProductTransactionVo EntityToVo(ProductTransaction dto) {
-		ProductTransactionVo vo = new ProductTransactionVo();
-		vo.setProductTransactionId(dto.getProductTransactionId());
-		vo.setBarcodeId(dto.getBarcodeId());
-		vo.setComment(dto.getComment());
-		vo.setEffectingTable(dto.getEffectingTable());
-		vo.setEffectingTableId(dto.getEffectingTableId());
-		vo.setQuantity(dto.getQuantity());
-		vo.setMasterFlag(dto.isMasterFlag());
-		vo.setNatureOfTransaction(dto.getNatureOfTransaction());
-		vo.setCreatedDate(dto.getCreatedDate());
-		vo.setLastModifiedDate(dto.getLastModifiedDate());
-		vo.setStoreId(dto.getStoreId());
+	public ProductTransactionVO EntityToVo(ProductTransaction entity) {
+		ProductTransactionVO vo = new ProductTransactionVO();
+		vo.setProductTransactionId(entity.getProductTransactionId());
+		vo.setBarcodeId(entity.getBarcodeId());
+		vo.setComment(entity.getComment());
+		vo.setEffectingTable(entity.getEffectingTable());
+		vo.setEffectingTableId(entity.getEffectingTableId());
+		vo.setQuantity(entity.getQuantity());
+		vo.setMasterFlag(entity.isMasterFlag());
+		vo.setNatureOfTransaction(entity.getNatureOfTransaction());
+		vo.setCreatedDate(entity.getCreatedDate());
+		vo.setLastModifiedDate(entity.getLastModifiedDate());
+		vo.setStoreId(entity.getStoreId());
 		return vo;
 
 	}
 
-	/*
-	 * to convert list dto's to vo's
-	 */
 
-	public List<ProductTransactionVo> EntityToVo(List<ProductTransaction> dtos) {
-		return dtos.stream().map(dto -> EntityToVo(dto)).collect(Collectors.toList());
+	public List<ProductTransactionVO> EntityToVo(List<ProductTransaction> entities) {
+		return entities.stream().map(dto -> EntityToVo(dto)).collect(Collectors.toList());
 
 	}
 
-	/*
-	 * VoToEntity converts vo to dto
-	 * 
-	 */
 
-	public ProductTransaction VoToEntity(ProductTransactionVo vo) {
-		ProductTransaction dto = new ProductTransaction();
-		dto.setMasterFlag(true);
-		dto.setStoreId(vo.getStoreId());
-		return dto;
+	public ProductTransaction voToEntity(ProductTransactionVO vo) {
+		ProductTransaction entity = new ProductTransaction();
+		entity.setMasterFlag(true);
+		entity.setStoreId(vo.getStoreId());
+		return entity;
 
 	}
 
-	/*
-	 * to convert list vo's to dto's
-	 */
-
-	public List<ProductTransaction> VoToEntity(List<ProductTransactionVo> vos) {
-		return vos.stream().map(vo -> VoToEntity(vo)).collect(Collectors.toList());
+	
+	public List<ProductTransaction> voToEntity(List<ProductTransactionVO> vos) {
+		return vos.stream().map(vo -> voToEntity(vo)).collect(Collectors.toList());
 
 	}
 

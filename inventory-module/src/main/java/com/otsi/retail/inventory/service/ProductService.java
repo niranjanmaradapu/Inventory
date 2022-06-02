@@ -2,15 +2,13 @@ package com.otsi.retail.inventory.service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.otsi.retail.inventory.commons.DomainType;
-import com.otsi.retail.inventory.vo.AdjustmentsVo;
+import com.otsi.retail.inventory.vo.AdjustmentsVO;
 import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
 import com.otsi.retail.inventory.vo.ProductVO;
@@ -41,7 +39,7 @@ public interface ProductService {
 	
 	Page<ProductVO> getAllBarcodes(SearchFilterVo vo, Pageable pageable);
 
-	Page<AdjustmentsVo> getAdjustments(SearchFilterVo vo, Pageable pageable);
+	Page<AdjustmentsVO> getAdjustments(SearchFilterVo vo, Pageable pageable);
 
 	Page<ProductVO> getBarcodeTextileReports(SearchFilterVo vo, Pageable pageable);
 
