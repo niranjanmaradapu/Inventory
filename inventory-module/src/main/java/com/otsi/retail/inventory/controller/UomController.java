@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.otsi.retail.inventory.model.UomEntity;
 import com.otsi.retail.inventory.service.UomService;
+import com.otsi.retail.inventory.util.CommonUtilities;
 import com.otsi.retail.inventory.util.Constants;
 import com.otsi.retail.inventory.vo.UomVO;
 

@@ -22,6 +22,8 @@ import com.otsi.retail.inventory.service.CatalogService;
 import com.otsi.retail.inventory.util.Constants;
 import com.otsi.retail.inventory.vo.CatalogVO;
 import com.otsi.retail.inventory.vo.UomVO;
+import com.otsi.retail.inventory.util.CommonUtilities;
+
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

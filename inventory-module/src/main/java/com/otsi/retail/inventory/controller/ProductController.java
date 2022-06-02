@@ -31,6 +31,7 @@ import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
 import com.otsi.retail.inventory.vo.ProductVO;
 import com.otsi.retail.inventory.vo.SearchFilterVo;
+import com.otsi.retail.inventory.util.CommonUtilities;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
