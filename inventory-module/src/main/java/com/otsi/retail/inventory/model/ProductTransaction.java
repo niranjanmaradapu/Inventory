@@ -17,7 +17,7 @@ public class ProductTransaction extends BaseEntity {
 
 	@Id
 	@GeneratedValue
-	private Long productTransactionId;
+	private Long id;
 	
 	private Long storeId;
 	

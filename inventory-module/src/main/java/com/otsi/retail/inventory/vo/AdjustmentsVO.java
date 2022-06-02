@@ -8,11 +8,18 @@ import lombok.Data;
 public class AdjustmentsVO {
 
 	private Long adjustmentId;
+	
 	private String currentBarcodeId;
+	
 	private String toBeBarcodeId;
+	
 	private Long createdBy;
+	
 	private String comments;
+	
 	private LocalDateTime createdDate;
+	
 	private LocalDateTime LastModifiedDate;
+	
 	private Long storeId;
 }

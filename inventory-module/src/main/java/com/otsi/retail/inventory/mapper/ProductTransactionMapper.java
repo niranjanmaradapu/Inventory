@@ -12,9 +12,9 @@ import com.otsi.retail.inventory.vo.ProductTransactionVO;
 public class ProductTransactionMapper {
 
 
-	public ProductTransactionVO EntityToVo(ProductTransaction entity) {
+	public ProductTransactionVO entityToVO(ProductTransaction entity) {
 		ProductTransactionVO vo = new ProductTransactionVO();
-		vo.setProductTransactionId(entity.getProductTransactionId());
+		vo.setId(entity.getId());
 		vo.setBarcodeId(entity.getBarcodeId());
 		vo.setComment(entity.getComment());
 		vo.setEffectingTable(entity.getEffectingTable());
@@ -30,8 +30,8 @@ public class ProductTransactionMapper {
 	}
 
 
-	public List<ProductTransactionVO> EntityToVo(List<ProductTransaction> entities) {
-		return entities.stream().map(dto -> EntityToVo(dto)).collect(Collectors.toList());
+	public List<ProductTransactionVO> entityToVO(List<ProductTransaction> entities) {
+		return entities.stream().map(dto -> entityToVO(dto)).collect(Collectors.toList());
 
 	}
 
