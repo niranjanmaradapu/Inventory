@@ -11,29 +11,29 @@ import com.otsi.retail.inventory.vo.UomVO;
 @Component
 public class UomMapper {
 
-	public UomVO entityToVO(UomEntity entity) {
-		UomVO vo = new UomVO();
-		vo.setId(entity.getId());
-		vo.setUomName(entity.getUomName());
-		return vo;
+	public UomVO entityToVO(UomEntity uom) {
+		UomVO uomVo = new UomVO();
+		uomVo.setId(uom.getId());
+		uomVo.setUomName(uom.getUomName());
+		return uomVo;
 
 	}
 
-	public List<UomVO> entityToVO(List<UomEntity> dtos) {
-		return dtos.stream().map(dto -> entityToVO(dto)).collect(Collectors.toList());
+	public List<UomVO> entityToVO(List<UomEntity> uomList) {
+		return uomList.stream().map(uom -> entityToVO(uom)).collect(Collectors.toList());
 
 	}
 
-	public UomEntity voToEntity(UomVO vo) {
-		UomEntity entity = new UomEntity();
-		entity.setId(vo.getId());
-		entity.setUomName(vo.getUomName());
-		return entity;
+	public UomEntity voToEntity(UomVO uomVo) {
+		UomEntity uom = new UomEntity();
+		uom.setId(uomVo.getId());
+		uom.setUomName(uomVo.getUomName());
+		return uom;
 
 	}
 
-	public List<UomEntity> VoToEntity(List<UomVO> vos) {
-		return vos.stream().map(vo -> voToEntity(vo)).collect(Collectors.toList());
+	public List<UomEntity> VoToEntity(List<UomVO> uomVoList) {
+		return uomVoList.stream().map(uomVo -> voToEntity(uomVo)).collect(Collectors.toList());
 
 	}
 

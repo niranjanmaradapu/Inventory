@@ -29,30 +29,30 @@ public class UomServiceImpl implements UomService {
 	private UomMapper uomMapper;
 
 	@Override
-	public UomVO saveUom(UomVO vo) {
-		UomEntity uom = uomMapper.voToEntity(vo);
+	public UomVO saveUom(UomVO uomVo) {
+		UomEntity uom = uomMapper.voToEntity(uomVo);
 		UomEntity uomSave = uomRepository.save(uom);
 		return uomMapper.entityToVO(uomSave);
 	}
 
 	@Override
 	public Optional<UomEntity> getUom(Long id) {
-		Optional<UomEntity> uomOptional = uomRepository.findById(id);
-		if (uomOptional.isPresent()) {
-			return uomOptional;
+		Optional<UomEntity> uom = uomRepository.findById(id);
+		if (uom.isPresent()) {
+			return uom;
 		}
 		return Optional.empty();
 	}
 
 	@Override
 	public List<UomVO> getAllUom() {
-		List<UomVO> uoms = new ArrayList<>();
-		List<UomEntity> uom = uomRepository.findAll();
-		uom.stream().forEach(um -> {
+		List<UomVO> uomVoList = new ArrayList<>();
+		List<UomEntity> uomList = uomRepository.findAll();
+		uomList.stream().forEach(um -> {
 			UomVO uomVo = uomMapper.entityToVO(um);
-			uoms.add(uomVo);
+			uomVoList.add(uomVo);
 		});
-		return uoms;
+		return uomVoList;
 	}
 
 	@Override

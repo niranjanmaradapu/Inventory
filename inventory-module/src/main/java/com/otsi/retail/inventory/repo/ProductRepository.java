@@ -31,9 +31,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	Product findByBarcode(String barcode);
 
-	List<Product> findByStoreIdAndBarcode(Long storeId, String barcode);
+	//List<Product> findByStoreIdAndBarcode(Long storeId, String barcode);
 
-	List<Product> findByBarcodeAndStoreId(String barcode, Long storeId);
+	Product findByBarcodeAndStoreId(String barcode, Long storeId);
 
 	List<Product> findByStoreIdAndStatus(Long storeId, ProductStatus status);
 

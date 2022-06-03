@@ -9,37 +9,37 @@ import com.otsi.retail.inventory.vo.AdjustmentsVO;
 @Component
 public class AdjustmentMapper {
 
-	public AdjustmentsVO entityToVO(Adjustments entity) {
-		AdjustmentsVO vo = new AdjustmentsVO();
-		vo.setAdjustmentId(entity.getAdjustmentId());
-		vo.setCreatedBy(entity.getCreatedBy());
-		vo.setCurrentBarcodeId(entity.getCurrentBarcodeId());
-		vo.setToBeBarcodeId(entity.getToBeBarcodeId());
-		vo.setCreatedDate(entity.getCreatedDate());
-		vo.setLastModifiedDate(entity.getLastModifiedDate());
-		vo.setComments(entity.getComments());
-		vo.setStoreId(entity.getStoreId());
-		return vo;
+	public AdjustmentsVO entityToVO(Adjustments adjustments) {
+		AdjustmentsVO adjustmentsVo = new AdjustmentsVO();
+		adjustmentsVo.setAdjustmentId(adjustments.getAdjustmentId());
+		adjustmentsVo.setCreatedBy(adjustments.getCreatedBy());
+		adjustmentsVo.setCurrentBarcodeId(adjustments.getCurrentBarcodeId());
+		adjustmentsVo.setToBeBarcodeId(adjustments.getToBeBarcodeId());
+		adjustmentsVo.setCreatedDate(adjustments.getCreatedDate());
+		adjustmentsVo.setLastModifiedDate(adjustments.getLastModifiedDate());
+		adjustmentsVo.setComments(adjustments.getComments());
+		adjustmentsVo.setStoreId(adjustments.getStoreId());
+		return adjustmentsVo;
 
 	}
 
-	public List<AdjustmentsVO> entityToVO(List<Adjustments> entities) {
-		return entities.stream().map(entity -> entityToVO(entity)).collect(Collectors.toList());
+	public List<AdjustmentsVO> entityToVO(List<Adjustments> adjustmentList) {
+		return adjustmentList.stream().map(adjustments -> entityToVO(adjustments)).collect(Collectors.toList());
 
 	}
 
-	public Adjustments voToEntity(AdjustmentsVO vo) {
-		Adjustments entity = new Adjustments();
-		entity.setAdjustmentId(vo.getAdjustmentId());
-		entity.setCurrentBarcodeId(vo.getCurrentBarcodeId());
-		entity.setToBeBarcodeId(vo.getToBeBarcodeId());
-		entity.setComments(vo.getComments());
-		return entity;
+	public Adjustments voToEntity(AdjustmentsVO adjusmentsVo) {
+		Adjustments adjusments = new Adjustments();
+		adjusments.setAdjustmentId(adjusmentsVo.getAdjustmentId());
+		adjusments.setCurrentBarcodeId(adjusmentsVo.getCurrentBarcodeId());
+		adjusments.setToBeBarcodeId(adjusmentsVo.getToBeBarcodeId());
+		adjusments.setComments(adjusmentsVo.getComments());
+		return adjusments;
 
 	}
 
-	public List<Adjustments> voToEntity(List<AdjustmentsVO> vos) {
-		return vos.stream().map(vo -> voToEntity(vo)).collect(Collectors.toList());
+	public List<Adjustments> voToEntity(List<AdjustmentsVO> adjustmentsVoList) {
+		return adjustmentsVoList.stream().map(adjustmentsVo -> voToEntity(adjustmentsVo)).collect(Collectors.toList());
 
 	}
 

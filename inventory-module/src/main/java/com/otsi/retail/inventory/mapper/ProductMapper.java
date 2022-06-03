@@ -14,69 +14,69 @@ import com.otsi.retail.inventory.vo.ProductVO;
 @Component
 public class ProductMapper {
 
-	public ProductVO entityToVO(Product entity) {
-		ProductVO vo = new ProductVO();
+	public ProductVO entityToVO(Product product) {
+		ProductVO productVo = new ProductVO();
 
-		BeanUtils.copyProperties(entity, vo);
-		vo.setEmpId(entity.getEmpId());
-		vo.setFromDate(entity.getCreatedDate());
-		vo.setToDate(entity.getLastModifiedDate());
-		vo.setBarcode(entity.getBarcode());
-		vo.setDivision(entity.getDivision());
-		vo.setSection(entity.getSection());
-		vo.setSubSection(entity.getSubSection());
-		vo.setName(entity.getName());
-		vo.setStatus(entity.getStatus());
-		vo.setCategory(entity.getCategory());
-		vo.setBatchNo(entity.getBatchNo());
-		vo.setColour(entity.getColour());
-		vo.setOriginalBarcodeCreatedAt(entity.getOriginalBarcodeCreatedAt());
-		vo.setStoreId(entity.getStoreId());
-		vo.setDomainId(entity.getDomainId());
-		vo.setSellingTypeCode(entity.getSellingTypeCode());
-		return vo;
-
-	}
-
-
-	public List<ProductVO> entityToVO(List<Product> entities) {
-		return entities.stream().map(dto -> entityToVO(dto)).collect(Collectors.toList());
+		BeanUtils.copyProperties(product, productVo);
+		productVo.setEmpId(product.getEmpId());
+		productVo.setFromDate(product.getCreatedDate());
+		productVo.setToDate(product.getLastModifiedDate());
+		productVo.setBarcode(product.getBarcode());
+		productVo.setDivision(product.getDivision());
+		productVo.setSection(product.getSection());
+		productVo.setSubSection(product.getSubSection());
+		productVo.setName(product.getName());
+		productVo.setStatus(product.getStatus());
+		productVo.setCategory(product.getCategory());
+		productVo.setBatchNo(product.getBatchNo());
+		productVo.setColour(product.getColour());
+		productVo.setOriginalBarcodeCreatedAt(product.getOriginalBarcodeCreatedAt());
+		productVo.setStoreId(product.getStoreId());
+		productVo.setDomainId(product.getDomainId());
+		productVo.setSellingTypeCode(product.getSellingTypeCode());
+		return productVo;
 
 	}
 
-	public Product customVoToEntityMapper(ProductVO vo) {
+
+	public List<ProductVO> entityToVO(List<Product> productList) {
+		return productList.stream().map(product -> entityToVO(product)).collect(Collectors.toList());
+
+	}
+
+	public Product customVoToEntityMapper(ProductVO productVo) {
 		Product product = new Product();
-		product.setQty(vo.getQty());
-		product.setId(vo.getId());
+		product.setQty(productVo.getQty());
+		product.setId(productVo.getId());
 		return product;
 
 	}
 
-	public Product voToEntity(ProductVO vo) {
-		Product entity = new Product();
-		BeanUtils.copyProperties(vo, entity);
-		entity.setCostPrice(vo.getCostPrice());
-		entity.setEmpId(vo.getEmpId());
-		entity.setStatus(ProductStatus.ENABLE);
-		entity.setName(vo.getName());
-		entity.setBarcode(vo.getBarcode());
-		entity.setDivision(vo.getDivision());
-		entity.setSection(vo.getSection());
-		entity.setSubSection(vo.getSubSection());
-		entity.setOriginalBarcodeCreatedAt(LocalDate.now());
-		entity.setCategory(vo.getCategory());
-		entity.setBatchNo(vo.getBatchNo());
-		entity.setColour(vo.getColour());
-		entity.setStoreId(vo.getStoreId());
-		entity.setDomainId(vo.getDomainId());
-		entity.setSellingTypeCode(vo.getSellingTypeCode());
-		return entity;
+	public Product voToEntity(ProductVO productVo) {
+		Product product = new Product();
+		BeanUtils.copyProperties(productVo, product);
+		product.setCostPrice(productVo.getCostPrice());
+		product.setEmpId(productVo.getEmpId());
+		product.setStatus(ProductStatus.ENABLE);
+		product.setName(productVo.getName());
+		product.setBarcode(productVo.getBarcode());
+		product.setDivision(productVo.getDivision());
+		product.setSection(productVo.getSection());
+		product.setSubSection(productVo.getSubSection());
+		product.setOriginalBarcodeCreatedAt(LocalDate.now());
+		product.setCategory(productVo.getCategory());
+		product.setBatchNo(productVo.getBatchNo());
+		product.setColour(productVo.getColour());
+		product.setStoreId(productVo.getStoreId());
+		product.setDomainId(productVo.getDomainId());
+		product.setSellingTypeCode(productVo.getSellingTypeCode());
+		return product;
 
 	}
 
 
-	public List<Product> VoToEntity(List<ProductVO> vos) {
-		return vos.stream().map(vo -> voToEntity(vo)).collect(Collectors.toList());
+	public List<Product> VoToEntity(List<ProductVO> productVoList) {
+		return productVoList.stream().map(productVo -> voToEntity(productVo)).collect(Collectors.toList());
 
 	}
 

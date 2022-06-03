@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.otsi.retail.inventory.model.ProductBundle;
 
 @Repository
-public interface ProductBundleRepo extends JpaRepository<ProductBundle, Long> {
+public interface ProductBundleRepository extends JpaRepository<ProductBundle, Long> {
 
 	List<ProductBundle> findByStatus(Boolean status);
 

@@ -13,24 +13,12 @@ import com.otsi.retail.inventory.commons.AdjustmentType;
 import com.otsi.retail.inventory.model.Adjustments;
 
 @Repository
-public interface AdjustmentRepo extends JpaRepository<Adjustments, Long> {
+public interface AdjustmentRepository extends JpaRepository<Adjustments, Long> {
 
 	Optional<Adjustments> findByCurrentBarcodeIdAndType(String currentBarcodeId , AdjustmentType type);
 	
 	Page<Adjustments> findByCurrentBarcodeIdAndTypeAndStoreId(String currentBarcodeId , AdjustmentType type , Long storeId , Pageable page);
 
-
-	// List<Adjustments> findAllByAdjustmentId(Long adjustmentId);
-
-	/*
-	 * Page<Adjustments> findByCreatedDateBetweenAndComments(LocalDateTime fromTime,
-	 * LocalDateTime fromTime1, String string, Pageable pageable);
-	 */
-	/*
-	 * Page<Adjustments>
-	 * findByCreatedDateBetweenAndCommentsOrderByLastModifiedDateAsc(LocalDateTime
-	 * fromTime, LocalDateTime toTime, String string, Pageable pageable);
-	 */
 
 	Page<Adjustments> findByCreatedDateBetweenAndCurrentBarcodeIdAndTypeOrderByCreatedDateAsc(
 			LocalDateTime fromTime, LocalDateTime toTime, String currentBarcodeId, AdjustmentType type, Pageable pageable);

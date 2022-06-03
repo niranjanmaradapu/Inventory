@@ -12,10 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +36,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otsi.retail.inventory.commons.AdjustmentType;
@@ -57,13 +54,13 @@ import com.otsi.retail.inventory.model.Adjustments;
 import com.otsi.retail.inventory.model.Product;
 import com.otsi.retail.inventory.model.ProductBundle;
 import com.otsi.retail.inventory.model.ProductTransaction;
-import com.otsi.retail.inventory.repo.AdjustmentRepo;
-import com.otsi.retail.inventory.repo.ProductBundleRepo;
+import com.otsi.retail.inventory.repo.AdjustmentRepository;
+import com.otsi.retail.inventory.repo.ProductBundleRepository;
 import com.otsi.retail.inventory.repo.ProductInventoryRepo;
 import com.otsi.retail.inventory.repo.ProductItemRepo;
 import com.otsi.retail.inventory.repo.ProductRepository;
 import com.otsi.retail.inventory.repo.ProductTransactionReRepo;
-import com.otsi.retail.inventory.repo.ProductTransactionRepo;
+import com.otsi.retail.inventory.repo.ProductTransactionRepository;
 import com.otsi.retail.inventory.util.Constants;
 import com.otsi.retail.inventory.util.DateConverters;
 import com.otsi.retail.inventory.util.ExcelService;
@@ -87,10 +84,10 @@ public class ProductServiceImpl implements ProductService {
 	private ProductRepository productRepository;
 
 	@Autowired
-	private ProductTransactionRepo productTransactionRepository;
+	private ProductTransactionRepository productTransactionRepository;
 
 	@Autowired
-	private AdjustmentRepo adjustmentRepository;
+	private AdjustmentRepository adjustmentRepository;
 
 	@Autowired
 	private AdjustmentMapper adjustmentMapper;
@@ -114,7 +111,7 @@ public class ProductServiceImpl implements ProductService {
 	private ExcelService excelService;
 
 	@Autowired
-	private ProductBundleRepo productBundleRepo;
+	private ProductBundleRepository productBundleRepo;
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -260,7 +257,7 @@ public class ProductServiceImpl implements ProductService {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, barcode + " barcode is invalidated");
 			}
 
-			Product product = productRepository.findByBarcode(barcode);
+			Product product = productRepository.findByBarcodeAndStoreId(barcode,storeId);
 			if (product == null) {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No records found for barcode:" + barcode);
 			}

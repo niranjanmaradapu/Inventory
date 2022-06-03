@@ -27,7 +27,7 @@ import com.otsi.retail.inventory.model.Product;
 import com.otsi.retail.inventory.model.ProductBundle;
 import com.otsi.retail.inventory.model.ProductBundleAssignmentTextile;
 import com.otsi.retail.inventory.repo.BundledProductAssignmentRepository;
-import com.otsi.retail.inventory.repo.ProductBundleRepo;
+import com.otsi.retail.inventory.repo.ProductBundleRepository;
 import com.otsi.retail.inventory.repo.ProductRepository;
 import com.otsi.retail.inventory.util.DateConverters;
 import com.otsi.retail.inventory.vo.ProductBundleVo;
@@ -42,7 +42,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 	private ProductBundleMapper productBundleMapper;
 
 	@Autowired
-	private ProductBundleRepo productBundleRepo;
+	private ProductBundleRepository productBundleRepo;
 
 	@Autowired
 	private ProductRepository productRepository;
@@ -70,7 +70,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		List<ProductBundleAssignmentTextile> bundleList = new ArrayList<ProductBundleAssignmentTextile>();
 		Integer productBundleQuantity = productBundleVo.getBundleQuantity();
 		Long productTotalQuantity = textiles.stream().mapToLong(x -> x.getQty()).sum();
-		
+
 		textiles.stream().forEach(productTextile -> {
 			// Long productTotalQuantity = 1000l;
 			if (productTextile.getQty() * productBundleQuantity > productTotalQuantity) {
@@ -83,7 +83,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 				productBarcode.setSellingTypeCode(ProductEnum.PRODUCTBUNDLE);
 				productRepository.save(productBarcode);
 			}
-     
+
 			ProductBundleAssignmentTextile bundledProductAssignment = new ProductBundleAssignmentTextile();
 			bundledProductAssignment.setProductBundleId(bundle);
 			bundledProductAssignment.setAssignedproductId(productMapper.customVoToEntityMapper(productTextile));
@@ -176,10 +176,13 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		else if (storeId != null) {
 			bundles = productBundleRepo.findAllByStoreIdAndStatus(storeId, status, pageable);
 		}
-
-		return bundles.map(bundle -> bundleMapToVo(bundle));
+		if (bundles != null && bundles.hasContent()) {
+			return bundles.map(bundle -> bundleMapToVo(bundle));
+		} else
+			return Page.empty();
 	}
 
+	
 	private ProductBundleVo bundleMapToVo(ProductBundle productBundle) {
 		ProductBundleVo productBundleVo = productBundleMapper.entityToVO(productBundle);
 		productBundleVo.setProductTextiles(productMapper.entityToVO(productBundle.getProductTextiles()));

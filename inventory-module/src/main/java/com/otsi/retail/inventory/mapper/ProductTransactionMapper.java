@@ -12,41 +12,41 @@ import com.otsi.retail.inventory.vo.ProductTransactionVO;
 public class ProductTransactionMapper {
 
 
-	public ProductTransactionVO entityToVO(ProductTransaction entity) {
-		ProductTransactionVO vo = new ProductTransactionVO();
-		vo.setId(entity.getId());
-		vo.setBarcodeId(entity.getBarcodeId());
-		vo.setComment(entity.getComment());
-		vo.setEffectingTable(entity.getEffectingTable());
-		vo.setEffectingTableId(entity.getEffectingTableId());
-		vo.setQuantity(entity.getQuantity());
-		vo.setMasterFlag(entity.isMasterFlag());
-		vo.setNatureOfTransaction(entity.getNatureOfTransaction());
-		vo.setCreatedDate(entity.getCreatedDate());
-		vo.setLastModifiedDate(entity.getLastModifiedDate());
-		vo.setStoreId(entity.getStoreId());
-		return vo;
+	public ProductTransactionVO entityToVO(ProductTransaction productTransaction) {
+		ProductTransactionVO productTransactionVo = new ProductTransactionVO();
+		productTransactionVo.setId(productTransaction.getId());
+		productTransactionVo.setBarcodeId(productTransaction.getBarcodeId());
+		productTransactionVo.setComment(productTransaction.getComment());
+		productTransactionVo.setEffectingTable(productTransaction.getEffectingTable());
+		productTransactionVo.setEffectingTableId(productTransaction.getEffectingTableId());
+		productTransactionVo.setQuantity(productTransaction.getQuantity());
+		productTransactionVo.setMasterFlag(productTransaction.isMasterFlag());
+		productTransactionVo.setNatureOfTransaction(productTransaction.getNatureOfTransaction());
+		productTransactionVo.setCreatedDate(productTransaction.getCreatedDate());
+		productTransactionVo.setLastModifiedDate(productTransaction.getLastModifiedDate());
+		productTransactionVo.setStoreId(productTransaction.getStoreId());
+		return productTransactionVo;
 
 	}
 
 
-	public List<ProductTransactionVO> entityToVO(List<ProductTransaction> entities) {
-		return entities.stream().map(dto -> entityToVO(dto)).collect(Collectors.toList());
+	public List<ProductTransactionVO> entityToVO(List<ProductTransaction> productTransactionList) {
+		return productTransactionList.stream().map(productTransaction -> entityToVO(productTransaction)).collect(Collectors.toList());
 
 	}
 
 
-	public ProductTransaction voToEntity(ProductTransactionVO vo) {
-		ProductTransaction entity = new ProductTransaction();
-		entity.setMasterFlag(true);
-		entity.setStoreId(vo.getStoreId());
-		return entity;
+	public ProductTransaction voToEntity(ProductTransactionVO productTransactionVo) {
+		ProductTransaction productTransaction = new ProductTransaction();
+		productTransaction.setMasterFlag(true);
+		productTransaction.setStoreId(productTransactionVo.getStoreId());
+		return productTransaction;
 
 	}
 
 	
-	public List<ProductTransaction> voToEntity(List<ProductTransactionVO> vos) {
-		return vos.stream().map(vo -> voToEntity(vo)).collect(Collectors.toList());
+	public List<ProductTransaction> voToEntity(List<ProductTransactionVO> productTransactionVoList) {
+		return productTransactionVoList.stream().map(productTransactionVo -> voToEntity(productTransactionVo)).collect(Collectors.toList());
 
 	}
 
