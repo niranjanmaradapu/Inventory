@@ -31,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -395,6 +396,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	@Transactional
 	public void inventoryUpdate(List<InventoryUpdateVo> request, String type, String referringTable) {
 		request.stream().forEach(x -> {
 			// for textile update
@@ -408,8 +410,9 @@ public class ProductServiceImpl implements ProductService {
 					if (barcodeDetails.getSellingTypeCode().equals(ProductEnum.BUNDLEDPRODUCT)) {
 						ProductBundle bundle = productBundleRepo.findByBarcode(x.getBarCode());
 
-						// individual quantity calculation Integer productTotalQuantity =
-						bundle.getProductTextiles().stream().mapToInt(barcode -> barcode.getQty()).sum();
+						// individual quantity calculation
+						//Integer productTotalQuantity = bundle.getProductTextiles().stream()
+								//.mapToInt(barcode -> barcode.getQty()).sum();
 
 						bundle.setBundleQuantity(Math.abs(x.getQuantity() - bundle.getBundleQuantity()));
 						bundle.getProductTextiles().stream().forEach(product -> {
@@ -417,15 +420,21 @@ public class ProductServiceImpl implements ProductService {
 							product.setQty(Math.abs(x.getQuantity() - product.getQty()));
 							productRepository.save(product);
 						});
+						productBundleRepo.save(bundle);
 						/*
 						 * barcodeDetails.setQty(Math.abs(x.getQuantity() -
 						 * (bundle.getBundleQuantity()))); productRepository.save(barcodeDetails);
 						 */
-						productBundleRepo.save(bundle);
-					} else {
+						
+					} else if (barcodeDetails.getSellingTypeCode().equals(ProductEnum.PRODUCTBUNDLE)) {
 						barcodeDetails.setQty(Math.abs(x.getQuantity() - barcodeDetails.getQty()));
+						productRepository.save(barcodeDetails);
 					}
+				} else {
+					barcodeDetails.setQty(Math.abs(x.getQuantity() - barcodeDetails.getQty()));
+					productRepository.save(barcodeDetails);
 				}
+
 			} else if (type.equals(Constants.RETURN_SLIP)) {
 				barcodeDetails.setQty(Math.abs(x.getQuantity() + barcodeDetails.getQty()));
 			}

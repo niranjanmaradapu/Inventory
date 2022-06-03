@@ -4,13 +4,16 @@
 package com.otsi.retail.inventory.model;
 
 import java.util.List;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -46,7 +49,7 @@ public class ProductBundle extends BaseEntity {
 
 	private float itemMrp;
 
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "product_bundle_assignment_textile", joinColumns = @JoinColumn(name = "product_bundle_id"), inverseJoinColumns = @JoinColumn(name = "assigned_product_id"))
 	private List<Product> productTextiles;
 
