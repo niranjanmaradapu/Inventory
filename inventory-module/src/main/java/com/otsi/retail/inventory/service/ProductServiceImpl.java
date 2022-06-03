@@ -257,7 +257,7 @@ public class ProductServiceImpl implements ProductService {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, barcode + " barcode is invalidated");
 			}
 
-			Product product = productRepository.findByBarcodeAndStoreId(barcode,storeId);
+			Product product = productRepository.findByBarcodeAndStoreId(barcode, storeId);
 			if (product == null) {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No records found for barcode:" + barcode);
 			}
@@ -407,15 +407,20 @@ public class ProductServiceImpl implements ProductService {
 				if (barcodeDetails.getSellingTypeCode() != null) {
 					if (barcodeDetails.getSellingTypeCode().equals(ProductEnum.BUNDLEDPRODUCT)) {
 						ProductBundle bundle = productBundleRepo.findByBarcode(x.getBarCode());
-						// individual quantity calculation
-						Integer productTotalQuantity = bundle.getProductTextiles().stream()
-								.mapToInt(barcode -> barcode.getQty()).sum();
+
+						// individual quantity calculation Integer productTotalQuantity =
+						bundle.getProductTextiles().stream().mapToInt(barcode -> barcode.getQty()).sum();
+
 						bundle.setBundleQuantity(Math.abs(x.getQuantity() - bundle.getBundleQuantity()));
 						bundle.getProductTextiles().stream().forEach(product -> {
 							// update quantity
-							barcodeDetails.setQty(Math.abs(x.getQuantity() - (productTotalQuantity)));
-							productRepository.save(barcodeDetails);
+							product.setQty(Math.abs(x.getQuantity() - product.getQty()));
+							productRepository.save(product);
 						});
+						/*
+						 * barcodeDetails.setQty(Math.abs(x.getQuantity() -
+						 * (bundle.getBundleQuantity()))); productRepository.save(barcodeDetails);
+						 */
 						productBundleRepo.save(bundle);
 					} else {
 						barcodeDetails.setQty(Math.abs(x.getQuantity() - barcodeDetails.getQty()));
