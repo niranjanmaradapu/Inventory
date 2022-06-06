@@ -185,10 +185,11 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		ProductBundleVo productBundleVo = productBundleMapper.entityToVO(productBundle);
 		productBundleVo.setProductTextiles(productMapper.entityToVO(productBundle.getProductTextiles()));
 		productBundleVo.getProductTextiles().stream().forEach(product -> {
-
-			Product productBarcode = productRepository.findByBarcodeAndSellingTypeCode(product.getBarcode(),
-					ProductEnum.PRODUCTBUNDLE);
-			productBundleVo.setValue(productBundleVo.getBundleQuantity() * productBarcode.getItemMrp());
+			if (product != null) {
+				Product productBarcode = productRepository.findByBarcodeAndSellingTypeCode(product.getBarcode(),
+						ProductEnum.PRODUCTBUNDLE);
+				productBundleVo.setValue(productBundleVo.getBundleQuantity() * productBarcode.getItemMrp());
+			}
 		});
 
 		return productBundleVo;

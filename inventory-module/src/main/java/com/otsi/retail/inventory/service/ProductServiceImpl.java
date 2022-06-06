@@ -37,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otsi.retail.inventory.commons.AdjustmentType;
@@ -57,10 +58,7 @@ import com.otsi.retail.inventory.model.ProductBundle;
 import com.otsi.retail.inventory.model.ProductTransaction;
 import com.otsi.retail.inventory.repo.AdjustmentRepository;
 import com.otsi.retail.inventory.repo.ProductBundleRepository;
-import com.otsi.retail.inventory.repo.ProductInventoryRepo;
-import com.otsi.retail.inventory.repo.ProductItemRepo;
 import com.otsi.retail.inventory.repo.ProductRepository;
-import com.otsi.retail.inventory.repo.ProductTransactionReRepo;
 import com.otsi.retail.inventory.repo.ProductTransactionRepository;
 import com.otsi.retail.inventory.util.Constants;
 import com.otsi.retail.inventory.util.DateConverters;
@@ -92,15 +90,6 @@ public class ProductServiceImpl implements ProductService {
 
 	@Autowired
 	private AdjustmentMapper adjustmentMapper;
-
-	@Autowired
-	private ProductItemRepo productItemRepo;
-
-	@Autowired
-	private ProductInventoryRepo productInventoryRepo;
-
-	@Autowired
-	private ProductTransactionReRepo productTransactionReRepo;
 
 	@PersistenceContext
 	EntityManager em;
@@ -150,27 +139,31 @@ public class ProductServiceImpl implements ProductService {
 		Product product = productMapper.voToEntity(productVO);
 		product.setBarcode("REBAR/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/"
 				+ Generation.getSaltString());
+		if (product.getSellingTypeCode() != null) {
+			product.setSellingTypeCode(productOptional.get().getSellingTypeCode());
+		}
 		product.setParentBarcode(oldProduct.getBarcode());
 		product = productRepository.save(product);
 
-		/*
-		 * List<ProductTransaction> transact = productTransactionRepository
-		 * .findAllByBarcodeId(productOptional.get().getBarcode());
-		 * transact.stream().forEach(t -> { if
-		 * (t.getEffectingTable().equals("product textile table")) { t =
-		 * productTransactionRepository.findByBarcodeIdAndEffectingTableAndMasterFlag(
-		 * productOptional.get().getBarcode(), "product textile table", true);
-		 * t.setMasterFlag(false); productTransactionRepository.save(t); } else if
-		 * (t.getEffectingTable().equals("Adjustments")) { t =
-		 * productTransactionRepository.findByBarcodeIdAndEffectingTableAndMasterFlag(
-		 * productOptional.get().getBarcode(), "Adjustments", true);
-		 * t.setMasterFlag(false); productTransactionRepository.save(t); } });
-		 */
 		Adjustments adjustments = saveAdjustment(product.getStoreId(), productVO.getEmpId(), product.getBarcode(),
 				oldProduct.getBarcode(), "rebar");
 		saveProductTransaction(product, NatureOfTransaction.REBARPARENT.getName(), ADJUSTMENTS_TABLE,
 				adjustments.getAdjustmentId(), ADJUSTMENTS_TABLE);
 		return productMapper.entityToVO(product);
+	}
+
+	@Override
+	public ProductVO updateQuantity(ProductVO productVO) {
+		Optional<Product> productOptional = productRepository.findById(productVO.getId());
+		if (!productOptional.isPresent()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product not found with id:" + productVO.getId());
+		}
+
+		Product productQty = productOptional.get();
+		// update quantity only
+		productQty.setQty(productVO.getQty());
+		Product updateQty = productRepository.save(productQty);
+		return productMapper.entityToVO(updateQty);
 	}
 
 	@Override
@@ -181,16 +174,6 @@ public class ProductServiceImpl implements ProductService {
 		}
 		Product product = productOptional.get();
 		deleteAdjustment(product.getBarcode());
-		// saveAndUpdateProductTransaction(product.getBarcode());
-		/*
-		 * productTransactions.stream().forEach(t -> { if
-		 * (t.getComment().equals("newly inserted table")) { t =
-		 * productTransactionRepository.findByBarcodeIdAndCommentAndMasterFlag(barcode,
-		 * "newly inserted table", true); productTransactionRepository.delete(t); } else
-		 * if (t.getComment().equals("Adjustments")) { t =
-		 * productTransactionRepository.findByBarcodeIdAndCommentAndMasterFlag(barcode,
-		 * "Adjustments", true); productTransactionRepository.delete(t); } });
-		 */
 		product.setStatus(ProductStatus.DISABLE);
 		productRepository.save(product);
 	}
@@ -411,8 +394,8 @@ public class ProductServiceImpl implements ProductService {
 						ProductBundle bundle = productBundleRepo.findByBarcode(x.getBarCode());
 
 						// individual quantity calculation
-						//Integer productTotalQuantity = bundle.getProductTextiles().stream()
-								//.mapToInt(barcode -> barcode.getQty()).sum();
+						// Integer productTotalQuantity = bundle.getProductTextiles().stream()
+						// .mapToInt(barcode -> barcode.getQty()).sum();
 
 						bundle.setBundleQuantity(Math.abs(x.getQuantity() - bundle.getBundleQuantity()));
 						bundle.getProductTextiles().stream().forEach(product -> {
@@ -425,7 +408,7 @@ public class ProductServiceImpl implements ProductService {
 						 * barcodeDetails.setQty(Math.abs(x.getQuantity() -
 						 * (bundle.getBundleQuantity()))); productRepository.save(barcodeDetails);
 						 */
-						
+
 					} else if (barcodeDetails.getSellingTypeCode().equals(ProductEnum.PRODUCTBUNDLE)) {
 						barcodeDetails.setQty(Math.abs(x.getQuantity() - barcodeDetails.getQty()));
 						productRepository.save(barcodeDetails);
@@ -788,4 +771,5 @@ public class ProductServiceImpl implements ProductService {
 		return bvo;
 
 	}
+
 }

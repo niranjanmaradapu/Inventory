@@ -36,7 +36,7 @@ public interface ProductService {
 	void saveProducts(List<ProductVO> productTextileVos, Long storeId);
 
 	ProductVO getProductByParentBarcode(String parentBarcode);
-	
+
 	Page<ProductVO> getAllBarcodes(SearchFilterVo vo, Pageable pageable);
 
 	Page<AdjustmentsVO> getAdjustments(SearchFilterVo vo, Pageable pageable);
@@ -50,6 +50,6 @@ public interface ProductService {
 
 	ProductVO barcodeDetails(String barcode, Long clientId, Long storeId);
 
-	
+	ProductVO updateQuantity(ProductVO productVO);
 
 }

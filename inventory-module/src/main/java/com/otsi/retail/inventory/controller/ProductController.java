@@ -86,6 +86,22 @@ public class ProductController {
 
 	/**
 	 * 
+	 * @param qty
+	 * @return
+	 */
+	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
+			@ApiResponse(code = 200, message = "Successful retrieval", response = ProductVO.class, responseContainer = "Object") })
+	@ApiOperation(value = "/product-qty", notes = "update qty of the product", response = ProductVO.class)
+	@PutMapping(value = "/product-qty")
+	public ResponseEntity<?> updateQuantity(@RequestBody ProductVO productVO) {
+		log.info("Received Request to updateQuantity :" + productVO);
+		ProductVO productQty = productService.updateQuantity(productVO);
+		return ResponseEntity.ok(productQty);
+
+	}
+
+	/**
+	 * 
 	 * @param barcode
 	 * @return
 	 */
@@ -130,10 +146,9 @@ public class ProductController {
 			@ApiResponse(code = 200, message = "Successful retrieval", response = ProductVO.class, responseContainer = "Object") })
 	@GetMapping("/barcode-details")
 	public ResponseEntity<?> getBarcodeDetails(@RequestParam("barcode") String barcode,
-			@RequestParam("storeId") Long storeId ,
-		@RequestHeader(value = "clientId") Long clientId) {
+			@RequestParam("storeId") Long storeId, @RequestHeader(value = "clientId") Long clientId) {
 		log.info("Received request to getProduct:" + barcode);
-		ProductVO productTaxValues = productService.barcodeDetails(barcode, clientId ,storeId);
+		ProductVO productTaxValues = productService.barcodeDetails(barcode, clientId, storeId);
 		return ResponseEntity.ok(productTaxValues);
 	}
 
@@ -161,17 +176,18 @@ public class ProductController {
 	public void inventoryUpdate(@RequestBody List<InventoryUpdateVo> request) {
 		String type = Constants.NEW_SALE;
 		String referringTable = Constants.ORDER_TABLE;
-		productService.inventoryUpdate(request ,type , referringTable);
+		productService.inventoryUpdate(request, type, referringTable);
 	}
+
 	/**
 	 * 
 	 * @param request
 	 */
-	@RabbitListener(queues ="returnslip_queue")
+	@RabbitListener(queues = "returnslip_queue")
 	public void returnslipInventoryUpdate(@RequestBody List<InventoryUpdateVo> request) {
 		String type = Constants.RETURN_SLIP;
 		String referringTable = Constants.CUSTOMER_TABLE;
-		productService.inventoryUpdate(request ,type , referringTable);
+		productService.inventoryUpdate(request, type, referringTable);
 	}
 
 	/**
