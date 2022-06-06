@@ -12,8 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,6 +69,7 @@ import com.otsi.retail.inventory.vo.AdjustmentsVO;
 import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.FieldNameVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
+import com.otsi.retail.inventory.vo.ProductBundleVo;
 import com.otsi.retail.inventory.vo.ProductVO;
 import com.otsi.retail.inventory.vo.SearchFilterVo;
 import com.otsi.retail.inventory.vo.UserDetailsVo;
@@ -87,6 +90,9 @@ public class ProductServiceImpl implements ProductService {
 
 	@Autowired
 	private AdjustmentRepository adjustmentRepository;
+
+	@Autowired
+	private ProductBundleRepository productBundleRepository;
 
 	@Autowired
 	private AdjustmentMapper adjustmentMapper;
@@ -136,7 +142,25 @@ public class ProductServiceImpl implements ProductService {
 		oldProduct.setStatus(ProductStatus.DISABLE);
 		productRepository.save(oldProduct);
 
-		Product product = productMapper.voToEntity(productVO);
+		Product product = new Product();
+		product.setCostPrice(productOptional.get().getCostPrice());
+		product.setEmpId(productOptional.get().getEmpId());
+		product.setStatus(ProductStatus.ENABLE);
+		product.setName(productOptional.get().getName());
+		product.setBarcode(productOptional.get().getBarcode());
+		product.setDivision(productOptional.get().getDivision());
+		product.setSection(productOptional.get().getSection());
+		product.setSubSection(productOptional.get().getSubSection());
+		product.setOriginalBarcodeCreatedAt(LocalDate.now());
+		product.setCategory(productOptional.get().getCategory());
+		product.setBatchNo(productOptional.get().getBatchNo());
+		product.setColour(productOptional.get().getColour());
+		product.setHsnCode(productOptional.get().getHsnCode());
+		product.setItemMrp(productOptional.get().getItemMrp());
+		product.setUom(productOptional.get().getUom());
+		product.setQty(productOptional.get().getQty());
+		product.setStoreId(productOptional.get().getStoreId());
+		product.setDomainType(productOptional.get().getDomainType());
 		product.setBarcode("REBAR/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/"
 				+ Generation.getSaltString());
 		if (product.getSellingTypeCode() != null) {
@@ -245,6 +269,7 @@ public class ProductServiceImpl implements ProductService {
 			if (product == null) {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No records found for barcode:" + barcode);
 			}
+
 			ProductVO productVO = productMapper.entityToVO(product);
 			List<UserDetailsVo> userDetailsVo = new ArrayList<>();
 			try {

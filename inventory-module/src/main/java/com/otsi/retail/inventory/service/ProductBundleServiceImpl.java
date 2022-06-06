@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.LongStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,6 +61,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
 					"bundle name,bundle qty and products are required");
 		}
+
 		Product product = new Product();
 		ProductBundle bundle = productBundleMapper.voToEntity(productBundleVo);
 		bundle.setBarcode("BAR-" + Generation.getSaltString().toString());
@@ -69,13 +71,11 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		List<ProductBundleAssignmentTextile> bundleList = new ArrayList<ProductBundleAssignmentTextile>();
 		Integer productBundleQuantity = productBundleVo.getBundleQuantity();
 		Long productTotalQuantity = textiles.stream().mapToLong(x -> x.getQty()).sum();
-
+		
+		if (productTotalQuantity * productBundleQuantity < productTotalQuantity) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "insufficient product quantity for product");
+		}
 		textiles.stream().forEach(productTextile -> {
-			// Long productTotalQuantity = 1000l;
-			if (productTextile.getQty() * productBundleQuantity > productTotalQuantity) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-						"insufficient product quantity for product: " + productTextile.getName());
-			}
 
 			Product productBarcode = productRepository.findByBarcodeAndStatus(productTextile.getBarcode(), status);
 			if (productBarcode != null) {
