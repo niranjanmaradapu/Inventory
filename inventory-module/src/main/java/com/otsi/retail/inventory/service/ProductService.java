@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.otsi.retail.inventory.vo.AdjustmentsVO;
 import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
+import com.otsi.retail.inventory.vo.InvoiceDetailsVO;
 import com.otsi.retail.inventory.vo.ProductVO;
 import com.otsi.retail.inventory.vo.SearchFilterVo;
 
@@ -51,5 +52,7 @@ public interface ProductService {
 	ProductVO barcodeDetails(String barcode, Long clientId, Long storeId);
 
 	ProductVO updateQuantity(ProductVO productVO);
+
+	InvoiceDetailsVO scanAndFetchbarcodeDetails(String barcode, Long clientId, Long storeId);
 
 }

@@ -69,6 +69,7 @@ import com.otsi.retail.inventory.vo.AdjustmentsVO;
 import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.FieldNameVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
+import com.otsi.retail.inventory.vo.InvoiceDetailsVO;
 import com.otsi.retail.inventory.vo.ProductBundleVo;
 import com.otsi.retail.inventory.vo.ProductVO;
 import com.otsi.retail.inventory.vo.SearchFilterVo;
@@ -300,6 +301,12 @@ public class ProductServiceImpl implements ProductService {
 			}
 		}
 		return productVO;
+	}
+	
+	@Override
+	public InvoiceDetailsVO scanAndFetchbarcodeDetails(String barcode, Long clientId, Long storeId) {
+		ProductVO productVO = barcodeDetails(barcode, clientId, storeId);
+		return productMapper.productToInvoiceMapper(productVO);
 	}
 
 	public Map getHsnDetails(String hsnCode, Float itemPrice, Long clientId) {

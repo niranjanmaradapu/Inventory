@@ -25,13 +25,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.otsi.retail.inventory.gatewayresponse.GateWayResponse;
 import com.otsi.retail.inventory.rabbitmq.MQConfig;
 import com.otsi.retail.inventory.service.ProductService;
+import com.otsi.retail.inventory.util.CommonUtilities;
 import com.otsi.retail.inventory.util.Constants;
 import com.otsi.retail.inventory.vo.AdjustmentsVO;
 import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
+import com.otsi.retail.inventory.vo.InvoiceDetailsVO;
 import com.otsi.retail.inventory.vo.ProductVO;
 import com.otsi.retail.inventory.vo.SearchFilterVo;
-import com.otsi.retail.inventory.util.CommonUtilities;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -323,6 +324,24 @@ public class ProductController {
 	public ResponseEntity<?> getProperties(@RequestParam("domainType") String domainType) {
 		DomainTypePropertiesVO properties = productService.getProperties(domainType);
 		return ResponseEntity.ok(properties);
+	}
+
+	/**
+	 * 
+	 * @param barcode
+	 * @param storeId
+	 * @param clientId
+	 * @return
+	 */
+	@ApiOperation(value = "/scan-barcode", notes = "fetch barcode using storeId", response = ProductVO.class)
+	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
+			@ApiResponse(code = 200, message = "Successful retrieval", response = ProductVO.class, responseContainer = "Object") })
+	@GetMapping("/scan-barcode")
+	public ResponseEntity<?> scanBarcode(@RequestParam("barcode") String barcode, @RequestParam("storeId") Long storeId,
+			@RequestHeader(value = "clientId") Long clientId) {
+		log.info("Received request to getProduct:" + barcode);
+		InvoiceDetailsVO invoiceDetailsVO = productService.scanAndFetchbarcodeDetails(barcode, clientId, storeId);
+		return ResponseEntity.ok(invoiceDetailsVO);
 	}
 
 }

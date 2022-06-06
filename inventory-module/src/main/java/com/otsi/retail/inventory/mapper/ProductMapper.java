@@ -1,6 +1,7 @@
 package com.otsi.retail.inventory.mapper;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 import com.otsi.retail.inventory.commons.ProductStatus;
 import com.otsi.retail.inventory.model.Product;
+import com.otsi.retail.inventory.vo.InvoiceDetailsVO;
+import com.otsi.retail.inventory.vo.LineItemVO;
 import com.otsi.retail.inventory.vo.ProductVO;
 
 @Component
@@ -37,7 +40,6 @@ public class ProductMapper {
 		return productVo;
 
 	}
-
 
 	public List<ProductVO> entityToVO(List<Product> productList) {
 		return productList.stream().map(product -> entityToVO(product)).collect(Collectors.toList());
@@ -74,10 +76,31 @@ public class ProductMapper {
 
 	}
 
-
 	public List<Product> VoToEntity(List<ProductVO> productVoList) {
 		return productVoList.stream().map(productVo -> voToEntity(productVo)).collect(Collectors.toList());
 
+	}
+
+	public InvoiceDetailsVO productToInvoiceMapper(ProductVO productVO) {
+		InvoiceDetailsVO invoiceDetailsVO = new InvoiceDetailsVO();
+		invoiceDetailsVO.setStoreId(productVO.getStoreId());
+		LineItemVO lineItemsVO = new LineItemVO();
+		lineItemsVO.setBarCode(productVO.getBarcode());
+		lineItemsVO.setCreationDate(productVO.getOriginalBarcodeCreatedAt());
+		lineItemsVO.setItemPrice(productVO.getItemMrp());
+		lineItemsVO.setQuantity(productVO.getQty());
+		lineItemsVO.setSection(productVO.getSection());
+		lineItemsVO.setSubSection(productVO.getSubSection());
+		lineItemsVO.setDivision(productVO.getDivision());
+		lineItemsVO.setHsnCode(productVO.getHsnCode());
+		lineItemsVO.setStoreId(productVO.getStoreId());
+		// GrossValue is multiple of net value of product and quantity
+		lineItemsVO.setGrossValue(productVO.getItemMrp() * productVO.getQty());
+		if (productVO.getTaxValues() != null) {
+			lineItemsVO.setTaxValues(productVO.getTaxValues());
+		}
+		invoiceDetailsVO.setLineItems(Arrays.asList(lineItemsVO));
+		return invoiceDetailsVO;
 	}
 
 }
