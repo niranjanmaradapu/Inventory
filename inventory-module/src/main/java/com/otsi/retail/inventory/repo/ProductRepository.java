@@ -31,16 +31,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	Product findByBarcode(String barcode);
 
-	//List<Product> findByStoreIdAndBarcode(Long storeId, String barcode);
-
 	Product findByBarcodeAndStoreId(String barcode, Long storeId);
 
 	List<Product> findByStoreIdAndStatus(Long storeId, ProductStatus status);
 
 	Product findByParentBarcode(String barcode);
 
-	List<Product> findByItemMrpBetweenAndStoreIdAndStatus(float itemMrpLessThan, float itemMrpGreaterThan,
-			Long storeId, ProductStatus status);
+	List<Product> findByItemMrpBetweenAndStoreIdAndStatus(float itemMrpLessThan, float itemMrpGreaterThan, Long storeId,
+			ProductStatus status);
 
 	List<Product> findByEmpIdAndStatus(String empId, ProductStatus status);
 
@@ -54,7 +52,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	Product findByBarcodeAndStatus(String barcode, ProductStatus status);
 
 	Product findByBarcodeAndSellingTypeCode(String barcode, ProductEnum productbundle);
-	
+
 	List<Product> findByCreatedDateBetweenAndStatusAndStoreId(LocalDateTime fromTime, LocalDateTime fromTime1,
 			ProductStatus status, Long storeId);
 
@@ -72,8 +70,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	Page<Product> findByBarcodeAndStoreId(String barcode, Long storeId, Pageable pageable);
 
-	Page<Product> findByStoreIdAndStatus(Long storeId, ProductStatus status, Pageable pageable);
-
 	Page<Product> findByStatus(ProductStatus status, Pageable pageable);
 
 	Page<Product> findByCreatedDateBetweenAndStatusAndStoreId(LocalDateTime fromTime, LocalDateTime fromTime1,
@@ -81,15 +77,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	List<Product> findAllByEmpId(Long empId);
 
-	Page<Product> findByItemMrpBetweenAndStoreIdAndStatus(float itemMrpLessThan, float itemMrpGreaterThan,
-			Long storeId, ProductStatus status, Pageable pageable);
+	Page<Product> findByItemMrpBetweenAndStoreIdAndStatus(float itemMrpLessThan, float itemMrpGreaterThan, Long storeId,
+			ProductStatus status, Pageable pageable);
 
-	Page<Product> findByEmpIdAndStatusAndStoreId(String empId, ProductStatus status, Long storeId,
-			Pageable pageable);
+	Page<Product> findByEmpIdAndStatusAndStoreId(String empId, ProductStatus status, Long storeId, Pageable pageable);
 
 	Page<Product> findByStoreIdOrderByCreatedDateDesc(Long storeId, Pageable pageable);
 
-
-
+	Page<Product> findByStoreIdAndStatusOrderByCreatedDateDesc(Long storeId, ProductStatus status, Pageable pageable);
 
 }

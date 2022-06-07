@@ -70,7 +70,6 @@ import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.FieldNameVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
 import com.otsi.retail.inventory.vo.InvoiceDetailsVO;
-import com.otsi.retail.inventory.vo.ProductBundleVo;
 import com.otsi.retail.inventory.vo.ProductVO;
 import com.otsi.retail.inventory.vo.SearchFilterVo;
 import com.otsi.retail.inventory.vo.UserDetailsVo;
@@ -302,7 +301,7 @@ public class ProductServiceImpl implements ProductService {
 		}
 		return productVO;
 	}
-	
+
 	@Override
 	public InvoiceDetailsVO scanAndFetchbarcodeDetails(String barcode, Long clientId, Long storeId) {
 		ProductVO productVO = barcodeDetails(barcode, clientId, storeId);
@@ -373,7 +372,8 @@ public class ProductServiceImpl implements ProductService {
 			 * using storeId
 			 */
 		else if (searchFilterVo.getStoreId() != null) {
-			barcodeDetails = productRepository.findByStoreIdAndStatus(searchFilterVo.getStoreId(), status, pageable);
+			barcodeDetails = productRepository.findByStoreIdAndStatusOrderByCreatedDateDesc(searchFilterVo.getStoreId(),
+					status, pageable);
 		}
 
 		/*
@@ -499,17 +499,27 @@ public class ProductServiceImpl implements ProductService {
 		 * using dates and currentBarcodeId and storeId
 		 */
 		else if (StringUtils.isNotEmpty(searchFilterVo.getCurrentBarcodeId())) {
-			Optional<Adjustments> adjustmentOptional = adjustmentRepository
+			Optional<Adjustments> adjustmentOptional;
+			adjustmentOptional = adjustmentRepository
 					.findByCurrentBarcodeIdAndType(searchFilterVo.getCurrentBarcodeId(), AdjustmentType.REBAR);
-			if (adjustmentOptional.isPresent()) {
+			if (!adjustmentOptional.isPresent()) {
+				adjustmentOptional = adjustmentRepository
+						.findByToBeBarcodeIdAndType(searchFilterVo.getCurrentBarcodeId(), AdjustmentType.REBAR);
 				Adjustments adjustment = adjustmentOptional.get();
 				List<Adjustments> adjustments = Arrays.asList(adjustment);
 				int pageSize = pageable.getPageSize();
 				int currentPage = pageable.getPageNumber();
-				// adjustmentDetails = new PageImpl<>(adjustments);
 				adjustmentDetails = new PageImpl<Adjustments>(adjustments, PageRequest.of(currentPage, pageSize),
 						adjustments.size());
-
+			} else if (adjustmentOptional.isPresent()) {
+				Adjustments adjustment = adjustmentOptional.get();
+				List<Adjustments> adjustments = Arrays.asList(adjustment);
+				int pageSize = pageable.getPageSize();
+				int currentPage = pageable.getPageNumber();
+				adjustmentDetails = new PageImpl<Adjustments>(adjustments, PageRequest.of(currentPage, pageSize),
+						adjustments.size());
+			} else {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "barcode was not found");
 			}
 
 		}
@@ -686,7 +696,8 @@ public class ProductServiceImpl implements ProductService {
 			 * using storeId
 			 */
 			else if (vo.getStoreId() != null) {
-				barcodeDetails = productRepository.findByStoreIdAndStatus(vo.getStoreId(), status, pageable);
+				barcodeDetails = productRepository.findByStoreIdAndStatusOrderByCreatedDateDesc(vo.getStoreId(), status,
+						pageable);
 
 			}
 

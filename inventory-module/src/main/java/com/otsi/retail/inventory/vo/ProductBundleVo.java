@@ -29,6 +29,8 @@ public class ProductBundleVo {
 	
 	private Float value;
 	
+	private float itemMrp;
+	
 	private String barcode;
 
 }

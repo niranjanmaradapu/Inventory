@@ -21,6 +21,7 @@ public class ProductBundleMapper {
 		productBundleVo.setFromDate(productBundle.getCreatedDate());
 		productBundleVo.setToDate(productBundle.getLastModifiedDate());
 		productBundleVo.setBarcode(productBundle.getBarcode());
+		productBundleVo.setItemMrp(productBundle.getItemMrp());
 
 		/*
 		 * List<ProductVO> listVo = new ArrayList<>();

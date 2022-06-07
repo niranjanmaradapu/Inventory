@@ -41,4 +41,6 @@ public interface AdjustmentRepository extends JpaRepository<Adjustments, Long> {
 
 	Page<Adjustments> findByCurrentBarcodeIdAndComments(String currentBarcodeId, String comments, Pageable pageable);
 
+	Optional<Adjustments> findByToBeBarcodeIdAndType(String currentBarcodeId, AdjustmentType rebar);
+
 }
