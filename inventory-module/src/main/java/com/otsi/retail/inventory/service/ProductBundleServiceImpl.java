@@ -162,20 +162,12 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		/*
 		 * using from date
 		 */
-<<<<<<< HEAD
-		if (fromDate != null && toDate == null && storeId != null) {
-			LocalDateTime fromTime = DateConverters.convertLocalDateToLocalDateTime(fromDate);
-			LocalDateTime toTime = DateConverters.convertToLocalDateTimeMax(fromDate);
-
-			bundles = productBundleRepo.findByCreatedDateBetweenAndStoreIdAndStatus(fromTime, toTime, storeId,status);
-=======
 		if (fromDate != null && storeId != null) {
 			LocalDateTime fromTime = DateConverters.convertLocalDateToLocalDateTime(fromDate);
 			LocalDateTime toTime = DateConverters.convertToLocalDateTimeMax(fromDate);
 
 			bundles = productBundleRepo.findByCreatedDateBetweenAndStoreIdAndStatus(fromTime, toTime, storeId, status,
 					pageable);
->>>>>>> alpha-release
 		}
 		/*
 		 * using storeId
