@@ -30,13 +30,18 @@ public class ProductImage {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long productImageId;
+	
 	@ManyToOne
 	@JsonBackReference
 	@JoinColumn(name = "productItemId")
 	private ProductItem productItem;
+	
 	private String image; 
+	
 	private Long pIUID;
+	
 	private LocalDate creationDate;
+	
 	private LocalDate lastModified;
 
 }

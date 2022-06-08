@@ -7,6 +7,7 @@ package com.otsi.retail.inventory.vo;
 public class EnumVo {
 
 	private float mrp;
+	
 	private String code;
 
 	/**

@@ -36,11 +36,16 @@ public class CatalogEntity extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	
 	private String name;
+	
 	private String catergory;
+	
 	@Enumerated(EnumType.STRING)
 	private Categories description;
+	
 	private int status;
+	
 	@JsonIgnore
 	@ManyToOne(targetEntity = CatalogEntity.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "parentId")

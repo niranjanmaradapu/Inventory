@@ -4,14 +4,13 @@
 package com.otsi.retail.inventory.mapper;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
 import com.otsi.retail.inventory.model.CatalogEntity;
-import com.otsi.retail.inventory.vo.CatalogVo;
+import com.otsi.retail.inventory.vo.CatalogVO;
 
 /**
  * @author Sudheer.Swamy
@@ -20,53 +19,45 @@ import com.otsi.retail.inventory.vo.CatalogVo;
 @Component
 public class CatalogMapper {
 
-	public CatalogEntity convertVoToEntity(CatalogVo vo) {
-
-		CatalogEntity entity = new CatalogEntity();
-		// entity.setId(vo.getId());
-		entity.setName(vo.getName());
-		entity.setDescription(vo.getDescription());
-		entity.setStatus(vo.getStatus());
-		entity.setCatergory(vo.getCategory());
-
-		return entity;
+	public CatalogEntity convertVoToEntity(CatalogVO catalogVo) {
+		CatalogEntity catalog = new CatalogEntity();
+		catalog.setName(catalogVo.getName());
+		catalog.setDescription(catalogVo.getDescription());
+		catalog.setStatus(catalogVo.getStatus());
+		catalog.setCatergory(catalogVo.getCategory());
+		return catalog;
 
 	}
 
-	public List<CatalogVo> convertlistEntityToVo(List<CatalogEntity> pentity) {
-
-		List<CatalogVo> lvo = new ArrayList<CatalogVo>();
-		pentity.stream().forEach(x -> {
-
-			CatalogVo vo = new CatalogVo();
-			vo.setId(x.getId());
-			vo.setName(x.getName());
-			vo.setCategory(x.getCatergory());
-			vo.setDescription(x.getDescription());
-			vo.setStatus(x.getStatus());
-			vo.setCUID(x.getParent().getId());
-			lvo.add(vo);
+	public List<CatalogVO> convertEntityToVO(List<CatalogEntity> catalogList) {
+		List<CatalogVO> catalogVoList = new ArrayList<CatalogVO>();
+		catalogList.stream().forEach(catalog -> {
+			CatalogVO catalogVo = new CatalogVO();
+			catalogVo.setId(catalog.getId());
+			catalogVo.setName(catalog.getName());
+			catalogVo.setCategory(catalog.getCatergory());
+			catalogVo.setDescription(catalog.getDescription());
+			catalogVo.setStatus(catalog.getStatus());
+			catalogVo.setCUID(catalog.getParent().getId());
+			catalogVoList.add(catalogVo);
 		});
+		return catalogVoList;
+	}
 
-		return lvo;
+	public CatalogVO convertEntityToVO(CatalogEntity catalog) {
+		CatalogVO catalogVo = new CatalogVO();
+		catalogVo.setId(catalog.getId());
+		catalogVo.setName(catalog.getName());
+		catalogVo.setDescription(catalog.getDescription());
+		catalogVo.setStatus(catalog.getStatus());
+		catalogVo.setCreatedDate(catalog.getCreatedDate());
+		catalogVo.setLastModifiedDate(catalog.getLastModifiedDate());
+		return catalogVo;
 
 	}
 
-	public CatalogVo convertEntityToVo(CatalogEntity dtos) {
-		CatalogVo vo = new CatalogVo();
-
-		vo.setId(dtos.getId());
-		vo.setName(dtos.getName());
-		vo.setDescription(dtos.getDescription());
-		vo.setStatus(dtos.getStatus());
-		vo.setCreatedDate(dtos.getCreatedDate());
-		vo.setLastModifiedDate(dtos.getLastModifiedDate());
-		return vo;
-
-	}
-
-	public List<CatalogVo> convertlEntityToVo(List<CatalogEntity> dtos) {
-		return dtos.stream().map(entity -> convertEntityToVo(entity)).collect(Collectors.toList());
+	public List<CatalogVO> convertlEntityToVo(List<CatalogEntity> catalogList) {
+		return catalogList.stream().map(catalog -> convertEntityToVO(catalog)).collect(Collectors.toList());
 
 	}
 

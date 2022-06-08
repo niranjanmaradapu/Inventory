@@ -4,19 +4,19 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import com.otsi.retail.inventory.model.UomEntity;
-import com.otsi.retail.inventory.vo.UomVo;
+import com.otsi.retail.inventory.vo.UomVO;
 
 @Service
 public interface UomService {
 
-	UomVo saveUom(UomVo vo);
+	UomVO saveUom(UomVO vo);
 
 	Optional<UomEntity> getUom(Long id);
 
-	List<UomVo> getAllUom();
+	List<UomVO> getAllUom();
 
-	String updateUom(UomVo uomVo);
+	UomVO updateUom(UomVO uomVo);
 
-	String deleteUom(Long id);
+	void deleteUom(Long id);
 
 }

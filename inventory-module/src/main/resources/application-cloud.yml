@@ -46,6 +46,14 @@ logging:
     file:
       name: C:\Users\retails\Desktop\logs\inventory-module.log       
     level:
-      com.otsi.retail.inventory.service: DEBUG   
+      com.otsi.retail.inventory.service: DEBUG
+      
+        
+######################### REST CALLS ###########################
 
+<<<<<<< HEAD
    
+=======
+hsn_details_url: http://10.100.177.121:8083/hsn-details/code
+   
+>>>>>>> alpha-release

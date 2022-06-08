@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.otsi.retail.inventory.model.ProductTransaction;
 
 @Repository
-public interface ProductTransactionRepo extends JpaRepository<ProductTransaction, Long> {
+public interface ProductTransactionRepository extends JpaRepository<ProductTransaction, Long> {
 
 	ProductTransaction findByQuantity(int qty);
 

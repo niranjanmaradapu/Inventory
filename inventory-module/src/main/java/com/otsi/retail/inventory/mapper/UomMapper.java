@@ -2,54 +2,38 @@ package com.otsi.retail.inventory.mapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Component;
+
 import com.otsi.retail.inventory.model.UomEntity;
-import com.otsi.retail.inventory.vo.UomVo;
+import com.otsi.retail.inventory.vo.UomVO;
 
 @Component
 public class UomMapper {
 
-	/*
-	 * EntityToVo converts dto to vo
-	 * 
-	 */
-
-	public UomVo EntityToVo(UomEntity dto) {
-		UomVo vo = new UomVo();
-		vo.setId(dto.getId());
-		vo.setUomName(dto.getUomName());
-		return vo;
+	public UomVO entityToVO(UomEntity uom) {
+		UomVO uomVo = new UomVO();
+		uomVo.setId(uom.getId());
+		uomVo.setUomName(uom.getUomName());
+		return uomVo;
 
 	}
 
-	/*
-	 * to convert list dto's to vo's
-	 */
-
-	public List<UomVo> EntityToVo(List<UomEntity> dtos) {
-		return dtos.stream().map(dto -> EntityToVo(dto)).collect(Collectors.toList());
+	public List<UomVO> entityToVO(List<UomEntity> uomList) {
+		return uomList.stream().map(uom -> entityToVO(uom)).collect(Collectors.toList());
 
 	}
 
-	/*
-	 * VoToEntity converts vo to dto
-	 * 
-	 */
-
-	public UomEntity VoToEntity(UomVo vo) {
-		UomEntity dto = new UomEntity();
-		dto.setId(vo.getId());
-		dto.setUomName(vo.getUomName());
-		return dto;
+	public UomEntity voToEntity(UomVO uomVo) {
+		UomEntity uom = new UomEntity();
+		uom.setId(uomVo.getId());
+		uom.setUomName(uomVo.getUomName());
+		return uom;
 
 	}
 
-	/*
-	 * to convert list vo's to dto's
-	 */
-
-	public List<UomEntity> VoToEntity(List<UomVo> vos) {
-		return vos.stream().map(vo -> VoToEntity(vo)).collect(Collectors.toList());
+	public List<UomEntity> VoToEntity(List<UomVO> uomVoList) {
+		return uomVoList.stream().map(uomVo -> voToEntity(uomVo)).collect(Collectors.toList());
 
 	}
 

@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 public class SearchFilterVo {
-    
+
 	@DateTimeFormat(pattern = "dd-MM-yyyy")
 	private LocalDate fromDate;
 
@@ -28,7 +28,7 @@ public class SearchFilterVo {
 	private String barcode;
 
 	private ProductStatus status;
-	
+
 	private String currentBarcodeId;
 
 }

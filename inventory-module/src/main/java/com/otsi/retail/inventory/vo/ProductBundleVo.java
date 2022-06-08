@@ -21,12 +21,16 @@ public class ProductBundleVo {
 
 	private Integer bundleQuantity;
 
-	private List<ProductTextileVo> productTextiles;
+	private List<ProductVO> productTextiles;
 
 	private LocalDateTime fromDate;
 
 	private LocalDateTime toDate;
 	
 	private Float value;
+	
+	private float itemMrp;
+	
+	private String barcode;
 
 }

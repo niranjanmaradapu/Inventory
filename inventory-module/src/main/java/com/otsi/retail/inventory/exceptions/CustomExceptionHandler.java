@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.otsi.retail.inventory.errors.ErrorResponse;
@@ -86,4 +87,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 		log.error("error response is:" + error);
 		return new ResponseEntity<Object>(error, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(ResponseStatusException.class)
+	public ResponseEntity<?> handleResponseStatusException(ResponseStatusException ex) {
+		ErrorResponse<?> error = new ErrorResponse<>(ex.getRawStatusCode(), ex.getReason());
+		log.error("error response is:" + error + " status:" + ex.getStatus());
+		return new ResponseEntity<>(error, ex.getStatus());
+	}
 }
+

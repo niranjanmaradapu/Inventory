@@ -1,12 +1,13 @@
 package com.otsi.retail.inventory.controller;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,13 +49,13 @@ public class ProductBundleController {
 	}
 
 	@PostMapping("/all")
-	public GateWayResponse<?> getAllProductBundles(
+	public GateWayResponse<?> getAllProductBundles(Pageable pageable,
 			@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
 			@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate,
 			@RequestParam(required = false) Long id, @RequestParam(required = false) Long storeId) {
 		log.info("Recieved request to getAllProductBundles");
-		List<ProductBundleVo> productBundles = productBundleService.getAllProductBundles(fromDate, toDate, id,
-				storeId);
+		Page<ProductBundleVo> productBundles = productBundleService.getAllProductBundles(fromDate, toDate, id,
+				storeId,pageable);
 		return new GateWayResponse<>("fetching all product bundle details sucessfully", productBundles);
 
 	}

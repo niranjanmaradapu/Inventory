@@ -2,7 +2,8 @@ package com.otsi.retail.inventory.commons;
 
 public enum ProductEnum {
 
-	None(0L, "none"), INDIVIDUALPRODUCT(1L, "individual product"), PRODUCTBUNDLE(2L, "product bundle");
+	None(0L, "none"), INDIVIDUALPRODUCT(1L, "individual product"), PRODUCTBUNDLE(2L, "product bundle"),
+	BUNDLEDPRODUCT(3L, "bundled product");
 
 	private Long id;
 	private String name;

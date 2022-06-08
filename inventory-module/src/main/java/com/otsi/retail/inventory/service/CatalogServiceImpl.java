@@ -3,10 +3,16 @@
  */
 package com.otsi.retail.inventory.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.otsi.retail.inventory.commons.Categories;
 import com.otsi.retail.inventory.exceptions.DataNotFoundException;
 import com.otsi.retail.inventory.exceptions.DuplicateRecordException;
@@ -14,7 +20,7 @@ import com.otsi.retail.inventory.exceptions.RecordNotFoundException;
 import com.otsi.retail.inventory.mapper.CatalogMapper;
 import com.otsi.retail.inventory.model.CatalogEntity;
 import com.otsi.retail.inventory.repo.CatalogRepository;
-import com.otsi.retail.inventory.vo.CatalogVo;
+import com.otsi.retail.inventory.vo.CatalogVO;
 
 /**
  * @author Sudheer.Swamy
@@ -24,51 +30,51 @@ import com.otsi.retail.inventory.vo.CatalogVo;
 public class CatalogServiceImpl implements CatalogService {
 
 	@Autowired
-	private CatalogRepository catalogRepo;
+	private CatalogRepository catalogRepository;
 
 	@Autowired
 	private CatalogMapper catalogMapper;
 
 	@Override
-	public CatalogVo saveCatalogDetails(CatalogVo catalog) throws Exception {
-		CatalogEntity entity = new CatalogEntity();
+	public CatalogVO saveCatalogDetails(CatalogVO catalogVo) throws Exception {
+		CatalogEntity catalog = new CatalogEntity();
 
-		entity = catalogMapper.convertVoToEntity(catalog);
-		if (entity == null) {
+		catalog = catalogMapper.convertVoToEntity(catalogVo);
+		if (catalog == null) {
 			throw new DataNotFoundException("Data not found");
 		}
 
-		if (catalog.getCUID() == 0) {
-			entity.setParent(null);
+		if (catalogVo.getCUID() == 0) {
+			catalog.setParent(null);
 		} else {
-			CatalogEntity centity = this.catalogRepo.getById(catalog.getCUID());
-			entity.setParent(centity);
+			CatalogEntity centity = this.catalogRepository.getById(catalogVo.getCUID());
+			catalog.setParent(centity);
 		}
 
-		catalogRepo.save(entity);
+		catalogRepository.save(catalog);
 
-		CatalogVo vo = catalogMapper.convertEntityToVo(entity);
-		if (entity.getParent() != null) {
-			vo.setCUID(entity.getParent().getId());
+		CatalogVO catalogVO = catalogMapper.convertEntityToVO(catalog);
+		if (catalog.getParent() != null) {
+			catalogVO.setCUID(catalog.getParent().getId());
 		} else {
-			vo.setCUID(null);
+			catalogVO.setCUID(null);
 
 		}
-		return vo;
+		return catalogVO;
 
 	}
 
 	@Override
-	public CatalogVo getCatalogByName(String name) throws Exception {
+	public CatalogVO getCatalogByName(String name) throws Exception {
 
-		Optional<CatalogEntity> names = catalogRepo.findByName(name);
+		Optional<CatalogEntity> names = catalogRepository.findByName(name);
 
 		if (!names.isPresent()) {
 			throw new RecordNotFoundException("Given catalog name is not exists");
 		} else {
 
-			CatalogVo vo = catalogMapper.convertEntityToVo(names.get());
-			return vo;
+			CatalogVO catalogVo = catalogMapper.convertEntityToVO(names.get());
+			return catalogVo;
 		}
 
 	}
@@ -76,9 +82,9 @@ public class CatalogServiceImpl implements CatalogService {
 	@Override
 	public void deleteCategoryById(Long id) throws Exception {
 
-		if (catalogRepo.findById(id).isPresent()) {
-			if (catalogRepo.findByParentId(id).isEmpty()) {
-				catalogRepo.deleteById(id);
+		if (catalogRepository.findById(id).isPresent()) {
+			if (catalogRepository.findByParentId(id).isEmpty()) {
+				catalogRepository.deleteById(id);
 			} else {
 				throw new DuplicateRecordException(
 						"Failed to delete,  Please delete child categories associated with this category");
@@ -90,46 +96,39 @@ public class CatalogServiceImpl implements CatalogService {
 	}
 
 	@Override
-	public List<CatalogVo> getCategories(Long id) {
-
-		Optional<CatalogEntity> entity = catalogRepo.findById(id);
-		if (!entity.isPresent()) {
-			throw new RecordNotFoundException("record not exists");
+	public List<CatalogVO> getCategories(Long id) {
+		Optional<CatalogEntity> catalog = catalogRepository.findById(id);
+		if (!catalog.isPresent()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "catalog not found for id:" + id);
 		}
-
-		List<CatalogEntity> pentity = catalogRepo.findByParentId(entity.get().getId());
-		if (pentity.isEmpty()) {
-			throw new RecordNotFoundException("record not exists");
+		List<CatalogEntity> catalogs = catalogRepository.findByParentId(catalog.get().getId());
+		if (catalogs.isEmpty()) {
+			return Collections.EMPTY_LIST;
 		}
-		
-		List<CatalogVo> lvo = catalogMapper.convertlistEntityToVo(pentity);
-		
-		return lvo;
+		List<CatalogVO> catalogsVO = catalogMapper.convertEntityToVO(catalogs);
+		return catalogsVO;
 	}
 
 	@Override
-	public List<CatalogVo> getMainCategories() {
-		
-		List<CatalogEntity> ent = catalogRepo.findByDescription(Categories.DIVISION);
-		if (ent.isEmpty()) {
+	public List<CatalogVO> getMainCategories() {
+
+		List<CatalogEntity> catalogList = catalogRepository.findByDescription(Categories.DIVISION);
+		if (catalogList.isEmpty()) {
 			throw new RecordNotFoundException("record not exists");
 		}
-		
-		List<CatalogVo> lvo = catalogMapper.convertlEntityToVo(ent);
-		return lvo;
+
+		List<CatalogVO> catalogVoList = catalogMapper.convertlEntityToVo(catalogList);
+		return catalogVoList;
 	}
 
 	@Override
-	public List<CatalogVo> getAllCategories() {
-		
-		List<CatalogEntity> listOfCategories = catalogRepo.findAll();
-		if(listOfCategories.isEmpty()) {
-			throw new RecordNotFoundException("record not exists");
+	public List<CatalogVO> getAllCategories() {
+		List<CatalogEntity> listOfCategories = catalogRepository.findAll();
+		if (listOfCategories.isEmpty()) {
+			return Collections.EMPTY_LIST;
 		}
-		
-		List<CatalogVo> catalogList = catalogMapper.convertlEntityToVo(listOfCategories);
-		
-		return catalogList;
+		List<CatalogVO> catalogVoList = catalogMapper.convertlEntityToVo(listOfCategories);
+		return catalogVoList;
 	}
 
 }
