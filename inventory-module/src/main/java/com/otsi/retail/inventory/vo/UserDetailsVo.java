@@ -13,16 +13,6 @@ public class UserDetailsVo {
 	private String phoneNumber;
 
 	private String gender;
-<<<<<<< HEAD
-	private LocalDateTime createdDate;
-	private LocalDateTime lastModifiedDate;
-	private String createdBy;
-	private Boolean isActive;
-	private Boolean isSuperAdmin;
-	private Boolean isCustomer;
-	private Role role;
-	private List<ClientDomains> clientDomians;
-=======
 
 	private LocalDate createdDate;
 
@@ -32,7 +22,6 @@ public class UserDetailsVo {
 
 	private Role role;
 
->>>>>>> alpha-release
 	private List<UserAv> userAv;
 
 	private List<StoreVo> stores;
