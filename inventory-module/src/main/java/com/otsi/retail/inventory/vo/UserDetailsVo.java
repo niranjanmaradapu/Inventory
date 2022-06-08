@@ -14,9 +14,9 @@ public class UserDetailsVo {
 
 	private String gender;
 
-	private LocalDate createdDate;
+	private LocalDateTime createdDate;
 
-	private LocalDate lastModifiedDate;
+	private LocalDateTime lastModifiedDate;
 
 	private String createdBy;
 
