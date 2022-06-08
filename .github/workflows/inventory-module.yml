@@ -87,5 +87,3 @@ jobs:
           cluster-name: Microservice-K8S-Cluster
           command: helm upgrade --set image.tag="$GITHUB_SHA" --install ${{ env.MODULE_NAME }} ./${{ env.MODULE_NAME }}/${{ env.MODULE_NAME }}
 
-
-
