@@ -21,7 +21,7 @@ public class AdjustmentMapper {
 		adjustmentsVo.setStoreId(adjustments.getStoreId());
 		return adjustmentsVo;
 
-	}
+	} 
 
 	public List<AdjustmentsVO> entityToVO(List<Adjustments> adjustmentList) {
 		return adjustmentList.stream().map(adjustments -> entityToVO(adjustments)).collect(Collectors.toList());

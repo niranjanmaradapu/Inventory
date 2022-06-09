@@ -86,4 +86,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	Page<Product> findByStoreIdAndStatusOrderByCreatedDateDesc(Long storeId, ProductStatus status, Pageable pageable);
 
+	Product findById(Product assignedproductId);
+
 }

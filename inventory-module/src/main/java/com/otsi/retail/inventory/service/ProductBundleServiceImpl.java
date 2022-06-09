@@ -71,10 +71,12 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		List<ProductBundleAssignmentTextile> bundleList = new ArrayList<ProductBundleAssignmentTextile>();
 		Integer productBundleQuantity = productBundleVo.getBundleQuantity();
 		Long productTotalQuantity = textiles.stream().mapToLong(x -> x.getQty()).sum();
-		
-		if (productTotalQuantity * productBundleQuantity < productTotalQuantity) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "insufficient product quantity for product");
-		}
+
+		/*
+		 * if (productTotalQuantity * productBundleQuantity == productTotalQuantity) {
+		 * throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+		 * "insufficient product quantity for product"); }
+		 */
 		textiles.stream().forEach(productTextile -> {
 
 			Product productBarcode = productRepository.findByBarcodeAndStatus(productTextile.getBarcode(), status);
@@ -89,15 +91,15 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 			bundledProductAssignment.setQuantity(productTextile.getQty());
 			bundleList.add(bundledProductAssignment);
 
-			if (productTextile.getQty() > 1) {
-				double itemMrpCalculation = 0L;
-				itemMrpCalculation = textiles.stream().mapToDouble(x -> x.getItemMrp() * x.getQty()).sum();
-				float mrp = (float) itemMrpCalculation;
-				product.setItemMrp(mrp);
-				bundle.setItemMrp(mrp);
-			}
+			/*
+			 * if (productTextile.getQty() > 1) { double itemMrpCalculation = 0L;
+			 * itemMrpCalculation = textiles.stream().mapToDouble(x -> x.getItemMrp() *
+			 * x.getQty()).sum(); float mrp = (float) itemMrpCalculation;
+			 * product.setItemMrp(mrp); bundle.setItemMrp(mrp); }
+			 */
 		});
-
+		product.setItemMrp(productBundleVo.getItemMrp());
+		bundle.setItemMrp(productBundleVo.getItemMrp());
 		bundledProductAssignmentRepository.saveAll(bundleList);
 		// saving product bundle again as individual product
 
