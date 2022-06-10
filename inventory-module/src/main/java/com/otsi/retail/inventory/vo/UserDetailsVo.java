@@ -2,6 +2,7 @@ package com.otsi.retail.inventory.vo;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -27,8 +28,6 @@ public class UserDetailsVo {
 	private List<StoreVo> stores;
 
 	private StoreVo ownerOf;
-
-	private Long modifiedBy;
 
 	private Boolean isActive;
 

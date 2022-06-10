@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 server:
  port: 9092
  
@@ -33,45 +32,6 @@ eureka:
 
 logging:
     file:
-      name: C:/Users/ADMIN/Desktop/logs/inventory-module.log 
-    level:
-      com.otsi.retail.inventory.service: DEBUG   
-
-=======
-server:
- port: 9092
- 
-spring:
- application:
-    name: inventory-service
- datasource:
-    platform: postgres
-    url: jdbc:postgresql://localhost:5432/inventory-module
-    username: postgres
-    password: Otsi@123
-    
- jpa:
-   hibernate:
-    ddl-auto: update
-   database-platform: org.hibernate.dialect.PostgreSQL9Dialect
-   show-sql: true
- rabbitmq:
-      host: localhost
-      port: 5672
-      username: guest
-      password: guest
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8762/eureka/
-  instance:
-    instance-id: ${spring.application.name}:${random.int}
-    hostname: localhost
-
-logging:
-    file:
       name: C:/logs/inventory-module.log
     level:
       com.otsi.retail.inventory.service: DEBUG
@@ -82,4 +42,3 @@ hsn_details_url: http://localhost:8083/hsn-details/code
 
         
 
->>>>>>> alpha-release
