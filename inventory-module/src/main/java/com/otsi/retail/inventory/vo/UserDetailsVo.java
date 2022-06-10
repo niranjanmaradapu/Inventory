@@ -27,8 +27,8 @@ public class UserDetailsVo {
 	private List<StoreVo> stores;
 
 	private StoreVo ownerOf;
-	private Long modifiedBy;
 
+	private Long modifiedBy;
 
 	private Boolean isActive;
 
