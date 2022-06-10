@@ -442,8 +442,8 @@ public class ProductServiceImpl implements ProductService {
 										.findById(assignmentBundle.getAssignedproductId().getId());
 								// update quantity
 
-								product.setQty(Math.abs(x.getQuantity() - productQty.get().getQty()));
-								productRepository.save(product);
+								productQty.get().setQty(Math.abs(x.getQuantity() - productQty.get().getQty()));
+								productRepository.save(productQty.get());
 
 							});
 
