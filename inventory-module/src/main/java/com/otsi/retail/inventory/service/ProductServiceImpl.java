@@ -442,8 +442,8 @@ public class ProductServiceImpl implements ProductService {
 										.findById(assignmentBundle.getAssignedproductId().getId());
 								// update quantity
 
-								product.setQty(Math.abs(x.getQuantity() - productQty.get().getQty()));
-								productRepository.save(product);
+								productQty.get().setQty(Math.abs(x.getQuantity() - productQty.get().getQty()));
+								productRepository.save(productQty.get());
 
 							});
 
@@ -583,7 +583,7 @@ public class ProductServiceImpl implements ProductService {
 							: Character.toUpperCase(enumName.charAt(0)) + enumName.substring(1).toUpperCase();
 				}
 
-				query = "select c.name from  catalog_categories c where c.description= '" + enumName + "'";
+				query = "select c.id,c.name from  catalog_categories c where c.description= '" + enumName + "'";
 			}
 
 			else if (enumName.equalsIgnoreCase("batchno") || enumName.equalsIgnoreCase("costprice")
