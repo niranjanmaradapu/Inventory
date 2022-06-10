@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import com.otsi.retail.inventory.model.ProductBundle;
-
 @Repository
 public interface ProductBundleRepository extends JpaRepository<ProductBundle, Long> {
 
@@ -27,5 +26,7 @@ public interface ProductBundleRepository extends JpaRepository<ProductBundle, Lo
 			LocalDateTime fromTime, LocalDateTime toTime, Long id, Boolean status, Long storeId, Pageable pageable);
 
 	ProductBundle findByBarcode(String barCode);
+
+	
 
 }

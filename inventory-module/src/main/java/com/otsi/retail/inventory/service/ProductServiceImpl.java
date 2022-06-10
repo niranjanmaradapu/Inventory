@@ -57,8 +57,10 @@ import com.otsi.retail.inventory.mapper.ProductMapper;
 import com.otsi.retail.inventory.model.Adjustments;
 import com.otsi.retail.inventory.model.Product;
 import com.otsi.retail.inventory.model.ProductBundle;
+import com.otsi.retail.inventory.model.ProductBundleAssignmentTextile;
 import com.otsi.retail.inventory.model.ProductTransaction;
 import com.otsi.retail.inventory.repo.AdjustmentRepository;
+import com.otsi.retail.inventory.repo.BundledProductAssignmentRepository;
 import com.otsi.retail.inventory.repo.ProductBundleRepository;
 import com.otsi.retail.inventory.repo.ProductRepository;
 import com.otsi.retail.inventory.repo.ProductTransactionRepository;
@@ -96,6 +98,9 @@ public class ProductServiceImpl implements ProductService {
 
 	@Autowired
 	private AdjustmentMapper adjustmentMapper;
+
+	@Autowired
+	private BundledProductAssignmentRepository bundledProductAssignmentRepository;
 
 	@PersistenceContext
 	EntityManager em;
@@ -425,21 +430,25 @@ public class ProductServiceImpl implements ProductService {
 					if (barcodeDetails.getSellingTypeCode().equals(ProductEnum.BUNDLEDPRODUCT)) {
 						ProductBundle bundle = productBundleRepo.findByBarcode(x.getBarCode());
 
-						// individual quantity calculation
-						// Integer productTotalQuantity = bundle.getProductTextiles().stream()
-						// .mapToInt(barcode -> barcode.getQty()).sum();
-
 						bundle.setBundleQuantity(Math.abs(x.getQuantity() - bundle.getBundleQuantity()));
-						bundle.getProductTextiles().stream().forEach(product -> {
-							// update quantity
-							product.setQty(Math.abs(x.getQuantity() - product.getQty()));
-							productRepository.save(product);
+						List<ProductBundleAssignmentTextile> bundleAssignment = bundledProductAssignmentRepository
+								.findByProductBundleId_Id(bundle.getId());
+
+						bundleAssignment.stream().forEach(assignmentBundle -> {
+
+							bundle.getProductTextiles().stream().forEach(product -> {
+
+								Optional<Product> productQty = productRepository
+										.findById(assignmentBundle.getAssignedproductId().getId());
+								// update quantity
+
+								product.setQty(Math.abs(x.getQuantity() - productQty.get().getQty()));
+								productRepository.save(product);
+
+							});
+
 						});
 						productBundleRepo.save(bundle);
-						/*
-						 * barcodeDetails.setQty(Math.abs(x.getQuantity() -
-						 * (bundle.getBundleQuantity()))); productRepository.save(barcodeDetails);
-						 */
 
 					} else if (barcodeDetails.getSellingTypeCode().equals(ProductEnum.PRODUCTBUNDLE)) {
 						barcodeDetails.setQty(Math.abs(x.getQuantity() - barcodeDetails.getQty()));
