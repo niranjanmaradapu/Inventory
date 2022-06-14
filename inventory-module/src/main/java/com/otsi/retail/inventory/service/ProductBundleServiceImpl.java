@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.otsi.retail.inventory.commons.Generation;
@@ -186,14 +187,15 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 	private ProductBundleVo bundleMapToVo(ProductBundle productBundle) {
 		ProductBundleVo productBundleVo = productBundleMapper.entityToVO(productBundle);
 		productBundleVo.setProductTextiles(productMapper.entityToVO(productBundle.getProductTextiles()));
-		productBundleVo.getProductTextiles().stream().forEach(product -> {
-			if (product != null) {
-				Product productBarcode = productRepository.findByBarcodeAndSellingTypeCode(product.getBarcode(),
-						ProductEnum.PRODUCTBUNDLE);
-				productBundleVo.setValue(productBundleVo.getBundleQuantity() * productBarcode.getItemMrp());
-			}
-		});
-
+		if (CollectionUtils.isEmpty(productBundleVo.getProductTextiles())) {
+			productBundleVo.getProductTextiles().stream().forEach(product -> {
+				if (product != null) {
+					Product productBarcode = productRepository.findByBarcodeAndSellingTypeCode(product.getBarcode(),
+							ProductEnum.PRODUCTBUNDLE);
+					productBundleVo.setValue(productBundleVo.getBundleQuantity() * productBarcode.getItemMrp());
+				}
+			});
+		}
 		return productBundleVo;
 
 	}
