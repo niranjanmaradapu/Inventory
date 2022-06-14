@@ -1,6 +1,6 @@
 package com.otsi.retail.inventory.vo;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 import lombok.Data;
@@ -12,10 +12,12 @@ import lombok.ToString;
 @ToString
 public class InvoiceDetailsVO {
 	
-	private Long storeId;
+	private List<ProductVO> barcode;
 
 	private int qty;
 	
+	private String dsNumber;
+
 	private String type;
 
 	private Long mrp;
@@ -26,11 +28,9 @@ public class InvoiceDetailsVO {
 
 	private Long salesMan;
 
-	private LocalDate createdDate;
+	private Date createdDate;
 
-	private LocalDate lastModifiedDate;
-	
-	private List<LineItemVO> lineItems;
+	private Date lastModified;
 
 
 }
