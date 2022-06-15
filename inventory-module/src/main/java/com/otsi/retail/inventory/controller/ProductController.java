@@ -33,6 +33,7 @@ import com.otsi.retail.inventory.vo.InventoryUpdateVo;
 import com.otsi.retail.inventory.vo.InvoiceDetailsVO;
 import com.otsi.retail.inventory.vo.ProductVO;
 import com.otsi.retail.inventory.vo.SearchFilterVo;
+import com.otsi.retail.inventory.vo.ValuesVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -221,6 +222,21 @@ public class ProductController {
 		log.info("Received Request to save products:" + productVOs);
 		productService.saveProducts(productVOs, storeId);
 		return ResponseEntity.ok(CommonUtilities.buildSuccessResponse(Constants.SUCCESS, Constants.RESULT));
+	}
+
+	/**
+	 * 
+	 * @param enumName
+	 * @return
+	 */
+	@ApiOperation(value = "getValuesFromColumns", notes = "fetch values using column names for the catalog category ", response = ValuesVO.class)
+	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
+			@ApiResponse(code = 200, message = "Successful retrieval", response = ProductVO.class, responseContainer = "List") })
+	@GetMapping("/getValuesFromColumns")
+	public GateWayResponse<?> getValuesFromColumns(@RequestParam("enumName") String enumName) {
+		log.info("Recieved request to getValuesFromColumns:" + enumName);
+		List<ValuesVO> valuesVo = productService.getValuesFromColumns(enumName);
+		return new GateWayResponse<>("fetching all " + enumName + " category details sucessfully", valuesVo);
 	}
 
 	/**

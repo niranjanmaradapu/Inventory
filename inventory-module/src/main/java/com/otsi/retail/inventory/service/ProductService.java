@@ -14,6 +14,7 @@ import com.otsi.retail.inventory.vo.InventoryUpdateVo;
 import com.otsi.retail.inventory.vo.InvoiceDetailsVO;
 import com.otsi.retail.inventory.vo.ProductVO;
 import com.otsi.retail.inventory.vo.SearchFilterVo;
+import com.otsi.retail.inventory.vo.ValuesVO;
 
 @Service
 public interface ProductService {
@@ -54,5 +55,7 @@ public interface ProductService {
 	ProductVO updateQuantity(ProductVO productVO);
 
 	InvoiceDetailsVO scanAndFetchbarcodeDetails(String barcode, Long clientId, Long storeId);
+
+	List<ValuesVO> getValuesFromColumns(String enumName);
 
 }
