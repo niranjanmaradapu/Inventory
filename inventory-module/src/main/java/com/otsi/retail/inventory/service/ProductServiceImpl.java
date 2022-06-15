@@ -134,9 +134,18 @@ public class ProductServiceImpl implements ProductService {
 		if (productVO.getCostPrice() == 0 || productVO.getItemMrp() == 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cost price and list price are required");
 		}
+		Product productBarcode = productRepository.findByBarcode(productVO.getBarcode());
+
 		Product product = productMapper.voToEntity(productVO);
+		if (productBarcode == null) {
+			product.setBarcode(productVO.getBarcode());
+		} else if (StringUtils.isNotEmpty(productBarcode.getBarcode())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Barcode already exists");
+		} else if(productVO.getBarcode()==null) {
+			product.setBarcode("BAR-" + Generation.getSaltString().toString());
+		}
+
 	
-		product.setBarcode("BAR-" + Generation.getSaltString().toString());
 		product = productRepository.save(product);
 		saveProductTransaction(product, NatureOfTransaction.PURCHASE.getName(), PRODUCT_TABLE, product.getId(),
 				PRODUCT_PURCHASE_COMMENT);
@@ -606,22 +615,8 @@ public class ProductServiceImpl implements ProductService {
 		try {
 			String query = null;
 			String underscore = "_";
-
-			if (enumName.equalsIgnoreCase("SECTION") || enumName.equalsIgnoreCase("SUBSECTION")
-					|| enumName.equalsIgnoreCase("DIVISION")) {
-				if (enumName.equalsIgnoreCase("SUBSECTION")) {
-					enumName = enumName.isEmpty() ? enumName
-							: enumName.substring(0, 3).toUpperCase() + underscore + enumName.substring(3).toUpperCase();
-				} else if (enumName.equalsIgnoreCase("SECTION") || enumName.equalsIgnoreCase("DIVISION")) {
-					enumName = enumName.isEmpty() ? enumName
-							: Character.toUpperCase(enumName.charAt(0)) + enumName.substring(1).toUpperCase();
-				}
-
-				query = "select c.id,c.name from  catalog_categories c where c.description= '" + enumName + "'";
-			}
-
-			else if (enumName.equalsIgnoreCase("batchno") || enumName.equalsIgnoreCase("costprice")
-					|| enumName.equalsIgnoreCase("mrp")) {
+			if (enumName.equalsIgnoreCase("batchno") || enumName.equalsIgnoreCase("costprice")
+					|| enumName.equalsIgnoreCase("mrp") || enumName.equalsIgnoreCase("uom")) {
 				if (enumName.equalsIgnoreCase("batchno")) {
 					enumName = enumName.isEmpty() ? enumName
 							: enumName.substring(0, 5).toLowerCase() + underscore + enumName.substring(5).toLowerCase();
@@ -632,6 +627,8 @@ public class ProductServiceImpl implements ProductService {
 					enumName = "itemmrp";
 					enumName = enumName.isEmpty() ? enumName
 							: enumName.substring(0, 4).toLowerCase() + underscore + enumName.substring(4).toLowerCase();
+				} else if (enumName.equalsIgnoreCase("uom")) {
+					enumName = "uom";
 				}
 				query = "select p." + enumName + " from  product p group by  p." + enumName;
 			} else if (enumName.equalsIgnoreCase("Dcode") || enumName.equalsIgnoreCase("StyleCode")
