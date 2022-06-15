@@ -43,6 +43,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otsi.retail.inventory.commons.AdjustmentType;
+import com.otsi.retail.inventory.commons.Categories;
 import com.otsi.retail.inventory.commons.DomainType;
 import com.otsi.retail.inventory.commons.Generation;
 import com.otsi.retail.inventory.commons.NatureOfTransaction;
@@ -55,12 +56,14 @@ import com.otsi.retail.inventory.gatewayresponse.GateWayResponse;
 import com.otsi.retail.inventory.mapper.AdjustmentMapper;
 import com.otsi.retail.inventory.mapper.ProductMapper;
 import com.otsi.retail.inventory.model.Adjustments;
+import com.otsi.retail.inventory.model.CatalogEntity;
 import com.otsi.retail.inventory.model.Product;
 import com.otsi.retail.inventory.model.ProductBundle;
 import com.otsi.retail.inventory.model.ProductBundleAssignmentTextile;
 import com.otsi.retail.inventory.model.ProductTransaction;
 import com.otsi.retail.inventory.repo.AdjustmentRepository;
 import com.otsi.retail.inventory.repo.BundledProductAssignmentRepository;
+import com.otsi.retail.inventory.repo.CatalogRepository;
 import com.otsi.retail.inventory.repo.ProductBundleRepository;
 import com.otsi.retail.inventory.repo.ProductRepository;
 import com.otsi.retail.inventory.repo.ProductTransactionRepository;
@@ -75,6 +78,7 @@ import com.otsi.retail.inventory.vo.InvoiceDetailsVO;
 import com.otsi.retail.inventory.vo.ProductVO;
 import com.otsi.retail.inventory.vo.SearchFilterVo;
 import com.otsi.retail.inventory.vo.UserDetailsVo;
+import com.otsi.retail.inventory.vo.ValuesVO;
 
 @Component
 public class ProductServiceImpl implements ProductService {
@@ -106,6 +110,9 @@ public class ProductServiceImpl implements ProductService {
 	EntityManager em;
 
 	@Autowired
+	private CatalogRepository catalogRepository;
+
+	@Autowired
 	private Config config;
 
 	@Autowired
@@ -128,6 +135,7 @@ public class ProductServiceImpl implements ProductService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cost price and list price are required");
 		}
 		Product product = productMapper.voToEntity(productVO);
+	
 		product.setBarcode("BAR-" + Generation.getSaltString().toString());
 		product = productRepository.save(product);
 		saveProductTransaction(product, NatureOfTransaction.PURCHASE.getName(), PRODUCT_TABLE, product.getId(),
@@ -564,6 +572,32 @@ public class ProductServiceImpl implements ProductService {
 			product.setStoreId(storeId);
 			addBarcode(product);
 		});
+	}
+
+	@Override
+	public List<ValuesVO> getValuesFromColumns(String enumName) {
+
+		List<ValuesVO> valuesVoList = new ArrayList<>();
+		List<CatalogEntity> catalogList = null;
+
+		if (enumName.equalsIgnoreCase("SECTION") || enumName.equalsIgnoreCase("SUBSECTION")
+				|| enumName.equalsIgnoreCase("DIVISION")) {
+			if (enumName.equalsIgnoreCase("DIVISION"))
+				catalogList = catalogRepository.findByDescription(Categories.DIVISION);
+			if (enumName.equalsIgnoreCase("SECTION"))
+				catalogList = catalogRepository.findByDescription(Categories.SECTION);
+			if (enumName.equalsIgnoreCase("SUBSECTION"))
+				catalogList = catalogRepository.findByDescription(Categories.SUB_SECTION);
+		}
+
+		catalogList.stream().forEach(catalog -> {
+			ValuesVO valuesVO = new ValuesVO();
+			valuesVO.setId(catalog.getId());
+			valuesVO.setName(catalog.getName());
+			valuesVoList.add(valuesVO);
+		});
+
+		return valuesVoList;
 	}
 
 	@Override
