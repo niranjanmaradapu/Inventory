@@ -597,23 +597,36 @@ public class ProductServiceImpl implements ProductService {
 
 		List<ValuesVO> valuesVoList = new ArrayList<>();
 		List<CatalogEntity> catalogList = null;
+		List<String> productList =null;
 
 		if (enumName.equalsIgnoreCase("SECTION") || enumName.equalsIgnoreCase("SUBSECTION")
-				|| enumName.equalsIgnoreCase("DIVISION")) {
+				|| enumName.equalsIgnoreCase("DIVISION") || enumName.equalsIgnoreCase("batchno")
+				|| enumName.equalsIgnoreCase("uom")) {
 			if (enumName.equalsIgnoreCase("DIVISION"))
 				catalogList = catalogRepository.findByDescription(Categories.DIVISION);
 			if (enumName.equalsIgnoreCase("SECTION"))
 				catalogList = catalogRepository.findByDescription(Categories.SECTION);
 			if (enumName.equalsIgnoreCase("SUBSECTION"))
 				catalogList = catalogRepository.findByDescription(Categories.SUB_SECTION);
+			if (enumName.equalsIgnoreCase("uom"))
+				productList = productRepository.findByUom(enumName);
+			if (enumName.equalsIgnoreCase("batchno"))
+				productList = productRepository.findByBatchNo(enumName);
 		}
-
-		catalogList.stream().forEach(catalog -> {
-			ValuesVO valuesVO = new ValuesVO();
-			valuesVO.setId(catalog.getId());
-			valuesVO.setName(catalog.getName());
-			valuesVoList.add(valuesVO);
-		});
+		if (CollectionUtils.isNotEmpty(catalogList)) {
+			catalogList.stream().forEach(catalog -> {
+				ValuesVO valuesVO = new ValuesVO();
+				valuesVO.setId(catalog.getId());
+				valuesVO.setName(catalog.getName());
+				valuesVoList.add(valuesVO);
+			});
+		} else if (CollectionUtils.isNotEmpty(productList)) {
+			productList.stream().forEach(product -> {
+				ValuesVO valuesVO = new ValuesVO();
+				valuesVO.setName(product);
+				valuesVoList.add(valuesVO);
+			});
+		}
 
 		return valuesVoList;
 	}

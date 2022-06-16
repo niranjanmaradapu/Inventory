@@ -87,5 +87,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	Page<Product> findByStoreIdAndStatusOrderByCreatedDateDesc(Long storeId, ProductStatus status, Pageable pageable);
 
 	Product findById(Product assignedproductId);
+	
+	@Query(value="select p.uom from  product p WHERE p.uom IS NOT NULL group by  p.uom",nativeQuery =true)
+	List<String> findByUom(String enumName);
+	@Query(value="select p.batch_no from  product p  WHERE p.batch_no IS NOT NULL group by  p.batch_no",nativeQuery =true)
+	List<String> findByBatchNo(String enumName);
 
 }
