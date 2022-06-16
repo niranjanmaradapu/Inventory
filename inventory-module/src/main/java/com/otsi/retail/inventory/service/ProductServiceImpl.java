@@ -54,9 +54,11 @@ import com.otsi.retail.inventory.exceptions.InvalidDataException;
 import com.otsi.retail.inventory.exceptions.RecordNotFoundException;
 import com.otsi.retail.inventory.gatewayresponse.GateWayResponse;
 import com.otsi.retail.inventory.mapper.AdjustmentMapper;
+import com.otsi.retail.inventory.mapper.DomainAttributesMapper;
 import com.otsi.retail.inventory.mapper.ProductMapper;
 import com.otsi.retail.inventory.model.Adjustments;
 import com.otsi.retail.inventory.model.CatalogEntity;
+import com.otsi.retail.inventory.model.DomainAttributes;
 import com.otsi.retail.inventory.model.Product;
 import com.otsi.retail.inventory.model.ProductBundle;
 import com.otsi.retail.inventory.model.ProductBundleAssignmentTextile;
@@ -64,6 +66,7 @@ import com.otsi.retail.inventory.model.ProductTransaction;
 import com.otsi.retail.inventory.repo.AdjustmentRepository;
 import com.otsi.retail.inventory.repo.BundledProductAssignmentRepository;
 import com.otsi.retail.inventory.repo.CatalogRepository;
+import com.otsi.retail.inventory.repo.DomainAttributesRepository;
 import com.otsi.retail.inventory.repo.ProductBundleRepository;
 import com.otsi.retail.inventory.repo.ProductRepository;
 import com.otsi.retail.inventory.repo.ProductTransactionRepository;
@@ -71,6 +74,7 @@ import com.otsi.retail.inventory.util.Constants;
 import com.otsi.retail.inventory.util.DateConverters;
 import com.otsi.retail.inventory.util.ExcelService;
 import com.otsi.retail.inventory.vo.AdjustmentsVO;
+import com.otsi.retail.inventory.vo.DomainAttributesVO;
 import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.FieldNameVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
@@ -123,6 +127,12 @@ public class ProductServiceImpl implements ProductService {
 
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private DomainAttributesRepository domainAttributesRepository;
+	
+	@Autowired
+	private DomainAttributesMapper domainAttributesMapper;
 
 	private static final String PRODUCT_TABLE = "PRODUCT";
 	private static final String PRODUCT_PURCHASE_COMMENT = "INSERTED";
@@ -141,11 +151,10 @@ public class ProductServiceImpl implements ProductService {
 			product.setBarcode(productVO.getBarcode());
 		} else if (StringUtils.isNotEmpty(productBarcode.getBarcode())) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Barcode already exists");
-		} else if(productVO.getBarcode()==null) {
+		} else if (productVO.getBarcode() == null) {
 			product.setBarcode("BAR-" + Generation.getSaltString().toString());
 		}
 
-	
 		product = productRepository.save(product);
 		saveProductTransaction(product, NatureOfTransaction.PURCHASE.getName(), PRODUCT_TABLE, product.getId(),
 				PRODUCT_PURCHASE_COMMENT);
@@ -853,6 +862,34 @@ public class ProductServiceImpl implements ProductService {
 				});
 		return bvo;
 
+	}
+
+	@Override
+	public List<DomainAttributes> findDomainAttributes(DomainType domainType) {
+		return domainAttributesRepository.findByDomainType(domainType);
+	}
+
+	@Override
+	public DomainAttributesVO saveDomainAttributes(DomainAttributesVO domainAttributesVO) {
+		DomainAttributes entity = domainAttributesMapper.toEntity(domainAttributesVO, null);
+		entity = domainAttributesRepository.save(entity);
+		return domainAttributesMapper.toVO(entity);
+	}
+
+	@Override
+	public DomainAttributesVO updateDomainAttributes(DomainAttributesVO domainAttributesVO) {
+		Optional<DomainAttributes> domainAttributesOptional = domainAttributesRepository
+				.findById(domainAttributesVO.getId());
+		if (domainAttributesOptional.isPresent()) {
+			DomainAttributes domainAttributes = domainAttributesOptional.get();
+			DomainAttributes entity = domainAttributesMapper.toEntity(domainAttributesVO, domainAttributes);
+			entity = domainAttributesRepository.save(entity);
+			return domainAttributesMapper.toVO(entity);
+
+		} else {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"no data found for id " + domainAttributesVO.getId());
+		}
 	}
 
 }

@@ -8,7 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.otsi.retail.inventory.commons.DomainType;
+import com.otsi.retail.inventory.model.DomainAttributes;
 import com.otsi.retail.inventory.vo.AdjustmentsVO;
+import com.otsi.retail.inventory.vo.DomainAttributesVO;
 import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
 import com.otsi.retail.inventory.vo.InvoiceDetailsVO;
@@ -57,5 +60,11 @@ public interface ProductService {
 	InvoiceDetailsVO scanAndFetchbarcodeDetails(String barcode, Long clientId, Long storeId);
 
 	List<ValuesVO> getValuesFromColumns(String enumName);
+
+	List<DomainAttributes> findDomainAttributes(DomainType domainType);
+
+	DomainAttributesVO saveDomainAttributes(DomainAttributesVO domainAttributesVO);
+
+	DomainAttributesVO updateDomainAttributes(DomainAttributesVO domainAttributesVO);
 
 }
