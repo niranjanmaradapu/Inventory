@@ -22,41 +22,6 @@ public class ProductBundleMapper {
 		productBundleVo.setToDate(productBundle.getLastModifiedDate());
 		productBundleVo.setBarcode(productBundle.getBarcode());
 		productBundleVo.setItemMrp(productBundle.getItemMrp());
-
-		/*
-		 * List<ProductVO> listVo = new ArrayList<>();
-		 * 
-		 * productBundle.getProductTextiles().stream().forEach(product -> { ProductVO
-		 * productTextileVo = new ProductVO(); productTextileVo.setId(product.getId());
-		 * productTextileVo.setBarcode(product.getBarcode());
-		 * productTextileVo.setEmpId(product.getEmpId());
-		 * productTextileVo.setParentBarcode(product.getBarcode());
-		 * productTextileVo.setFromDate(product.getCreatedDate());
-		 * productTextileVo.setToDate(product.getLastModifiedDate());
-		 * productTextileVo.setStatus(product.getStatus());
-		 * productTextileVo.setName(product.getName());
-		 * productTextileVo.setDivision(product.getDivision());
-		 * productTextileVo.setSection(product.getSection());
-		 * productTextileVo.setSubSection(product.getSubSection());
-		 * productTextileVo.setSellingTypeCode(product.getSellingTypeCode());
-		 * productTextileVo.setQty(product.getQty());
-		 * productTextileVo.setValue(product.getQty() * product.getItemMrp());
-		 * productTextileVo.setOriginalBarcodeCreatedAt(product.
-		 * getOriginalBarcodeCreatedAt());
-		 * productTextileVo.setCategory(product.getCategory());
-		 * productTextileVo.setBatchNo(product.getBatchNo());
-		 * productTextileVo.setCostPrice(product.getCostPrice());
-		 * productTextileVo.setItemMrp(product.getItemMrp());
-		 * productTextileVo.setHsnCode(product.getHsnCode());
-		 * productTextileVo.setUom(product.getUom());
-		 * productTextileVo.setColour(product.getColour());
-		 * productTextileVo.setStoreId(product.getStoreId());
-		 * productTextileVo.setDomainId(product.getDomainId());
-		 * listVo.add(productTextileVo);
-		 * 
-		 * }); 
-		 * productBundleVo.setProductTextiles(listVo);
-		 */
 		return productBundleVo;
 
 	}

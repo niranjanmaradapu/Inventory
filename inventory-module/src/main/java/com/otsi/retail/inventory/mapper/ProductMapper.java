@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import com.otsi.retail.inventory.commons.ProductStatus;
 import com.otsi.retail.inventory.model.Product;
 import com.otsi.retail.inventory.vo.InvoiceDetailsVO;
-import com.otsi.retail.inventory.vo.LineItemVO;
 import com.otsi.retail.inventory.vo.ProductVO;
 
 @Component
@@ -81,25 +80,22 @@ public class ProductMapper {
 
 	}
 
-	public InvoiceDetailsVO productToInvoiceMapper(ProductVO productVO) {
+	public InvoiceDetailsVO productToInvoiceMapper(ProductVO vo) {
 		InvoiceDetailsVO invoiceDetailsVO = new InvoiceDetailsVO();
-		invoiceDetailsVO.setStoreId(productVO.getStoreId());
-		LineItemVO lineItemsVO = new LineItemVO();
-		lineItemsVO.setBarCode(productVO.getBarcode());
-		lineItemsVO.setCreationDate(productVO.getOriginalBarcodeCreatedAt());
-		lineItemsVO.setItemPrice(productVO.getItemMrp());
-		lineItemsVO.setQuantity(productVO.getQty());
-		lineItemsVO.setSection(productVO.getSection());
-		lineItemsVO.setSubSection(productVO.getSubSection());
-		lineItemsVO.setDivision(productVO.getDivision());
-		lineItemsVO.setHsnCode(productVO.getHsnCode());
-		lineItemsVO.setStoreId(productVO.getStoreId());
+		ProductVO productVO = new ProductVO();
+		productVO.setBarcode(vo.getBarcode());
+		productVO.setItemMrp(vo.getItemMrp());
+		productVO.setQty(vo.getQty());
+		productVO.setSection(vo.getSection());
+		productVO.setSubSection(vo.getSubSection());
+		productVO.setDivision(vo.getDivision());
+		productVO.setHsnCode(vo.getHsnCode());
+		productVO.setStoreId(vo.getStoreId());
 		// GrossValue is multiple of net value of product and quantity
-		lineItemsVO.setGrossValue(productVO.getItemMrp() * productVO.getQty());
 		if (productVO.getTaxValues() != null) {
-			lineItemsVO.setTaxValues(productVO.getTaxValues());
+			productVO.setTaxValues(vo.getTaxValues());
 		}
-		invoiceDetailsVO.setLineItems(Arrays.asList(lineItemsVO));
+		invoiceDetailsVO.setBarcode(Arrays.asList(productVO));
 		return invoiceDetailsVO;
 	}
 

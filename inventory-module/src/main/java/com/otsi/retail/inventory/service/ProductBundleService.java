@@ -15,7 +15,7 @@ public interface ProductBundleService {
 
 	Optional<ProductBundle> getProductBundle(Long id);
 
-	String updateProductBundle(ProductBundleVo productBundleVo);
+	ProductBundleVo updateProductBundle(ProductBundleVo productBundleVo);
 
 	ProductBundleVo deleteProductBundle(Long id);
 

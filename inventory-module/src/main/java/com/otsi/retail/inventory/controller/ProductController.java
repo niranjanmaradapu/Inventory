@@ -9,6 +9,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,18 +22,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.otsi.retail.inventory.commons.DomainType;
 import com.otsi.retail.inventory.gatewayresponse.GateWayResponse;
+import com.otsi.retail.inventory.model.DomainAttributes;
 import com.otsi.retail.inventory.rabbitmq.MQConfig;
 import com.otsi.retail.inventory.service.ProductService;
 import com.otsi.retail.inventory.util.CommonUtilities;
 import com.otsi.retail.inventory.util.Constants;
 import com.otsi.retail.inventory.vo.AdjustmentsVO;
+import com.otsi.retail.inventory.vo.DomainAttributesVO;
 import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
 import com.otsi.retail.inventory.vo.InvoiceDetailsVO;
 import com.otsi.retail.inventory.vo.ProductVO;
 import com.otsi.retail.inventory.vo.SearchFilterVo;
+import com.otsi.retail.inventory.vo.ValuesVO;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -228,6 +234,21 @@ public class ProductController {
 	 * @param enumName
 	 * @return
 	 */
+	@ApiOperation(value = "getValuesFromColumns", notes = "fetch values using column names for the catalog category ", response = ValuesVO.class)
+	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
+			@ApiResponse(code = 200, message = "Successful retrieval", response = ProductVO.class, responseContainer = "List") })
+	@GetMapping("/getValuesFromColumns")
+	public GateWayResponse<?> getValuesFromColumns(@RequestParam("enumName") String enumName) {
+		log.info("Recieved request to getValuesFromColumns:" + enumName);
+		List<ValuesVO> valuesVo = productService.getValuesFromColumns(enumName);
+		return new GateWayResponse<>("fetching all " + enumName + " details sucessfully", valuesVo);
+	}
+
+	/**
+	 * 
+	 * @param enumName
+	 * @return
+	 */
 	@ApiOperation(value = "getValuesFromProductTextileColumns", notes = "fetch values using column names for the textile ", response = ProductVO.class)
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
 			@ApiResponse(code = 200, message = "Successful retrieval", response = ProductVO.class, responseContainer = "List") })
@@ -342,6 +363,32 @@ public class ProductController {
 		log.info("Received request to getProduct:" + barcode);
 		InvoiceDetailsVO invoiceDetailsVO = productService.scanAndFetchbarcodeDetails(barcode, clientId, storeId);
 		return ResponseEntity.ok(invoiceDetailsVO);
+	}
+
+	@GetMapping(path = "/domain-attributes")
+	public ResponseEntity<?> getDomainAttributes(@RequestParam DomainType domainType) {
+		List<DomainAttributes> properties = productService.findDomainAttributes(domainType);
+		return ResponseEntity.ok(properties);
+	}
+
+	@PostMapping(path = "/domain-attributes")
+	public ResponseEntity<?> saveDomainAttributes(@RequestBody DomainAttributesVO domainAttributes) {
+		if (domainAttributes.getId() != null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"invalid id property in payload " + domainAttributes.getId());
+		}
+		DomainAttributesVO domainAttributesVO = productService.saveDomainAttributes(domainAttributes);
+		return ResponseEntity.ok(domainAttributesVO);
+	}
+
+	@PutMapping(path = "/domain-attributes")
+	public ResponseEntity<?> updateDomainAttributes(@RequestBody DomainAttributesVO domainAttributes) {
+		if (domainAttributes.getId() == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"id property is null in payload " + domainAttributes.getId());
+		}
+		DomainAttributesVO domainAttributesVO = productService.updateDomainAttributes(domainAttributes);
+		return ResponseEntity.ok(domainAttributesVO);
 	}
 
 }

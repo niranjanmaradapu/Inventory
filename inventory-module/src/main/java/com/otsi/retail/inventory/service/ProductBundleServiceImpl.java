@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
 import org.apache.logging.log4j.LogManager;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.otsi.retail.inventory.commons.Generation;
@@ -71,10 +73,12 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		List<ProductBundleAssignmentTextile> bundleList = new ArrayList<ProductBundleAssignmentTextile>();
 		Integer productBundleQuantity = productBundleVo.getBundleQuantity();
 		Long productTotalQuantity = textiles.stream().mapToLong(x -> x.getQty()).sum();
-		
-		if (productTotalQuantity * productBundleQuantity < productTotalQuantity) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "insufficient product quantity for product");
-		}
+
+		/*
+		 * if (productTotalQuantity * productBundleQuantity == productTotalQuantity) {
+		 * throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+		 * "insufficient product quantity for product"); }
+		 */
 		textiles.stream().forEach(productTextile -> {
 
 			Product productBarcode = productRepository.findByBarcodeAndStatus(productTextile.getBarcode(), status);
@@ -89,15 +93,15 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 			bundledProductAssignment.setQuantity(productTextile.getQty());
 			bundleList.add(bundledProductAssignment);
 
-			if (productTextile.getQty() > 1) {
-				double itemMrpCalculation = 0L;
-				itemMrpCalculation = textiles.stream().mapToDouble(x -> x.getItemMrp() * x.getQty()).sum();
-				float mrp = (float) itemMrpCalculation;
-				product.setItemMrp(mrp);
-				bundle.setItemMrp(mrp);
-			}
+			/*
+			 * if (productTextile.getQty() > 1) { double itemMrpCalculation = 0L;
+			 * itemMrpCalculation = textiles.stream().mapToDouble(x -> x.getItemMrp() *
+			 * x.getQty()).sum(); float mrp = (float) itemMrpCalculation;
+			 * product.setItemMrp(mrp); bundle.setItemMrp(mrp); }
+			 */
 		});
-
+		product.setItemMrp(productBundleVo.getItemMrp());
+		bundle.setItemMrp(productBundleVo.getItemMrp());
 		bundledProductAssignmentRepository.saveAll(bundleList);
 		// saving product bundle again as individual product
 
@@ -184,30 +188,58 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 	private ProductBundleVo bundleMapToVo(ProductBundle productBundle) {
 		ProductBundleVo productBundleVo = productBundleMapper.entityToVO(productBundle);
 		productBundleVo.setProductTextiles(productMapper.entityToVO(productBundle.getProductTextiles()));
-		productBundleVo.getProductTextiles().stream().forEach(product -> {
-			if (product != null) {
-				Product productBarcode = productRepository.findByBarcodeAndSellingTypeCode(product.getBarcode(),
-						ProductEnum.PRODUCTBUNDLE);
-				productBundleVo.setValue(productBundleVo.getBundleQuantity() * productBarcode.getItemMrp());
-			}
-		});
-
+		if (CollectionUtils.isEmpty(productBundleVo.getProductTextiles())) {
+			productBundleVo.getProductTextiles().stream().forEach(product -> {
+				if (product != null) {
+					Product productBarcode = productRepository.findByBarcodeAndSellingTypeCode(product.getBarcode(),
+							ProductEnum.PRODUCTBUNDLE);
+					productBundleVo.setValue(productBundleVo.getBundleQuantity() * productBarcode.getItemMrp());
+				}
+			});
+		}
 		return productBundleVo;
 
 	}
 
 	@Override
-	public String updateProductBundle(ProductBundleVo productBundleVo) {
+	public ProductBundleVo updateProductBundle(ProductBundleVo productBundleVo) {
 		log.debug("debugging updateProductBundle:" + productBundleVo);
 		Optional<ProductBundle> productBundleOpt = productBundleRepo.findById(productBundleVo.getId());
 		if (!productBundleOpt.isPresent()) {
 			throw new RecordNotFoundException("bundle data is  not found with id: " + productBundleVo.getId());
 		}
-		ProductBundle productBundle = productBundleMapper.voToEntity(productBundleVo);
-		productBundle.setId(productBundleVo.getId());
-		ProductBundle productBundleUpdate = productBundleRepo.save(productBundle);
-		log.info("after updating bundle details:" + productBundleUpdate);
-		return "after updated bundle successfully:" + productBundleVo.toString();
+		List<ProductVO> products = productBundleVo.getProductTextiles();
+		List<ProductBundleAssignmentTextile> bundleAssignment = bundledProductAssignmentRepository
+				.findByProductBundleId_Id(productBundleOpt.get().getId());
+		productBundleOpt.get().setId(productBundleVo.getId());
+		List<ProductBundle> bundleAssign = bundleAssignment.stream().map(s -> s.getProductBundleId()).distinct()
+				.collect(Collectors.toList());
+
+		bundleAssign.stream().forEach(assignmentBundle -> {
+
+			products.stream().forEach(productTextile -> {
+				List<ProductBundleAssignmentTextile> assignedProduct = bundledProductAssignmentRepository
+						.findByAssignedproductId_Id(productTextile.getId());
+				if (assignedProduct == null) {
+					/*
+					 * assignmentBundle.setProductBundleId(assignmentBundle.getProductBundleId());
+					 * assignmentBundle.setAssignedproductId(assignmentBundle.getAssignedproductId()
+					 * ); assignmentBundle.setQuantity(productTextile.getQty());
+					 * bundledProductAssignmentRepository.save(assignmentBundle); } else {
+					 */
+				} else {
+					ProductBundleAssignmentTextile productBundleAssignment = new ProductBundleAssignmentTextile();
+					productBundleAssignment.setProductBundleId(productBundleOpt.get());
+					productBundleAssignment.setAssignedproductId(productMapper.customVoToEntityMapper(productTextile));
+					productBundleAssignment.setQuantity(productTextile.getQty());
+					bundledProductAssignmentRepository.save(productBundleAssignment);
+				}
+			});
+		});
+		ProductBundle productBundleUpdate = productBundleRepo.save(productBundleOpt.get());
+		productBundleVo = productBundleMapper.entityToVO(productBundleUpdate);
+		// productBundleVo.setProductTextiles(productMapper.entityToVO(productBundleUpdate.getProductTextiles()));
+		return productBundleVo;
 	}
 
 	@Override
