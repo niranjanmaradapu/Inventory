@@ -2,7 +2,10 @@ package com.otsi.retail.inventory.commons;
 
 public enum DomainType {
 
-	None(0L, "none"), Textile(1L, "Textile"), Retail(2L, "Retail");
+	None(0L, "none"),
+	Textile(1L, "Textile"),
+	Retail(2L, "Retail"),
+	FruitsAndVegetables(3l , "Fruits And Vegetables");
 
 	private Long id;
 	private String name;

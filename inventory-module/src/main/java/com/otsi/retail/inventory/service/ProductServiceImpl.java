@@ -54,9 +54,11 @@ import com.otsi.retail.inventory.exceptions.InvalidDataException;
 import com.otsi.retail.inventory.exceptions.RecordNotFoundException;
 import com.otsi.retail.inventory.gatewayresponse.GateWayResponse;
 import com.otsi.retail.inventory.mapper.AdjustmentMapper;
+import com.otsi.retail.inventory.mapper.DomainAttributesMapper;
 import com.otsi.retail.inventory.mapper.ProductMapper;
 import com.otsi.retail.inventory.model.Adjustments;
 import com.otsi.retail.inventory.model.CatalogEntity;
+import com.otsi.retail.inventory.model.DomainAttributes;
 import com.otsi.retail.inventory.model.Product;
 import com.otsi.retail.inventory.model.ProductBundle;
 import com.otsi.retail.inventory.model.ProductBundleAssignmentTextile;
@@ -64,6 +66,7 @@ import com.otsi.retail.inventory.model.ProductTransaction;
 import com.otsi.retail.inventory.repo.AdjustmentRepository;
 import com.otsi.retail.inventory.repo.BundledProductAssignmentRepository;
 import com.otsi.retail.inventory.repo.CatalogRepository;
+import com.otsi.retail.inventory.repo.DomainAttributesRepository;
 import com.otsi.retail.inventory.repo.ProductBundleRepository;
 import com.otsi.retail.inventory.repo.ProductRepository;
 import com.otsi.retail.inventory.repo.ProductTransactionRepository;
@@ -71,6 +74,7 @@ import com.otsi.retail.inventory.util.Constants;
 import com.otsi.retail.inventory.util.DateConverters;
 import com.otsi.retail.inventory.util.ExcelService;
 import com.otsi.retail.inventory.vo.AdjustmentsVO;
+import com.otsi.retail.inventory.vo.DomainAttributesVO;
 import com.otsi.retail.inventory.vo.DomainTypePropertiesVO;
 import com.otsi.retail.inventory.vo.FieldNameVO;
 import com.otsi.retail.inventory.vo.InventoryUpdateVo;
@@ -123,6 +127,12 @@ public class ProductServiceImpl implements ProductService {
 
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private DomainAttributesRepository domainAttributesRepository;
+	
+	@Autowired
+	private DomainAttributesMapper domainAttributesMapper;
 
 	private static final String PRODUCT_TABLE = "PRODUCT";
 	private static final String PRODUCT_PURCHASE_COMMENT = "INSERTED";
@@ -134,9 +144,17 @@ public class ProductServiceImpl implements ProductService {
 		if (productVO.getCostPrice() == 0 || productVO.getItemMrp() == 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cost price and list price are required");
 		}
+		Product productBarcode = productRepository.findByBarcode(productVO.getBarcode());
+
 		Product product = productMapper.voToEntity(productVO);
-	
-		product.setBarcode("BAR-" + Generation.getSaltString().toString());
+		if (productBarcode == null) {
+			product.setBarcode(productVO.getBarcode());
+		} else if (StringUtils.isNotEmpty(productBarcode.getBarcode())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Barcode already exists");
+		} else if (productVO.getBarcode() == null) {
+			product.setBarcode("BAR-" + Generation.getSaltString().toString());
+		}
+
 		product = productRepository.save(product);
 		saveProductTransaction(product, NatureOfTransaction.PURCHASE.getName(), PRODUCT_TABLE, product.getId(),
 				PRODUCT_PURCHASE_COMMENT);
@@ -579,23 +597,36 @@ public class ProductServiceImpl implements ProductService {
 
 		List<ValuesVO> valuesVoList = new ArrayList<>();
 		List<CatalogEntity> catalogList = null;
+		List<String> productList =null;
 
 		if (enumName.equalsIgnoreCase("SECTION") || enumName.equalsIgnoreCase("SUBSECTION")
-				|| enumName.equalsIgnoreCase("DIVISION")) {
+				|| enumName.equalsIgnoreCase("DIVISION") || enumName.equalsIgnoreCase("batchno")
+				|| enumName.equalsIgnoreCase("uom")) {
 			if (enumName.equalsIgnoreCase("DIVISION"))
 				catalogList = catalogRepository.findByDescription(Categories.DIVISION);
 			if (enumName.equalsIgnoreCase("SECTION"))
 				catalogList = catalogRepository.findByDescription(Categories.SECTION);
 			if (enumName.equalsIgnoreCase("SUBSECTION"))
 				catalogList = catalogRepository.findByDescription(Categories.SUB_SECTION);
+			if (enumName.equalsIgnoreCase("uom"))
+				productList = productRepository.findByUom(enumName);
+			if (enumName.equalsIgnoreCase("batchno"))
+				productList = productRepository.findByBatchNo(enumName);
 		}
-
-		catalogList.stream().forEach(catalog -> {
-			ValuesVO valuesVO = new ValuesVO();
-			valuesVO.setId(catalog.getId());
-			valuesVO.setName(catalog.getName());
-			valuesVoList.add(valuesVO);
-		});
+		if (CollectionUtils.isNotEmpty(catalogList)) {
+			catalogList.stream().forEach(catalog -> {
+				ValuesVO valuesVO = new ValuesVO();
+				valuesVO.setId(catalog.getId());
+				valuesVO.setName(catalog.getName());
+				valuesVoList.add(valuesVO);
+			});
+		} else if (CollectionUtils.isNotEmpty(productList)) {
+			productList.stream().forEach(product -> {
+				ValuesVO valuesVO = new ValuesVO();
+				valuesVO.setName(product);
+				valuesVoList.add(valuesVO);
+			});
+		}
 
 		return valuesVoList;
 	}
@@ -606,22 +637,8 @@ public class ProductServiceImpl implements ProductService {
 		try {
 			String query = null;
 			String underscore = "_";
-
-			if (enumName.equalsIgnoreCase("SECTION") || enumName.equalsIgnoreCase("SUBSECTION")
-					|| enumName.equalsIgnoreCase("DIVISION")) {
-				if (enumName.equalsIgnoreCase("SUBSECTION")) {
-					enumName = enumName.isEmpty() ? enumName
-							: enumName.substring(0, 3).toUpperCase() + underscore + enumName.substring(3).toUpperCase();
-				} else if (enumName.equalsIgnoreCase("SECTION") || enumName.equalsIgnoreCase("DIVISION")) {
-					enumName = enumName.isEmpty() ? enumName
-							: Character.toUpperCase(enumName.charAt(0)) + enumName.substring(1).toUpperCase();
-				}
-
-				query = "select c.id,c.name from  catalog_categories c where c.description= '" + enumName + "'";
-			}
-
-			else if (enumName.equalsIgnoreCase("batchno") || enumName.equalsIgnoreCase("costprice")
-					|| enumName.equalsIgnoreCase("mrp")) {
+			if (enumName.equalsIgnoreCase("batchno") || enumName.equalsIgnoreCase("costprice")
+					|| enumName.equalsIgnoreCase("mrp") || enumName.equalsIgnoreCase("uom")) {
 				if (enumName.equalsIgnoreCase("batchno")) {
 					enumName = enumName.isEmpty() ? enumName
 							: enumName.substring(0, 5).toLowerCase() + underscore + enumName.substring(5).toLowerCase();
@@ -632,6 +649,8 @@ public class ProductServiceImpl implements ProductService {
 					enumName = "itemmrp";
 					enumName = enumName.isEmpty() ? enumName
 							: enumName.substring(0, 4).toLowerCase() + underscore + enumName.substring(4).toLowerCase();
+				} else if (enumName.equalsIgnoreCase("uom")) {
+					enumName = "uom";
 				}
 				query = "select p." + enumName + " from  product p group by  p." + enumName;
 			} else if (enumName.equalsIgnoreCase("Dcode") || enumName.equalsIgnoreCase("StyleCode")
@@ -856,6 +875,34 @@ public class ProductServiceImpl implements ProductService {
 				});
 		return bvo;
 
+	}
+
+	@Override
+	public List<DomainAttributes> findDomainAttributes(DomainType domainType) {
+		return domainAttributesRepository.findByDomainType(domainType);
+	}
+
+	@Override
+	public DomainAttributesVO saveDomainAttributes(DomainAttributesVO domainAttributesVO) {
+		DomainAttributes entity = domainAttributesMapper.toEntity(domainAttributesVO, null);
+		entity = domainAttributesRepository.save(entity);
+		return domainAttributesMapper.toVO(entity);
+	}
+
+	@Override
+	public DomainAttributesVO updateDomainAttributes(DomainAttributesVO domainAttributesVO) {
+		Optional<DomainAttributes> domainAttributesOptional = domainAttributesRepository
+				.findById(domainAttributesVO.getId());
+		if (domainAttributesOptional.isPresent()) {
+			DomainAttributes domainAttributes = domainAttributesOptional.get();
+			DomainAttributes entity = domainAttributesMapper.toEntity(domainAttributesVO, domainAttributes);
+			entity = domainAttributesRepository.save(entity);
+			return domainAttributesMapper.toVO(entity);
+
+		} else {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"no data found for id " + domainAttributesVO.getId());
+		}
 	}
 
 }
