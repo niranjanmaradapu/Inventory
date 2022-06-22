@@ -13,7 +13,12 @@ public interface BundledProductAssignmentRepository extends JpaRepository<Produc
 
 	ProductBundleAssignmentTextile findByProductBundleId(Long id);
 
-
 	List<ProductBundleAssignmentTextile> findByProductBundleId_Id(Long id);
+
+	ProductBundleAssignmentTextile findByProductBundleAssignmentTextileId(Long productBundleAssignmentTextileId);
+
+	ProductBundleAssignmentTextile findAllByProductBundleId_Id(Long id);
+
+	List<ProductBundleAssignmentTextile> findByAssignedproductId_Id(Long id);
 
 }

@@ -187,9 +187,9 @@ public class ProductServiceImpl implements ProductService {
 		product.setBatchNo(productOptional.get().getBatchNo());
 		product.setColour(productOptional.get().getColour());
 		product.setHsnCode(productOptional.get().getHsnCode());
-		product.setItemMrp(productOptional.get().getItemMrp());
+		product.setItemMrp(productVO.getItemMrp());
 		product.setUom(productOptional.get().getUom());
-		product.setQty(productOptional.get().getQty());
+		product.setQty(productVO.getQty());
 		product.setStoreId(productOptional.get().getStoreId());
 		product.setDomainType(productOptional.get().getDomainType());
 		product.setBarcode("REBAR/" + LocalDate.now().getYear() + LocalDate.now().getDayOfMonth() + "/"
@@ -525,8 +525,8 @@ public class ProductServiceImpl implements ProductService {
 				&& StringUtils.isEmpty(searchFilterVo.getCurrentBarcodeId()) && searchFilterVo.getStoreId() != null) {
 			LocalDateTime fromTime = DateConverters.convertLocalDateToLocalDateTime(searchFilterVo.getFromDate());
 			LocalDateTime toTime = DateConverters.convertToLocalDateTimeMax(searchFilterVo.getToDate());
-			adjustmentDetails = adjustmentRepository.findByCreatedDateBetweenAndTypeOrderByCreatedDateDesc(fromTime,
-					toTime, AdjustmentType.REBAR, pageable);
+			adjustmentDetails = adjustmentRepository.findByCreatedDateBetweenAndStoreIdAndTypeOrderByCreatedDateDesc(fromTime,
+					toTime,searchFilterVo.getStoreId(), AdjustmentType.REBAR, pageable);
 
 		}
 
