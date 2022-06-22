@@ -10,20 +10,22 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Component
 public class AuditAwareImpl implements AuditorAware<Long> {
 
 	private final Logger log = LogManager.getLogger(AuditAwareImpl.class);
 
-	@Autowired
-	private HttpServletRequest request;
-
 	@Override
 	public Optional<Long> getCurrentAuditor() {
 		String userId = null;
 		try {
-			userId = request.getHeader("userId");
+			RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+			HttpServletRequest servletRequest = ((ServletRequestAttributes) requestAttributes).getRequest();
+			 userId = servletRequest.getHeader("userId");
 		} catch (Exception ex) {
 			log.error("exception in current auditor " + ex);
 		}

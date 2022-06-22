@@ -241,7 +241,7 @@ public class ProductController {
 	public GateWayResponse<?> getValuesFromColumns(@RequestParam("enumName") String enumName) {
 		log.info("Recieved request to getValuesFromColumns:" + enumName);
 		List<ValuesVO> valuesVo = productService.getValuesFromColumns(enumName);
-		return new GateWayResponse<>("fetching all " + enumName + " category details sucessfully", valuesVo);
+		return new GateWayResponse<>("fetching all " + enumName + " details sucessfully", valuesVo);
 	}
 
 	/**

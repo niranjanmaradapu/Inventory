@@ -15,14 +15,13 @@ import com.otsi.retail.inventory.model.Adjustments;
 @Repository
 public interface AdjustmentRepository extends JpaRepository<Adjustments, Long> {
 
-	Optional<Adjustments> findByCurrentBarcodeIdAndType(String currentBarcodeId , AdjustmentType type);
-	
-	Page<Adjustments> findByCurrentBarcodeIdAndTypeAndStoreId(String currentBarcodeId , AdjustmentType type , Long storeId , Pageable page);
+	Optional<Adjustments> findByCurrentBarcodeIdAndType(String currentBarcodeId, AdjustmentType type);
 
+	Page<Adjustments> findByCurrentBarcodeIdAndTypeAndStoreId(String currentBarcodeId, AdjustmentType type,
+			Long storeId, Pageable page);
 
-	Page<Adjustments> findByCreatedDateBetweenAndCurrentBarcodeIdAndTypeOrderByCreatedDateAsc(
-			LocalDateTime fromTime, LocalDateTime toTime, String currentBarcodeId, AdjustmentType type, Pageable pageable);
-
+	Page<Adjustments> findByCreatedDateBetweenAndCurrentBarcodeIdAndTypeOrderByCreatedDateAsc(LocalDateTime fromTime,
+			LocalDateTime toTime, String currentBarcodeId, AdjustmentType type, Pageable pageable);
 
 	Page<Adjustments> findByAdjustmentIdInAndComments(List<Long> effectingId, String string, Pageable pageable);
 
@@ -36,11 +35,15 @@ public interface AdjustmentRepository extends JpaRepository<Adjustments, Long> {
 			LocalDateTime fromTime, LocalDateTime toTime, String string, List<String> barcodes, Pageable pageable);
 
 	Page<Adjustments> findByTypeOrderByCreatedDateDesc(AdjustmentType string, Pageable pageable);
-	
-	Page<Adjustments> findByTypeAndStoreIdOrderByCreatedDateDesc(AdjustmentType string, Long storeId, Pageable pageable);
+
+	Page<Adjustments> findByTypeAndStoreIdOrderByCreatedDateDesc(AdjustmentType string, Long storeId,
+			Pageable pageable);
 
 	Page<Adjustments> findByCurrentBarcodeIdAndComments(String currentBarcodeId, String comments, Pageable pageable);
 
 	Optional<Adjustments> findByToBeBarcodeIdAndType(String currentBarcodeId, AdjustmentType rebar);
+
+	Page<Adjustments> findByCreatedDateBetweenAndStoreIdAndTypeOrderByCreatedDateDesc(LocalDateTime fromTime,
+			LocalDateTime toTime, Long storeId, AdjustmentType rebar, Pageable pageable);
 
 }
