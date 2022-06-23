@@ -14,4 +14,5 @@ RUN curl -O https://download.newrelic.com/newrelic/java-agent/newrelic-agent/cur
 #ENV NEW_RELIC_LOG_FILE_NAME="STDOUT"
 
 
+
 ENTRYPOINT ["java", "-Dspring.profiles.active=cloud", "-jar", "target/inventory-module.jar"]
