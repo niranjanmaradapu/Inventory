@@ -6,9 +6,7 @@ package com.otsi.retail.inventory.mapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Component;
-
 import com.otsi.retail.inventory.model.CatalogEntity;
 import com.otsi.retail.inventory.vo.CatalogVO;
 
@@ -39,6 +37,7 @@ public class CatalogMapper {
 			catalogVo.setDescription(catalog.getDescription());
 			catalogVo.setStatus(catalog.getStatus());
 			catalogVo.setCUID(catalog.getParent().getId());
+			catalogVo.setDomainType(catalog.getDomainType());
 			catalogVoList.add(catalogVo);
 		});
 		return catalogVoList;
@@ -52,6 +51,7 @@ public class CatalogMapper {
 		catalogVo.setStatus(catalog.getStatus());
 		catalogVo.setCreatedDate(catalog.getCreatedDate());
 		catalogVo.setLastModifiedDate(catalog.getLastModifiedDate());
+		catalogVo.setDomainType(catalog.getDomainType());
 		return catalogVo;
 
 	}
