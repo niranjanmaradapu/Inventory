@@ -82,8 +82,8 @@ public class CatalogController {
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
 			@ApiResponse(code = 200, message = "Successful retrieval", response = CatalogVO.class, responseContainer = "List") })
 	@GetMapping("/divisions")
-	public ResponseEntity<?> getListOfMainCatagories(@RequestParam("domainType") DomainType domainType) {
-		List<CatalogVO> catalogVO = catalogService.getMainCategories(domainType);
+	public ResponseEntity<?> getListOfMainCatagories(@RequestParam(required = false) DomainType domainType) {
+		List<CatalogVO> catalogVO = catalogService.getMainCategories();
 		return ResponseEntity.ok(catalogVO);
 
 	}
@@ -98,8 +98,8 @@ public class CatalogController {
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
 			@ApiResponse(code = 200, message = "Successful retrieval", response = CatalogVO.class, responseContainer = "List") })
 	@GetMapping("/category")
-	public ResponseEntity<?> getCategories(@RequestParam Long id,@RequestParam("domainType") DomainType domainType) {
-		List<CatalogVO> catalogVO = catalogService.getCategories(id,domainType);
+	public ResponseEntity<?> getCategories(@RequestParam Long id,@RequestParam(required = false) DomainType domainType) {
+		List<CatalogVO> catalogVO = catalogService.getCategories(id);
 		return ResponseEntity.ok(catalogVO);
 
 	}
@@ -128,8 +128,8 @@ public class CatalogController {
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
 			@ApiResponse(code = 200, message = "Successful retrieval", response = CatalogVO.class, responseContainer = "List") })
 	@GetMapping("/categories")
-	public ResponseEntity<?> getListOfCategories(@RequestParam("domainType") DomainType domainType) {
-		List<CatalogVO> catalogs = catalogService.getAllCategories(domainType);
+	public ResponseEntity<?> getListOfCategories(@RequestParam(required = false) DomainType domainType) {
+		List<CatalogVO> catalogs = catalogService.getAllCategories();
 		return ResponseEntity.ok(catalogs);
 
 	}

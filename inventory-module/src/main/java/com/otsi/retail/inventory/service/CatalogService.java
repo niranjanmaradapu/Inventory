@@ -20,10 +20,10 @@ public interface CatalogService {
 
 	public void deleteCategoryById(Long id) throws Exception;
 
-	public List<CatalogVO> getCategories(Long id, DomainType domainType);
+	public List<CatalogVO> getCategories(Long id);
 
-	public List<CatalogVO> getMainCategories(DomainType domainType);
+	public List<CatalogVO> getMainCategories();
 
-	public List<CatalogVO> getAllCategories(DomainType domainType);
+	public List<CatalogVO> getAllCategories();
 
 }

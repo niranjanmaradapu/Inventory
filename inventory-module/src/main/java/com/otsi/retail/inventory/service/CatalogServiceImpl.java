@@ -94,12 +94,12 @@ public class CatalogServiceImpl implements CatalogService {
 	}
 
 	@Override
-	public List<CatalogVO> getCategories(Long id, DomainType domainType) {
+	public List<CatalogVO> getCategories(Long id) {
 		Optional<CatalogEntity> catalog = catalogRepository.findById(id);
 		if (!catalog.isPresent()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "catalog not found for id:" + id);
 		}
-		List<CatalogEntity> catalogs = catalogRepository.findByParentIdAndDomainType(catalog.get().getId(), domainType);
+		List<CatalogEntity> catalogs = catalogRepository.findByParentId(catalog.get().getId());
 		if (catalogs.isEmpty()) {
 			return Collections.EMPTY_LIST;
 		}
@@ -108,9 +108,9 @@ public class CatalogServiceImpl implements CatalogService {
 	}
 
 	@Override
-	public List<CatalogVO> getMainCategories(DomainType domainType) {
+	public List<CatalogVO> getMainCategories() {
 
-		List<CatalogEntity> catalogList = catalogRepository.findByDescriptionAndDomainType(Categories.DIVISION,domainType);
+		List<CatalogEntity> catalogList = catalogRepository.findByDescription(Categories.DIVISION);
 		if (catalogList.isEmpty()) {
 			throw new RecordNotFoundException("record not exists");
 		}
@@ -120,8 +120,8 @@ public class CatalogServiceImpl implements CatalogService {
 	}
 
 	@Override
-	public List<CatalogVO> getAllCategories(DomainType domainType) {
-		List<CatalogEntity> listOfCategories = catalogRepository.findByDomainType(domainType);
+	public List<CatalogVO> getAllCategories() {
+		List<CatalogEntity> listOfCategories = catalogRepository.findAll();
 		if (listOfCategories.isEmpty()) {
 			return Collections.EMPTY_LIST;
 		}
