@@ -6,6 +6,7 @@ package com.otsi.retail.inventory.vo;
  */
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -99,4 +100,6 @@ public class ProductVO {
 	private DomainType domainType;
 	
 	private Map taxValues;
+	
+	private List<DomainAttributesVO> metadata;
 }

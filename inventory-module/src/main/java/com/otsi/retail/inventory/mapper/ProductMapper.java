@@ -53,26 +53,26 @@ public class ProductMapper {
 
 	}
 
-	public Product voToEntity(ProductVO productVo) {
+	public Product voToEntity(ProductVO productVO) {
 		Product product = new Product();
-		BeanUtils.copyProperties(productVo, product);
-		product.setCostPrice(productVo.getCostPrice());
-		product.setEmpId(productVo.getEmpId());
+		BeanUtils.copyProperties(productVO, product);
+		product.setCostPrice(productVO.getCostPrice());
+		product.setEmpId(productVO.getEmpId());
 		product.setStatus(ProductStatus.ENABLE);
-		product.setName(productVo.getName());
-		product.setBarcode(productVo.getBarcode());
-		product.setDivision(productVo.getDivision());
-		product.setSection(productVo.getSection());
-		product.setSubSection(productVo.getSubSection());
+		product.setName(productVO.getName());
+		product.setBarcode(productVO.getBarcode());
+		product.setDivision(productVO.getDivision());
+		product.setSection(productVO.getSection());
+		product.setSubSection(productVO.getSubSection());
 		product.setOriginalBarcodeCreatedAt(LocalDate.now());
-		product.setCategory(productVo.getCategory());
-		product.setBatchNo(productVo.getBatchNo());
-		product.setColour(productVo.getColour());
-		product.setStoreId(productVo.getStoreId());
-		product.setDomainId(productVo.getDomainId());
-		product.setSellingTypeCode(productVo.getSellingTypeCode());
+		product.setCategory(productVO.getCategory());
+		product.setBatchNo(productVO.getBatchNo());
+		product.setColour(productVO.getColour());
+		product.setStoreId(productVO.getStoreId());
+		product.setDomainId(productVO.getDomainId());
+		product.setSellingTypeCode(productVO.getSellingTypeCode());
+		product.setMetadata(productVO.getMetadata());;
 		return product;
-
 	}
 
 	public List<Product> VoToEntity(List<ProductVO> productVoList) {

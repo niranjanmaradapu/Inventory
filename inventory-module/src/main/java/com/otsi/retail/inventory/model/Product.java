@@ -1,6 +1,7 @@
 package com.otsi.retail.inventory.model;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,9 +10,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Target;
+import org.hibernate.annotations.Type;
+
 import com.otsi.retail.inventory.commons.DomainType;
 import com.otsi.retail.inventory.commons.ProductEnum;
 import com.otsi.retail.inventory.commons.ProductStatus;
+import com.otsi.retail.inventory.vo.DomainAttributesVO;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -73,5 +78,10 @@ public class Product extends BaseEntity {
 	
 	@Enumerated(EnumType.STRING)
 	private DomainType domainType;
+	
+	
+	@Type(type = "com.otsi.retail.inventory.commons.CustomJsonListType")
+    @Target(DomainAttributesVO.class)
+	private List<DomainAttributesVO> metadata;
 
 }
