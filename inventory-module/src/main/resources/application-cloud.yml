@@ -51,9 +51,6 @@ logging:
         
 ######################### REST CALLS ###########################
 
-<<<<<<< HEAD
-   
-=======
 hsn_details_url: http://10.100.177.121:8083/hsn-details/code
    
->>>>>>> alpha-release
+
