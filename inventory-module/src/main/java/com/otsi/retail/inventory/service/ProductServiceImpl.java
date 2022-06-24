@@ -465,7 +465,7 @@ public class ProductServiceImpl implements ProductService {
 							bundle.getProductTextiles().stream().forEach(product -> {
 
 								Optional<Product> productQty = productRepository
-										.findById(assignmentBundle.getAssignedproductId().getId());
+										.findById(assignmentBundle.getAssignedProductId().getId());
 								// update quantity
 
 								productQty.get().setQty(Math.abs(x.getQuantity() - productQty.get().getQty()));
@@ -563,15 +563,15 @@ public class ProductServiceImpl implements ProductService {
 		 * rebars list for specific store
 		 */
 		else if (StringUtils.isEmpty(searchFilterVo.getCurrentBarcodeId()) && searchFilterVo.getStoreId() != null) {
-			adjustmentDetails = adjustmentRepository.findByTypeAndStoreIdOrderByCreatedDateDesc(AdjustmentType.REBAR,
-					searchFilterVo.getStoreId(), pageable);
+			adjustmentDetails = adjustmentRepository.findByTypeAndStoreIdAndStatusOrderByCreatedDateDesc(AdjustmentType.REBAR,
+					searchFilterVo.getStoreId(),Boolean.TRUE, pageable);
 		}
 
 		/*
 		 * rebars list for all store
 		 */
 		else if (StringUtils.isEmpty(searchFilterVo.getCurrentBarcodeId()) && searchFilterVo.getStoreId() == null) {
-			adjustmentDetails = adjustmentRepository.findByTypeOrderByCreatedDateDesc(AdjustmentType.REBAR, pageable);
+			adjustmentDetails = adjustmentRepository.findByTypeAndStatusOrderByCreatedDateDesc(AdjustmentType.REBAR,Boolean.TRUE ,pageable);
 		}
 
 		if (adjustmentDetails.hasContent()) {

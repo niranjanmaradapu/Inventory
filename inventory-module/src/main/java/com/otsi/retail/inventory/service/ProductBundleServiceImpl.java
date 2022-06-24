@@ -89,7 +89,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 
 			ProductBundleAssignmentTextile bundledProductAssignment = new ProductBundleAssignmentTextile();
 			bundledProductAssignment.setProductBundleId(bundle);
-			bundledProductAssignment.setAssignedproductId(productMapper.customVoToEntityMapper(productTextile));
+			bundledProductAssignment.setAssignedProductId(productMapper.customVoToEntityMapper(productTextile));
 			bundledProductAssignment.setQuantity(productTextile.getQty());
 			bundleList.add(bundledProductAssignment);
 
@@ -219,7 +219,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 
 			products.stream().forEach(productTextile -> {
 				List<ProductBundleAssignmentTextile> assignedProduct = bundledProductAssignmentRepository
-						.findByAssignedproductId_Id(productTextile.getId());
+						.findByAssignedProductId_Id(productTextile.getId());
 				if (assignedProduct == null) {
 					/*
 					 * assignmentBundle.setProductBundleId(assignmentBundle.getProductBundleId());
@@ -230,7 +230,7 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 				} else {
 					ProductBundleAssignmentTextile productBundleAssignment = new ProductBundleAssignmentTextile();
 					productBundleAssignment.setProductBundleId(productBundleOpt.get());
-					productBundleAssignment.setAssignedproductId(productMapper.customVoToEntityMapper(productTextile));
+					productBundleAssignment.setAssignedProductId(productMapper.customVoToEntityMapper(productTextile));
 					productBundleAssignment.setQuantity(productTextile.getQty());
 					bundledProductAssignmentRepository.save(productBundleAssignment);
 				}

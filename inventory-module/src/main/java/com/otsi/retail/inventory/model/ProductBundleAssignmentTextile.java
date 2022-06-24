@@ -37,7 +37,7 @@ public class ProductBundleAssignmentTextile extends BaseEntity {
     
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "assigned_product_id")
-	private Product assignedproductId;
+	private Product assignedProductId;
 
 	@Column(name = "quantity")
 	private Integer quantity;

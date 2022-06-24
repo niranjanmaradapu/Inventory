@@ -46,4 +46,9 @@ public interface AdjustmentRepository extends JpaRepository<Adjustments, Long> {
 	Page<Adjustments> findByCreatedDateBetweenAndStoreIdAndTypeOrderByCreatedDateDesc(LocalDateTime fromTime,
 			LocalDateTime toTime, Long storeId, AdjustmentType rebar, Pageable pageable);
 
+	Page<Adjustments> findByTypeAndStoreIdAndStatusOrderByCreatedDateDesc(AdjustmentType rebar, Long storeId,
+			Boolean true1, Pageable pageable);
+
+	Page<Adjustments> findByTypeAndStatusOrderByCreatedDateDesc(AdjustmentType rebar, Boolean true1, Pageable pageable);
+
 }

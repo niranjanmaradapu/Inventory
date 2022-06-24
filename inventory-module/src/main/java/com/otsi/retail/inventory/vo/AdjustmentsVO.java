@@ -19,6 +19,8 @@ public class AdjustmentsVO {
 	
 	private LocalDateTime createdDate;
 	
+	private Boolean status;
+	
 	private LocalDateTime LastModifiedDate;
 	
 	private Long storeId;
