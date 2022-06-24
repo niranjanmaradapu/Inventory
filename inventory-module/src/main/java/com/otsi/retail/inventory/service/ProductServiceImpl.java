@@ -844,6 +844,7 @@ public class ProductServiceImpl implements ProductService {
 		adjustment.setToBeBarcodeId(barcode);
 		adjustment.setComments(comments);
 		adjustment.setStoreId(storeId);
+		adjustment.setStatus(Boolean.TRUE);		
 		adjustment.setType(AdjustmentType.REBAR);
 		adjustment = adjustmentRepository.save(adjustment);
 		return adjustment;
