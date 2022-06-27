@@ -22,15 +22,13 @@ import com.otsi.retail.inventory.util.Constants;
 import com.otsi.retail.inventory.vo.CatalogVO;
 import com.otsi.retail.inventory.vo.UomVO;
 import com.otsi.retail.inventory.util.CommonUtilities;
-
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 /**
- * @author Sudheer.Swamy
+ * @author Vasavi
  *
  */
 @Api(value = "CatalogController", description = "REST APIs related to CatalogEntity !!!!")
@@ -82,8 +80,8 @@ public class CatalogController {
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
 			@ApiResponse(code = 200, message = "Successful retrieval", response = CatalogVO.class, responseContainer = "List") })
 	@GetMapping("/divisions")
-	public ResponseEntity<?> getListOfMainCatagories(@RequestParam(required = false) DomainType domainType) {
-		List<CatalogVO> catalogVO = catalogService.getMainCategories();
+	public ResponseEntity<?> getListOfMainCatagories(@RequestParam("domainType") DomainType domainType) {
+		List<CatalogVO> catalogVO = catalogService.getMainCategories(domainType);
 		return ResponseEntity.ok(catalogVO);
 
 	}
@@ -98,8 +96,8 @@ public class CatalogController {
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
 			@ApiResponse(code = 200, message = "Successful retrieval", response = CatalogVO.class, responseContainer = "List") })
 	@GetMapping("/category")
-	public ResponseEntity<?> getCategories(@RequestParam Long id,@RequestParam(required = false) DomainType domainType) {
-		List<CatalogVO> catalogVO = catalogService.getCategories(id);
+	public ResponseEntity<?> getCategories(@RequestParam Long id,@RequestParam("domainType") DomainType domainType) {
+		List<CatalogVO> catalogVO = catalogService.getCategories(id,domainType);
 		return ResponseEntity.ok(catalogVO);
 
 	}
@@ -128,8 +126,8 @@ public class CatalogController {
 	@ApiResponses(value = { @ApiResponse(code = 500, message = "Server error"),
 			@ApiResponse(code = 200, message = "Successful retrieval", response = CatalogVO.class, responseContainer = "List") })
 	@GetMapping("/categories")
-	public ResponseEntity<?> getListOfCategories(@RequestParam(required = false) DomainType domainType) {
-		List<CatalogVO> catalogs = catalogService.getAllCategories();
+	public ResponseEntity<?> getListOfCategories(@RequestParam("domainType") DomainType domainType) {
+		List<CatalogVO> catalogs = catalogService.getAllCategories(domainType);
 		return ResponseEntity.ok(catalogs);
 
 	}

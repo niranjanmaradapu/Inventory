@@ -50,6 +50,7 @@ public class CatalogMapper {
 		catalogVo.setDescription(catalog.getDescription());
 		catalogVo.setStatus(catalog.getStatus());
 		catalogVo.setCreatedDate(catalog.getCreatedDate());
+		catalogVo.setCategory(catalog.getCatergory());
 		catalogVo.setLastModifiedDate(catalog.getLastModifiedDate());
 		catalogVo.setDomainType(catalog.getDomainType());
 		return catalogVo;

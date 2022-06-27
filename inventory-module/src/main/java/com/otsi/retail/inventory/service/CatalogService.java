@@ -4,12 +4,11 @@
 package com.otsi.retail.inventory.service;
 
 import java.util.List;
-
 import com.otsi.retail.inventory.commons.DomainType;
 import com.otsi.retail.inventory.vo.CatalogVO;
 
 /**
- * @author Sudheer.Swamy
+ * @author Vasavi
  *
  */
 public interface CatalogService {
@@ -20,10 +19,10 @@ public interface CatalogService {
 
 	public void deleteCategoryById(Long id) throws Exception;
 
-	public List<CatalogVO> getCategories(Long id);
+	public List<CatalogVO> getCategories(Long id, DomainType domainType);
 
-	public List<CatalogVO> getMainCategories();
+	public List<CatalogVO> getMainCategories(DomainType domainType);
 
-	public List<CatalogVO> getAllCategories();
+	public List<CatalogVO> getAllCategories(DomainType domainType);
 
 }
