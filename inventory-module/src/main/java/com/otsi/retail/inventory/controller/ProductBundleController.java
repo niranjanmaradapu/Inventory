@@ -41,7 +41,6 @@ public class ProductBundleController {
 
 	}
 
-
 	@GetMapping("/")
 	public GateWayResponse<?> getProductBundle(@RequestParam Long id) {
 		log.info("Recieved request to getProductBundle:" + id);
@@ -55,17 +54,17 @@ public class ProductBundleController {
 			@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate,
 			@RequestParam(required = false) Long id, @RequestParam(required = false) Long storeId) {
 		log.info("Recieved request to getAllProductBundles");
-		Page<ProductBundleVo> productBundles = productBundleService.getAllProductBundles(fromDate, toDate, id,
-				storeId,pageable);
+		Page<ProductBundleVo> productBundles = productBundleService.getAllProductBundles(fromDate, toDate, id, storeId,
+				pageable);
 		return new GateWayResponse<>("fetching all product bundle details sucessfully", productBundles);
 
 	}
 
 	@PutMapping("/update")
-	public ResponseEntity<?> updateProductBundle(@RequestBody ProductBundleVo productBundleVo) throws Exception {
+	public GateWayResponse<?> updateProductBundle(@RequestBody ProductBundleVo productBundleVo) throws Exception {
 		log.info("Recieved request to updateProductBundle:" + productBundleVo);
 		ProductBundleVo updateBundle = productBundleService.updateProductBundle(productBundleVo);
-		return ResponseEntity.ok(updateBundle);
+		return new GateWayResponse<>("product bundle updated successfully", "");
 
 	}
 

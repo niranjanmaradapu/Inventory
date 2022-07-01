@@ -208,37 +208,34 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 		if (!productBundleOpt.isPresent()) {
 			throw new RecordNotFoundException("bundle data is  not found with id: " + productBundleVo.getId());
 		}
-		List<ProductVO> products = productBundleVo.getProductTextiles();
+
 		List<ProductBundleAssignmentTextile> bundleAssignment = bundledProductAssignmentRepository
 				.findByProductBundleId_Id(productBundleOpt.get().getId());
 		productBundleOpt.get().setId(productBundleVo.getId());
 		List<ProductBundle> bundleAssign = bundleAssignment.stream().map(s -> s.getProductBundleId()).distinct()
 				.collect(Collectors.toList());
 
-		bundleAssign.stream().forEach(assignmentBundle -> {
+		productBundleVo.getProductTextiles().stream().forEach(product -> {
+			bundleAssign.stream().forEach(assignmentBundle -> {
 
-			products.stream().forEach(productTextile -> {
-				List<ProductBundleAssignmentTextile> assignedProduct = bundledProductAssignmentRepository
-						.findByAssignedProductId_Id(productTextile.getId());
-				if (assignedProduct == null) {
-					/*
-					 * assignmentBundle.setProductBundleId(assignmentBundle.getProductBundleId());
-					 * assignmentBundle.setAssignedproductId(assignmentBundle.getAssignedproductId()
-					 * ); assignmentBundle.setQuantity(productTextile.getQty());
-					 * bundledProductAssignmentRepository.save(assignmentBundle); } else {
-					 */
-				} else {
+				List<Long> productIds = assignmentBundle.getProductTextiles().stream().map(prod -> prod.getId())
+						.collect(Collectors.toList());
+
+				if (!(productIds.contains(product.getId()))) {
+
 					ProductBundleAssignmentTextile productBundleAssignment = new ProductBundleAssignmentTextile();
 					productBundleAssignment.setProductBundleId(productBundleOpt.get());
-					productBundleAssignment.setAssignedProductId(productMapper.customVoToEntityMapper(productTextile));
-					productBundleAssignment.setQuantity(productTextile.getQty());
+					productBundleAssignment.setAssignedProductId(productMapper.customVoToEntityMapper(product));
+					productBundleAssignment.setQuantity(product.getQty());
 					bundledProductAssignmentRepository.save(productBundleAssignment);
 				}
+
 			});
 		});
+
 		ProductBundle productBundleUpdate = productBundleRepo.save(productBundleOpt.get());
 		productBundleVo = productBundleMapper.entityToVO(productBundleUpdate);
-		// productBundleVo.setProductTextiles(productMapper.entityToVO(productBundleUpdate.getProductTextiles()));
+		productBundleVo.setProductTextiles(productMapper.entityToVO(productBundleUpdate.getProductTextiles()));
 		return productBundleVo;
 	}
 

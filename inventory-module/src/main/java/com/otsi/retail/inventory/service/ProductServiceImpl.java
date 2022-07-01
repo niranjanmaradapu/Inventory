@@ -296,7 +296,7 @@ public class ProductServiceImpl implements ProductService {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, barcode + " barcode is invalidated");
 			}
 
-			Product product = productRepository.findByBarcodeAndStoreId(barcode, storeId);
+			Product product = productRepository.findByBarcodeAndStoreIdAndStatus(barcode, storeId,ProductStatus.ENABLE);
 			if (product == null) {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No records found for barcode:" + barcode);
 			}
