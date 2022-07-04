@@ -102,4 +102,8 @@ public class ProductVO {
 	private Map taxValues;
 	
 	private List<DomainAttributesVO> metadata;
+	
+	private LocalDateTime createdDate;
+
+    private LocalDateTime lastModifiedDate;
 }
