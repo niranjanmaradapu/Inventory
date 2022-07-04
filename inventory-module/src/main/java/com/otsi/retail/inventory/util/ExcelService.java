@@ -16,6 +16,8 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import com.otsi.retail.inventory.commons.DomainType;
+
 @Service
 public class ExcelService<T> {
 
@@ -26,7 +28,7 @@ public class ExcelService<T> {
 		XSSFSheet sheet = wb.getSheetAt(0);
 		List<String> headerList = new ArrayList<>();
 		List<T> productTextileVOList = new ArrayList<>();
-		
+
 		for (Row row : sheet) {
 			T testExcel = cls.newInstance();
 			for (Cell cell : row) {
@@ -38,9 +40,14 @@ public class ExcelService<T> {
 					case NUMERIC:
 						handleNumericType(testExcel, headerName, cell);
 						break;
+
 					case STRING:
 						String stringCellValue = cell.getStringCellValue();
-						callSetter(testExcel, headerName, stringCellValue);
+						if (headerName.equalsIgnoreCase("domainType")) {
+							callSetter(testExcel, headerName, DomainType.valueOf(stringCellValue));
+						} else {
+							callSetter(testExcel, headerName, stringCellValue);
+						}
 						break;
 					}
 				}
