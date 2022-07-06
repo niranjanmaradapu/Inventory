@@ -9,6 +9,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -21,20 +25,28 @@ import com.otsi.retail.inventory.commons.DomainType;
 @Service
 public class ExcelService<T> {
 
-	public List<T> readExcel(InputStream fis, Class<T> cls)
-			throws IOException, InstantiationException, IllegalAccessException {
+	public List<T> readExcel(InputStream fis, Class<T> cls) throws IOException, InstantiationException,
+			IllegalAccessException, InterruptedException, ExecutionException {
 
 		XSSFWorkbook wb = new XSSFWorkbook(fis);
 		XSSFSheet sheet = wb.getSheetAt(0);
 		List<String> headerList = new ArrayList<>();
 		List<T> productTextileVOList = new ArrayList<>();
+		ExecutorService executor = Executors.newFixedThreadPool(10);
 
 		for (Row row : sheet) {
 			T testExcel = cls.newInstance();
-			for (Cell cell : row) {
-				if (row.getRowNum() == 0) {
+			if (row.getRowNum() == 0) {
+				for (Cell cell : row) {
 					headerList.add(cell.getStringCellValue());
-				} else {
+				}
+			}
+			else {
+			
+				Future<T> futureResponse = executor.submit(() -> {
+
+				for (Cell cell : row) {
+
 					String headerName = headerList.get(cell.getColumnIndex());
 					switch (cell.getCellType()) {
 					case NUMERIC:
@@ -50,11 +62,16 @@ public class ExcelService<T> {
 						}
 						break;
 					}
+
 				}
+				return testExcel;
+			});
+			productTextileVOList.add(futureResponse.get());
 			}
-			if (row.getRowNum() > 0)
-				productTextileVOList.add(testExcel);
+			//if (row.getRowNum() > 0)
 		}
+
+		executor.shutdown();
 		System.out.println("list details " + productTextileVOList.toString());
 		wb.close();
 		return productTextileVOList;

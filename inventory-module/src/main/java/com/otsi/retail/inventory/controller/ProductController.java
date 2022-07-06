@@ -2,6 +2,7 @@ package com.otsi.retail.inventory.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -330,10 +331,12 @@ public class ProductController {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 * @throws IOException
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
 	 */
 	@PostMapping(path = "/add-bulk-products", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> addBulkProducts(@RequestParam("file") MultipartFile file,
-			@RequestParam("storeId") Long storeId) throws InstantiationException, IllegalAccessException, IOException {
+			@RequestParam("storeId") Long storeId) throws InstantiationException, IllegalAccessException, IOException, InterruptedException, ExecutionException {
 		productService.addBulkProducts(file, storeId);
 		return ResponseEntity.ok(CommonUtilities.buildSuccessResponse(Constants.SUCCESS, Constants.RESULT));
 	}

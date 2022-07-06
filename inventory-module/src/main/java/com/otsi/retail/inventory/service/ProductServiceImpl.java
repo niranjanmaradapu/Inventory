@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -806,12 +807,13 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public void addBulkProducts(MultipartFile multipartFile, Long storeId)
-			throws InstantiationException, IllegalAccessException, IOException {
+			throws InstantiationException, IllegalAccessException, IOException, InterruptedException, ExecutionException {
 		List<ProductVO> products = excelService.readExcel(multipartFile.getInputStream(), ProductVO.class);
 		if (CollectionUtils.isNotEmpty(products)) {
 			products.forEach(product -> {
 				product.setStoreId(storeId);
-				addBarcode(product);
+				ProductVO productVO = addBarcode(product);
+				System.out.println("barcode:"+productVO.getBarcode());
 			});
 		}
 	}

@@ -2,6 +2,7 @@ package com.otsi.retail.inventory.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,7 +50,7 @@ public interface ProductService {
 	Page<ProductVO> getBarcodeTextileReports(SearchFilterVo vo, Pageable pageable);
 
 	void addBulkProducts(MultipartFile multipartFile, Long storeId)
-			throws InstantiationException, IllegalAccessException, IOException;
+			throws InstantiationException, IllegalAccessException, IOException, InterruptedException, ExecutionException;
 
 	DomainTypePropertiesVO getProperties(String domainType);
 
