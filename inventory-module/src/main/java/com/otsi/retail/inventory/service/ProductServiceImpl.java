@@ -128,10 +128,10 @@ public class ProductServiceImpl implements ProductService {
 
 	@Autowired
 	private RestTemplate restTemplate;
-	
+
 	@Autowired
 	private DomainAttributesRepository domainAttributesRepository;
-	
+
 	@Autowired
 	private DomainAttributesMapper domainAttributesMapper;
 
@@ -297,7 +297,7 @@ public class ProductServiceImpl implements ProductService {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, barcode + " barcode is invalidated");
 			}
 
-			Product product = productRepository.findByBarcodeAndStoreIdAndStatus(barcode, storeId,ProductStatus.ENABLE);
+			Product product = productRepository.findByBarcodeAndStoreId(barcode, storeId);
 			if (product == null) {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No records found for barcode:" + barcode);
 			}
@@ -526,8 +526,8 @@ public class ProductServiceImpl implements ProductService {
 				&& StringUtils.isEmpty(searchFilterVo.getCurrentBarcodeId()) && searchFilterVo.getStoreId() != null) {
 			LocalDateTime fromTime = DateConverters.convertLocalDateToLocalDateTime(searchFilterVo.getFromDate());
 			LocalDateTime toTime = DateConverters.convertToLocalDateTimeMax(searchFilterVo.getToDate());
-			adjustmentDetails = adjustmentRepository.findByCreatedDateBetweenAndStoreIdAndTypeOrderByCreatedDateDesc(fromTime,
-					toTime,searchFilterVo.getStoreId(), AdjustmentType.REBAR, pageable);
+			adjustmentDetails = adjustmentRepository.findByCreatedDateBetweenAndStoreIdAndTypeOrderByCreatedDateDesc(
+					fromTime, toTime, searchFilterVo.getStoreId(), AdjustmentType.REBAR, pageable);
 
 		}
 
@@ -564,15 +564,16 @@ public class ProductServiceImpl implements ProductService {
 		 * rebars list for specific store
 		 */
 		else if (StringUtils.isEmpty(searchFilterVo.getCurrentBarcodeId()) && searchFilterVo.getStoreId() != null) {
-			adjustmentDetails = adjustmentRepository.findByTypeAndStoreIdAndStatusOrderByCreatedDateDesc(AdjustmentType.REBAR,
-					searchFilterVo.getStoreId(),Boolean.TRUE, pageable);
+			adjustmentDetails = adjustmentRepository.findByTypeAndStoreIdAndStatusOrderByCreatedDateDesc(
+					AdjustmentType.REBAR, searchFilterVo.getStoreId(), Boolean.TRUE, pageable);
 		}
 
 		/*
 		 * rebars list for all store
 		 */
 		else if (StringUtils.isEmpty(searchFilterVo.getCurrentBarcodeId()) && searchFilterVo.getStoreId() == null) {
-			adjustmentDetails = adjustmentRepository.findByTypeAndStatusOrderByCreatedDateDesc(AdjustmentType.REBAR,Boolean.TRUE ,pageable);
+			adjustmentDetails = adjustmentRepository.findByTypeAndStatusOrderByCreatedDateDesc(AdjustmentType.REBAR,
+					Boolean.TRUE, pageable);
 		}
 
 		if (adjustmentDetails.hasContent()) {
@@ -598,7 +599,7 @@ public class ProductServiceImpl implements ProductService {
 
 		List<ValuesVO> valuesVoList = new ArrayList<>();
 		List<CatalogEntity> catalogList = null;
-		List<String> productList =null;
+		List<String> productList = null;
 
 		if (enumName.equalsIgnoreCase("SECTION") || enumName.equalsIgnoreCase("SUBSECTION")
 				|| enumName.equalsIgnoreCase("DIVISION") || enumName.equalsIgnoreCase("batchno")
@@ -806,14 +807,14 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public void addBulkProducts(MultipartFile multipartFile, Long storeId)
-			throws InstantiationException, IllegalAccessException, IOException, InterruptedException, ExecutionException {
+	public void addBulkProducts(MultipartFile multipartFile, Long storeId) throws InstantiationException,
+			IllegalAccessException, IOException, InterruptedException, ExecutionException {
 		List<ProductVO> products = excelService.readExcel(multipartFile.getInputStream(), ProductVO.class);
 		if (CollectionUtils.isNotEmpty(products)) {
 			products.forEach(product -> {
 				product.setStoreId(storeId);
 				ProductVO productVO = addBarcode(product);
-				System.out.println("barcode:"+productVO.getBarcode());
+				System.out.println("barcode:" + productVO.getBarcode());
 			});
 		}
 	}
@@ -846,7 +847,7 @@ public class ProductServiceImpl implements ProductService {
 		adjustment.setToBeBarcodeId(barcode);
 		adjustment.setComments(comments);
 		adjustment.setStoreId(storeId);
-		adjustment.setStatus(Boolean.TRUE);		
+		adjustment.setStatus(Boolean.TRUE);
 		adjustment.setType(AdjustmentType.REBAR);
 		adjustment = adjustmentRepository.save(adjustment);
 		return adjustment;

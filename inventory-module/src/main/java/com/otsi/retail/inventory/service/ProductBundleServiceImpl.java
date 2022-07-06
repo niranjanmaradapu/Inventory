@@ -187,16 +187,24 @@ public class ProductBundleServiceImpl implements ProductBundleService {
 
 	private ProductBundleVo bundleMapToVo(ProductBundle productBundle) {
 		ProductBundleVo productBundleVo = productBundleMapper.entityToVO(productBundle);
-		productBundleVo.setProductTextiles(productMapper.entityToVO(productBundle.getProductTextiles()));
-		if (CollectionUtils.isEmpty(productBundleVo.getProductTextiles())) {
-			productBundleVo.getProductTextiles().stream().forEach(product -> {
-				if (product != null) {
-					Product productBarcode = productRepository.findByBarcodeAndSellingTypeCode(product.getBarcode(),
-							ProductEnum.PRODUCTBUNDLE);
-					productBundleVo.setValue(productBundleVo.getBundleQuantity() * productBarcode.getItemMrp());
+		List<ProductBundleAssignmentTextile> bundleAssignments = bundledProductAssignmentRepository
+				.findByProductBundleId_Id(productBundle.getId());
+
+		List<Product> products = productBundle.getProductTextiles();
+		List<Product> productList = new ArrayList<>();
+
+		products.stream().forEach(product -> {
+			bundleAssignments.stream().forEach(bundleAssignment -> {
+				if (product.getId().equals(bundleAssignment.getAssignedProductId().getId())) {
+					product.setQty(bundleAssignment.getQuantity());
+					productBundleVo.setValue(
+							productBundleVo.getBundleQuantity() * bundleAssignment.getAssignedProductId().getItemMrp());
+					productList.add(product);
 				}
 			});
-		}
+		});
+		productList.stream().map(product -> product.getId()).distinct().collect(Collectors.toList());
+		productBundleVo.setProductTextiles(productMapper.entityToVO(productList));
 		return productBundleVo;
 
 	}
