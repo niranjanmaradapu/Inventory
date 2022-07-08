@@ -17,7 +17,7 @@ public class SearchFilterVo {
 	@DateTimeFormat(pattern = "dd-MM-yyyy")
 	private LocalDate toDate;
 
-	private String empId;
+	private Long empId;
 
 	private float itemMrpLessThan;
 

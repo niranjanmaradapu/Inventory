@@ -80,7 +80,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	Page<Product> findByItemMrpBetweenAndStoreIdAndStatus(float itemMrpLessThan, float itemMrpGreaterThan, Long storeId,
 			ProductStatus status, Pageable pageable);
 
-	Page<Product> findByEmpIdAndStatusAndStoreId(String empId, ProductStatus status, Long storeId, Pageable pageable);
+	Page<Product> findByEmpIdAndStatusAndStoreId(Long empId, ProductStatus status, Long storeId, Pageable pageable);
 
 	Page<Product> findByStoreIdOrderByCreatedDateDesc(Long storeId, Pageable pageable);
 
