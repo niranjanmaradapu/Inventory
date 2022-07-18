@@ -19,6 +19,7 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -697,6 +698,17 @@ public class ProductServiceImpl implements ProductService {
 				LocalDateTime fromTime1 = DateConverters.convertToLocalDateTimeMax(vo.getFromDate());
 				barcodeDetails = productRepository.findByCreatedDateBetweenAndStatusAndStoreId(fromTime, fromTime1,
 						status, vo.getStoreId(), pageable);
+			}
+
+			/*
+			 * using dates with empId and storeId
+			 */
+			else if (vo.getFromDate() != null && (vo.getToDate() != null) && ObjectUtils.isNotEmpty(vo.getEmpId())
+					&& vo.getStoreId() != null) {
+				LocalDateTime fromTime = DateConverters.convertLocalDateToLocalDateTime(vo.getFromDate());
+				LocalDateTime toTime = DateConverters.convertToLocalDateTimeMax(vo.getToDate());
+				barcodeDetails = productRepository.findByCreatedDateBetweenAndEmpIdAndStatusAndStoreId(fromTime, toTime,
+						vo.getEmpId(), status, vo.getStoreId(), pageable);
 			}
 
 			/*

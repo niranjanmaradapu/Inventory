@@ -96,4 +96,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	Product findByBarcodeAndStoreIdAndStatus(String barcode, Long storeId, ProductStatus enable);
 
+	Page<Product> findByCreatedDateBetweenAndEmpIdAndStatusAndStoreId(LocalDateTime fromTime, LocalDateTime toTime,
+			Long empId, ProductStatus status, Long storeId, Pageable pageable);
+
 }
