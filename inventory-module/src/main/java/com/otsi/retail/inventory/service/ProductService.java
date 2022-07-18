@@ -54,11 +54,11 @@ public interface ProductService {
 
 	DomainTypePropertiesVO getProperties(String domainType);
 
-	ProductVO barcodeDetails(String barcode, Long clientId, Long storeId);
+	ProductVO barcodeDetails(String barcode, Long clientId, Long storeId , Boolean isTaxIncluded);
 
 	ProductVO updateQuantity(ProductVO productVO);
 
-	InvoiceDetailsVO scanAndFetchbarcodeDetails(String barcode, Long clientId, Long storeId);
+	InvoiceDetailsVO scanAndFetchbarcodeDetails(String barcode, Long clientId, Long storeId , Boolean isTaxIncluded);
 
 	List<ValuesVO> getValuesFromColumns(String enumName);
 

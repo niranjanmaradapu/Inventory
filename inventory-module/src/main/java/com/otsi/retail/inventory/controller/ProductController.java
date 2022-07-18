@@ -154,9 +154,9 @@ public class ProductController {
 			@ApiResponse(code = 200, message = "Successful retrieval", response = ProductVO.class, responseContainer = "Object") })
 	@GetMapping("/barcode-details")
 	public ResponseEntity<?> getBarcodeDetails(@RequestParam("barcode") String barcode,
-			@RequestParam("storeId") Long storeId, @RequestHeader(value = "clientId") Long clientId) {
+			@RequestParam("storeId") Long storeId, @RequestHeader(value = "clientId") Long clientId , @RequestHeader(value = "isTaxIncluded" , required =false) Boolean isTaxIncluded) {
 		log.info("Received request to getProduct:" + barcode);
-		ProductVO productTaxValues = productService.barcodeDetails(barcode, clientId, storeId);
+		ProductVO productTaxValues = productService.barcodeDetails(barcode, clientId, storeId , isTaxIncluded);
 		return ResponseEntity.ok(productTaxValues);
 	}
 
@@ -362,9 +362,9 @@ public class ProductController {
 			@ApiResponse(code = 200, message = "Successful retrieval", response = ProductVO.class, responseContainer = "Object") })
 	@GetMapping("/scan-barcode")
 	public ResponseEntity<?> scanBarcode(@RequestParam("barcode") String barcode, @RequestParam("storeId") Long storeId,
-			@RequestHeader(value = "clientId") Long clientId) {
+			@RequestHeader(value = "clientId") Long clientId , @RequestHeader(value = "isTaxIncluded" , required=false) Boolean isTaxIncluded) {
 		log.info("Received request to getProduct:" + barcode);
-		InvoiceDetailsVO invoiceDetailsVO = productService.scanAndFetchbarcodeDetails(barcode, clientId, storeId);
+		InvoiceDetailsVO invoiceDetailsVO = productService.scanAndFetchbarcodeDetails(barcode, clientId, storeId , isTaxIncluded);
 		return ResponseEntity.ok(invoiceDetailsVO);
 	}
 

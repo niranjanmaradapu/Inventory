@@ -322,11 +322,11 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public ProductVO barcodeDetails(String barcode, Long clientId, Long storeId) {
+	public ProductVO barcodeDetails(String barcode, Long clientId, Long storeId, Boolean isTaxIncluded) {
 		ProductVO productVO = getBarcode(barcode, storeId);
 		if (StringUtils.isNotBlank(productVO.getHsnCode())) {
 			try {
-				Map taxValues = getHsnDetails(productVO.getHsnCode(), productVO.getItemMrp(), clientId);
+				Map taxValues = getHsnDetails(productVO.getHsnCode(), productVO.getItemMrp(), clientId, isTaxIncluded);
 				productVO.setTaxValues(taxValues);
 			} catch (Exception ex) {
 				log.info("exception occured while fetching tax values for barcode {}", barcode);
@@ -336,14 +336,18 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public InvoiceDetailsVO scanAndFetchbarcodeDetails(String barcode, Long clientId, Long storeId) {
-		ProductVO productVO = barcodeDetails(barcode, clientId, storeId);
+	public InvoiceDetailsVO scanAndFetchbarcodeDetails(String barcode, Long clientId, Long storeId,
+			Boolean isTaxIncluded) {
+		ProductVO productVO = barcodeDetails(barcode, clientId, storeId, isTaxIncluded);
 		return productMapper.productToInvoiceMapper(productVO);
 	}
 
-	public Map getHsnDetails(String hsnCode, Float itemPrice, Long clientId) {
+	public Map getHsnDetails(String hsnCode, Float itemPrice, Long clientId, Boolean isTaxIncluded) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("clientId", String.valueOf(clientId));
+		if (isTaxIncluded != null) {
+			headers.add("isTaxIncluded", String.valueOf(isTaxIncluded));
+		}
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity requestEntity = new HttpEntity<>(headers);
 		UriComponents builder = UriComponentsBuilder.fromHttpUrl(config.getHsnDetailsUrl())
